@@ -8,13 +8,13 @@ import time
 x_range = (-0.3, 0.3)
 z_range = (0.3, 3.0)
 
-WINDOW_D = 'obstacles' #depth
+#WINDOW_D = 'obstacles' #depth
 WINDOW = 'markers'
 
 stop = False
 fun_step = 0
 
-def fun(turtle,step):
+def fun(turtle):
     global fun_step
     fun_step += 1
     fun_step %= 7
@@ -30,14 +30,14 @@ def bumper_callBack(msg):
 def main():
     global stop
     turtle = Turtlebot(pc=True, rgb = True, depth = True)
-    cv2.namedWindow(WINDOW_D)   #display depth
+   # cv2.namedWindow(WINDOW_D)   #display depth
     cv2.namedWindow(WINDOW)     #display rgb image
-    fun_step = 0
+   
 
     while not turtle.is_shutting_down():
         # get point cloud
         if not stop:
-            turtle.cmd_velocity(linear=0.5)
+            turtle.cmd_velocity(linear=0.0)
         else:
             fun(turtle)
             turtle.cmd_velocity(linear=0)
@@ -46,7 +46,10 @@ def main():
         
         #conversion to hsv
         hsv = cv2.cvtColor(rgb, cv2.COLOR_BGR2HSV)
-
+        dark_blue = (103,255,20)
+        light_blue = (95,100,180)
+        maskk = cv2.inRange(hsv,light_blue,dark_blue)
+        result = cv2.bitwise_and(rgb,rgb,mask=maskk)
         if (pc is None) or (rgb is None):
             continue
 
@@ -79,7 +82,7 @@ def main():
 
         # show image
         #cv2.imshow(WINDOW_D, im_color)
-        cv2.imshow(WINDOW,hsv)
+        cv2.imshow(WINDOW,result)
         cv2.waitKey(1)
 
 
