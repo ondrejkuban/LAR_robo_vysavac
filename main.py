@@ -23,8 +23,12 @@ def main():
     cv2.namedWindow(WINDOW_D)   #display depth
     cv2.namedWindow(WINDOW)     #display rgb image
 
-    while not turtle.is_shutting_down() and not stop:
+    while not turtle.is_shutting_down():
         # get point cloud
+        if not stop:
+            turtle.cmd_velocity(linear=1)
+        else:
+            turtle.cmd_velocity(linear=0)
         pc = turtle.get_point_cloud()
         rgb = turtle.get_rgb_image()
 
