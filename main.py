@@ -12,6 +12,9 @@ WINDOW = 'markers'
 
 stop = False
 
+def fun(turtle,step):
+    turtle.play_sound(step)
+
 #stop robot
 def bumper_callBack(msg):
     global stop
@@ -23,12 +26,16 @@ def main():
     turtle = Turtlebot(pc=True, rgb = True, depth = True)
     cv2.namedWindow(WINDOW_D)   #display depth
     cv2.namedWindow(WINDOW)     #display rgb image
+    fun_step = 0
 
     while not turtle.is_shutting_down():
         # get point cloud
         if not stop:
             turtle.cmd_velocity(linear=1)
         else:
+            fun_step += 1
+            fun_step %= 7
+            fun(turtle,fun_step)
             turtle.cmd_velocity(linear=0)
         pc = turtle.get_point_cloud()
         rgb = turtle.get_rgb_image()
