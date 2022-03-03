@@ -11,8 +11,12 @@ WINDOW_D = 'obstacles' #depth
 WINDOW = 'markers'
 
 stop = False
+fun_step = 0
 
 def fun(turtle,step):
+    global fun_step
+    fun_step += 1
+    fun_step %= 7
     turtle.play_sound(step)
 
 #stop robot
@@ -33,9 +37,7 @@ def main():
         if not stop:
             turtle.cmd_velocity(linear=1)
         else:
-            fun_step += 1
-            fun_step %= 7
-            fun(turtle,fun_step)
+            fun(turtle)
             turtle.cmd_velocity(linear=0)
         pc = turtle.get_point_cloud()
         rgb = turtle.get_rgb_image()
