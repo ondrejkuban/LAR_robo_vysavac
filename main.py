@@ -14,11 +14,12 @@ stop = False
 
 #stop robot
 def bumper_callBack(msg):
+    global stop
     stop = True
     print('Bumper was activated, new state is STOP')
 
 def main():
-
+    global stop
     turtle = Turtlebot(pc=True, rgb = True, depth = True)
     cv2.namedWindow(WINDOW_D)   #display depth
     cv2.namedWindow(WINDOW)     #display rgb image
