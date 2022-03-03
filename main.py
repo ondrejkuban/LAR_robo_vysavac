@@ -3,6 +3,7 @@ from robolab_turtlebot import Turtlebot, Rate
 from robolab_turtlebot import detector
 import numpy as np
 import cv2
+import time
 
 x_range = (-0.3, 0.3)
 z_range = (0.3, 3.0)
@@ -11,9 +12,14 @@ WINDOW_D = 'obstacles' #depth
 WINDOW = 'markers'
 
 stop = False
+fun_step = 0
 
 def fun(turtle,step):
+    global fun_step
+    fun_step += 1
+    fun_step %= 7
     turtle.play_sound(step)
+    time.sleep(0.4)
 
 #stop robot
 def bumper_callBack(msg):
@@ -31,14 +37,15 @@ def main():
     while not turtle.is_shutting_down():
         # get point cloud
         if not stop:
-            turtle.cmd_velocity(linear=1)
+            turtle.cmd_velocity(linear=0.5)
         else:
-            fun_step += 1
-            fun_step %= 7
-            fun(turtle,fun_step)
+            fun(turtle)
             turtle.cmd_velocity(linear=0)
         pc = turtle.get_point_cloud()
         rgb = turtle.get_rgb_image()
+        
+        #conversion to hsv
+        hsv = cv2.cvtColor(rgb, cv2.COLOR_BGR2HSV)
 
         if (pc is None) or (rgb is None):
             continue
@@ -71,8 +78,8 @@ def main():
         turtle.register_bumper_event_cb(bumper_callBack)
 
         # show image
-        cv2.imshow(WINDOW_D, im_color)
-        cv2.imshow(WINDOW,rgb)
+        #cv2.imshow(WINDOW_D, im_color)
+        cv2.imshow(WINDOW,hsv)
         cv2.waitKey(1)
 
 
