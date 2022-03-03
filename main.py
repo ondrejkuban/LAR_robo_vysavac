@@ -8,13 +8,20 @@ z_range = (0.3, 3.0)
 WINDOW_D = 'obstacles' #depth
 WINDOW = 'markers'
 
+stop = False
+
+def bumper_callBack():
+    #stop robot
+    state = state_names["STOP"]
+    stop = True
+
 def main():
 
     turtle = Turtlebot(pc=True, rgb = True, depth = True)
     cv2.namedWindow(WINDOW_D)   #display depth
     cv2.namedWindow(WINDOW)     #display rgb image
 
-    while not turtle.is_shutting_down():
+    while not turtle.is_shutting_down() and not stop:
         # get point cloud
         pc = turtle.get_point_cloud()
         rgb = turtle.get_rgb_image()
@@ -45,6 +52,9 @@ def main():
 
         #draw markers in the image
         detector.draw_markers(rgb, markers)
+
+        #Callback of bumper activation
+        turtle.register_bumper_event_cb(bumper_callBack)
 
         # show image
         cv2.imshow(WINDOW_D, im_color)
