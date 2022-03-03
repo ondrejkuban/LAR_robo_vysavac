@@ -48,7 +48,7 @@ def main():
         hsv = cv2.cvtColor(rgb, cv2.COLOR_BGR2HSV)
         dark_blue = (50,255,20)
         light_blue = (160,100,180)
-        maskk = cv2.inRange(hsv,light_blue,dark_blue)
+        maskk = cv2.inRange(hsv,(10, 100, 20), (25, 255, 255))
         result = cv2.bitwise_and(rgb,rgb,mask=maskk)
         if (pc is None) or (rgb is None):
             continue
