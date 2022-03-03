@@ -3,6 +3,7 @@ from robolab_turtlebot import Turtlebot, Rate
 from robolab_turtlebot import detector
 import numpy as np
 import cv2
+import time
 
 x_range = (-0.3, 0.3)
 z_range = (0.3, 3.0)
@@ -18,6 +19,7 @@ def fun(turtle,step):
     fun_step += 1
     fun_step %= 7
     turtle.play_sound(step)
+    time.sleep(0.8)
 
 #stop robot
 def bumper_callBack(msg):
