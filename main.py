@@ -20,6 +20,7 @@ def fun(turtle):
     fun_step %= 7
     turtle.play_sound(fun_step)
     time.sleep(0.4)
+    turtle.cmd_velocity(angular=1)
 
 #stop robot
 def bumper_callBack(msg):
