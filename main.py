@@ -14,7 +14,7 @@ WINDOW = 'markers'
 stop = False
 fun_step = 0
 
-def fun(turtle,step):
+def fun(turtle):
     global fun_step
     fun_step += 1
     fun_step %= 7
