@@ -60,7 +60,7 @@ def main():
                 max = out[2][i][4]
                 max_o = out[2][i]
         cv2.rectangle(rgb, (max_o[0],max_o[1]), (max_o[0] + max_o[2], max_o[1] + max_o[3]), (255,0,0), 2)
-        img_map, contours, hierarchy = cv2.findContours()
+        #img_map, contours, hierarchy = cv2.findContours()
         
         # mask out floor points
         mask = pc[:, :, 1] > x_range[0]
