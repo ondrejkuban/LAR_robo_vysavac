@@ -12,7 +12,8 @@ WINDOW = 'markers'
 
 stop = False
 
-def bumper_callBack(): #stop robot
+#stop robot
+def bumper_callBack(msg):
     stop = True
     print('Bumper was activated, new state is STOP')
 
