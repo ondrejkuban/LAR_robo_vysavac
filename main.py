@@ -12,7 +12,7 @@ stop = False
 
 def bumper_callBack():
     #stop robot
-    state = state_names["STOP"]
+    state = 'STOP'
     stop = True
 
 def main():
