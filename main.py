@@ -1,4 +1,5 @@
-from robolab_turtlebot import Turtlebot, detector
+from __future__ import print_function
+from robolab_turtlebot import Turtlebot, detector, Rate
 import numpy as np
 import cv2
 
@@ -10,10 +11,9 @@ WINDOW = 'markers'
 
 stop = False
 
-def bumper_callBack():
-    #stop robot
-    state = 'STOP'
+def bumper_callBack(): #stop robot
     stop = True
+    print('Bumper was activated, new state is STOP')
 
 def main():
 
