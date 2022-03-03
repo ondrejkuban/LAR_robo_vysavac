@@ -52,10 +52,11 @@ def main():
         result = cv2.bitwise_and(rgb,rgb,mask=maskk)
         if (pc is None) or (rgb is None):
             continue
-
+        out = cv2.connectedComponents(maskk.astype(np.uint8))
+        
         # mask out floor points
         mask = pc[:, :, 1] > x_range[0]
-
+        
         # mask point too far and close
         mask = np.logical_and(mask, pc[:, :, 2] > z_range[0])
         mask = np.logical_and(mask, pc[:, :, 2] < z_range[1])
@@ -82,7 +83,7 @@ def main():
 
         # show image
         cv2.imshow(WINDOW_D, rgb)
-        cv2.imshow(WINDOW,maskk)
+        cv2.imshow(WINDOW,out)
         cv2.waitKey(1)
 
 
