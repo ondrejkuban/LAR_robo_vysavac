@@ -8,7 +8,7 @@ import time
 x_range = (-0.3, 0.3)
 z_range = (0.3, 3.0)
 
-#WINDOW_D = 'obstacles' #depth
+WINDOW_D = 'obstacles' #depth
 WINDOW = 'markers'
 
 stop = False
