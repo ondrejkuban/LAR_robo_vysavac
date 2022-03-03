@@ -30,7 +30,7 @@ def bumper_callBack(msg):
 def main():
     global stop
     turtle = Turtlebot(pc=True, rgb = True, depth = True)
-   # cv2.namedWindow(WINDOW_D)   #display depth
+    cv2.namedWindow(WINDOW_D)   #display depth
     cv2.namedWindow(WINDOW)     #display rgb image
    
 
@@ -81,7 +81,7 @@ def main():
         turtle.register_bumper_event_cb(bumper_callBack)
 
         # show image
-        #cv2.imshow(WINDOW_D, im_color)
+        cv2.imshow(WINDOW_D, rgb)
         cv2.imshow(WINDOW,result)
         cv2.waitKey(1)
 
