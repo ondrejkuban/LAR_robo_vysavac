@@ -19,7 +19,7 @@ def fun(turtle,step):
     fun_step += 1
     fun_step %= 7
     turtle.play_sound(step)
-    time.sleep(0.8)
+    time.sleep(0.4)
 
 #stop robot
 def bumper_callBack(msg):
