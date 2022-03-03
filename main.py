@@ -18,7 +18,7 @@ def fun(turtle):
     global fun_step
     fun_step += 1
     fun_step %= 7
-    turtle.play_sound(step)
+    turtle.play_sound(fun_step)
     time.sleep(0.4)
 
 #stop robot
