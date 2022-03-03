@@ -1,5 +1,6 @@
 from __future__ import print_function
-from robolab_turtlebot import Turtlebot, detector, Rate
+from robolab_turtlebot import Turtlebot, Rate
+from robolar_turtlebot import detector
 import numpy as np
 import cv2
 
