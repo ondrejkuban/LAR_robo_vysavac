@@ -52,7 +52,15 @@ def main():
         result = cv2.bitwise_and(rgb,rgb,mask=maskk)
         if (pc is None) or (rgb is None):
             continue
-        out = cv2.connectedComponents(maskk.astype(np.uint8))
+        out = cv2.connectedComponentsWithStats(maskk.astype(np.uint8))
+        max = 0
+        max_o = []
+        for i in range(1,out[0]):
+            if max < out[2][i][4]:
+                max = out[2][i][4]
+                max_o = out[2][i]
+        cv2.rectangle(rgb, (max_o[0],max_o[1]), (max_o[0] + max_o[2], max_o[1] + max_o[3]), (255,0,0), 2)
+        img_map, contours, hierarchy = cv2.findContours()
         
         # mask out floor points
         mask = pc[:, :, 1] > x_range[0]
@@ -83,8 +91,8 @@ def main():
 
         # show image
         cv2.imshow(WINDOW_D, rgb)
-        #cv2.imshow(WINDOW,out[1])
-        print(out)
+        cv2.imshow(WINDOW,maskk)
+        print(max_o)
         cv2.waitKey(1)
 
 
