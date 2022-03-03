@@ -83,7 +83,8 @@ def main():
 
         # show image
         cv2.imshow(WINDOW_D, rgb)
-        cv2.imshow(WINDOW,out[1])
+        #cv2.imshow(WINDOW,out[1])
+        print(out)
         cv2.waitKey(1)
 
 
