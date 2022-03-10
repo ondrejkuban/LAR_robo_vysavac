@@ -16,12 +16,12 @@ fun_step = 0
 
 
 def fun(turtle):
-    global fun_step
-    fun_step += 1
-    fun_step %= 7
-    turtle.play_sound(fun_step)
+    #global fun_step
+    #fun_step += 1
+    #fun_step %= 7
+    #turtle.play_sound(fun_step)
+    #turtle.cmd_velocity(linear=0, angular=0.5)
     time.sleep(0.4)
-    turtle.cmd_velocity(linear=0, angular=0.5)
 
 
 # stop robot
