@@ -203,7 +203,7 @@ def main():
                 else:
                     turtle.cmd_velocity(linear=0.2, angular=0.0)
             elif len(red_sort) > 0 and red_sort[0].angle is not None:
-                if red_sort[0].center[0] > 320:
+                if red_sort[0].center[0] > 320 and red_sort[0].distance>0.15:
                     turtle.cmd_velocity(linear=0.0, angular=-0.2)
                 else:
                     turtle.cmd_velocity(linear=0.0, angular=0.2)
