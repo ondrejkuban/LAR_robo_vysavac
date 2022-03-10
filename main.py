@@ -109,8 +109,9 @@ def calculate_euclidean(points):  # points[2] for x and points[0] for y
 
 def get_distances_for_cones(point_cloud, cones):
     for cone in cones:
-        if point_cloud[cone.center[1]][cone.center[0]] is not None:
-            cone.distance = calculate_euclidean(point_cloud[cone.center[1]][cone.center[0]])
+        out = calculate_euclidean(point_cloud[cone.center[1]][cone.center[0]])
+        if not np.isnan(out):
+            cone.distance = out
 
 
 def main():
