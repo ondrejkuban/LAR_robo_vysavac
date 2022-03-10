@@ -121,7 +121,7 @@ def draw_rectangles(image, cones: list):
 
 
 def calculate_euclidean(first_point):  # points[2] for x and points[0] for y
-    return np.sqrt((first_point[0])**2 + (first_point[1])**2)
+    return np.sqrt((first_point[0])**2 + (first_point[2])**2)
 
 
 def get_distances_for_cones(point_cloud, cones):
