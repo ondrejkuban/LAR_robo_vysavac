@@ -59,6 +59,17 @@ class Cone:
         self.distance = -1
         self.x = None
         self.y = None
+        self.angle = None
+
+class PID:
+    def __init__(self):
+        self.p_gain = 1
+        self.i_gain = 1
+        self.d_gain = 1
+        self.goal = 0
+
+    def get_new_output(self,measurement):
+        return self.p_gain*(measurement-self.goal)
 
 
 def detection_is_valid(detection):
@@ -102,7 +113,7 @@ def get_cones_for_color(image, threshold: tuple):
 def draw_rectangles(image, cones: list):
     for cone in cones:
         cv2.rectangle(image, cone.pt1, cone.pt2, color=get_threshold_for_color(cone.color), thickness=2)
-        cv2.putText(image, str(cone.distance), cone.pt1, cv2.FONT_ITALIC, 1, get_threshold_for_color(cone.color), 2)
+        cv2.putText(image, str(cone.angle), cone.pt1, cv2.FONT_ITALIC, 1, get_threshold_for_color(cone.color), 2)
 
 
 def calculate_euclidean(points):  # points[2] for x and points[0] for y
@@ -116,6 +127,7 @@ def get_distances_for_cones(point_cloud, cones):
             cone.x = point_cloud[cone.center[1]][cone.center[0]][2]
             cone.y = point_cloud[cone.center[1]][cone.center[0]][0]
             cone.distance = out
+            cone.angle = np.arccos(cone.x/cone.distance)
 
 
 def main():
@@ -123,13 +135,13 @@ def main():
     turtle = Turtlebot(pc=True, rgb=True, depth=True)
     cv2.namedWindow(WINDOW)  # display rgb image
     turtle.register_bumper_event_cb(bumper_callBack)
-
+    pid = PID()
     while not turtle.is_shutting_down():
         # get point cloud
-        if not stop:
-            turtle.cmd_velocity(linear=0.0)
-        else:
-            fun(turtle)
+        #if not stop:
+           # turtle.cmd_velocity(linear=0.0)
+        #else:
+           # fun(turtle)
         depth = turtle.get_depth_image()
         point_cloud = turtle.get_point_cloud()
         rgb = turtle.get_rgb_image()
@@ -156,7 +168,7 @@ def main():
         draw_rectangles(out, red_cones)
         draw_rectangles(out, green_cones)
         draw_rectangles(out, blue_cones)
-
+        turtle.cmd_velocity(linear=pid.get_new_output())
         cv2.imshow("RGB", im)
         cv2.waitKey(1)
 
