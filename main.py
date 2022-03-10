@@ -73,7 +73,11 @@ class PID:
     def get_new_output(self,measurement):
         if self.p_gain*(measurement-self.goal) > 1:
             return 1
-        if self.p_gain*(measurement-self.goal) < 0.1:
+        if self.p_gain*(measurement-self.goal) < -1:
+            return -1
+        if -0.1 < self.p_gain*(measurement - self.goal) < 0:
+            return -0.1
+        if 0.1 > self.p_gain*(measurement - self.goal) > 0:
             return 0.1
         return self.p_gain*(measurement-self.goal)
 
