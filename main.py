@@ -185,7 +185,7 @@ def main():
                 else:
                     turtle.cmd_velocity(linear=0.5, angular=0.0)
             else:
-                turtle.cmd_velocity(linear=0.0, angular=0.0)
+                turtle.cmd_velocity(linear=0.5, angular=0.0)
         else:
             fun(turtle)
         cv2.imshow("RGB", im)
