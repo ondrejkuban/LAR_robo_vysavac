@@ -172,7 +172,7 @@ def main():
         draw_rectangles(out, blue_cones)
 
         red_sort = sorted(red_cones,key= lambda cone: cone.distance)
-        if len(red_sort) > 1 and None not in red_sort:
+        if len(red_sort) > 1 and red_sort[0].angle is not None and red_sort[1].angle is not None:
             turtle.cmd_velocity(linear=0.2,angular=-pid.get_new_output(red_sort[0].angle-red_sort[1].angle))
         cv2.imshow("RGB", im)
         cv2.waitKey(1)
