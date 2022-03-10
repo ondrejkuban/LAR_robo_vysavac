@@ -105,6 +105,7 @@ def main():
     turtle = Turtlebot(pc=True, rgb=True, depth=True)
     cv2.namedWindow(WINDOW_D)  # display depth
     cv2.namedWindow(WINDOW)  # display rgb image
+    register_bumper_event_cb(self, bumper_callBack):
 
     while not turtle.is_shutting_down():
         # get point cloud
