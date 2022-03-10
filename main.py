@@ -64,7 +64,7 @@ class Cone:
 
 class PID:
     def __init__(self):
-        self.p_gain = 1.5
+        self.p_gain = 1.25
         self.i_gain = 1
         self.d_gain = 1
         self.goal = 0
@@ -188,14 +188,14 @@ def main():
                 if abs(error) > 0.09:
                     turtle.cmd_velocity(linear=0,angular=-pid.get_new_output(error))
                 else:
-                    turtle.cmd_velocity(linear=0.7, angular=0.0)
+                    turtle.cmd_velocity(linear=0.8, angular=0.0)
             elif len(red_sort) > 0 and red_sort[0].angle is not None:
                 if red_sort[0].center[0] > 320 and red_sort[0].distance>0.55:
-                    turtle.cmd_velocity(linear=0.0, angular=-0.2)
+                    turtle.cmd_velocity(linear=0.0, angular=-0.35)
                 else:
-                    turtle.cmd_velocity(linear=0.0, angular=0.2)
+                    turtle.cmd_velocity(linear=0.0, angular=0.35)
             else:
-                turtle.cmd_velocity(linear=0.7, angular=0.0)
+                turtle.cmd_velocity(linear=0.8, angular=0.0)
         else:
             fun(turtle)
         cv2.imshow("RGB", im)
