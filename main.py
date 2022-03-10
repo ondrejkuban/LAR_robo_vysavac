@@ -62,7 +62,7 @@ class Cone:
 def detection_is_valid(detection):
     if detection[4] < surface_threshold:
         return False
-    if detection[2] * 3 > detection[3]:
+    if detection[2] * 2 > detection[3]:
         return False
     return True
 
@@ -104,7 +104,7 @@ def draw_rectangles(image, cones: list):
 
 
 def calculate_euclidean(points):
-    return round(points[0],3)#round(np.sqrt(points[0]**2 + points[1]**2),3)
+    return round(points[1],3)#round(np.sqrt(points[0]**2 + points[1]**2),3)
 
 
 def main():
