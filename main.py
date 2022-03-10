@@ -184,7 +184,7 @@ def main():
                     turtle.cmd_velocity(linear=0,
                                         angular=-pid.get_new_output(abs(red_sort[0].angle) - abs(red_sort[1].angle)))
 
-                Rate(1).sleep()
+
             else:
                 turtle.cmd_velocity(linear=0.0, angular=0.0)
         else:
