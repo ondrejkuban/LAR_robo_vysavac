@@ -73,6 +73,8 @@ class PID:
     def get_new_output(self,measurement):
         if self.p_gain*(measurement-self.goal) > 1:
             return 1
+        if self.p_gain*(measurement-self.goal) < 0.1:
+            return 0.1
         return self.p_gain*(measurement-self.goal)
 
 
@@ -183,9 +185,9 @@ def main():
 
 
                 else:
-                    turtle.cmd_velocity(linear=0.5, angular=0.0)
+                    turtle.cmd_velocity(linear=0.2, angular=0.0)
             else:
-                turtle.cmd_velocity(linear=0.5, angular=0.0)
+                turtle.cmd_velocity(linear=0.2, angular=0.0)
         else:
             fun(turtle)
         cv2.imshow("RGB", im)
