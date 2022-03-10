@@ -184,7 +184,7 @@ def main():
         if not stop:
             red_sort = sorted(blue_cones, key=lambda cone: cone.distance)
             if len(red_sort) > 1 and red_sort[0].angle is not None and red_sort[1].angle is not None:
-                if abs(abs(red_sort[0].angle) - abs(red_sort[1].angle)) > 0.15:
+                if abs(abs(red_sort[0].angle) - abs(red_sort[1].angle)) > 0.05:
                     print(abs(abs(red_sort[0].angle) - abs(red_sort[1].angle)))
                     if abs(red_sort[0].angle) > abs(red_sort[1].angle):
                         turtle.cmd_velocity(linear=0,
