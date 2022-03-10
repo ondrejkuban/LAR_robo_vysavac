@@ -103,7 +103,7 @@ def draw_rectangles(image, cones: list):
 def main():
     global stop
     turtle = Turtlebot(pc=True, rgb=True, depth=True)
-    #cv2.namedWindow(WINDOW_D)  # display depth
+    cv2.namedWindow(WINDOW_D)  # display depth
     cv2.namedWindow(WINDOW)  # display rgb image
 
     while not turtle.is_shutting_down():
@@ -113,12 +113,14 @@ def main():
         else:
             fun(turtle)
             turtle.cmd_velocity(linear=0)
-       # pc = turtle.get_dep
+        depth = turtle.get_depth_image()
+        k_depth = turtle.get_depth_K()
+        k_rgb = turtle.get_rgb_K()
         rgb = turtle.get_rgb_image()
 
-        #M = k_depth @ np.linalg.inv(k_rgb)
-        #warped_rgb = cv2.warpPerspective(rgb_image, M, (640, 480))
-        hsv = cv2.cvtColor(rgb, cv2.COLOR_BGR2HSV)
+        M = k_depth @ np.linalg.inv(k_rgb)
+        warped_rgb = cv2.warpPerspective(rgb, M, (640, 480))
+        hsv = cv2.cvtColor(warped_rgb, cv2.COLOR_BGR2HSV)
         get_cones_for_color(hsv, ColorsThresholds.BLUE)
         # creating mask to find rectangles
         red_cones = get_cones_for_color(hsv, ColorsThresholds.RED)
@@ -126,20 +128,20 @@ def main():
         blue_cones = get_cones_for_color(hsv, ColorsThresholds.BLUE)
 
         # drawing rectangle
-        im = rgb.copy()
+        im = warped_rgb.copy()
         draw_rectangles(im, red_cones)
         draw_rectangles(im, green_cones)
         draw_rectangles(im, blue_cones)
 
-        #minmax = cv2.minMaxLoc(depth_image)
-        #max = np.ceil(minmax[1])
-        #out = cv2.convertScaleAbs(depth_image, alpha=255 / max)
-        #draw_rectangles(out, red_cones)
-        #draw_rectangles(out, green_cones)
-        #draw_rectangles(out, blue_cones)
+        minmax = cv2.minMaxLoc(depth)
+        max = np.ceil(minmax[1])
+        out = cv2.convertScaleAbs(depth, alpha=255 / max)
+        draw_rectangles(out, red_cones)
+        draw_rectangles(out, green_cones)
+        draw_rectangles(out, blue_cones)
 
         cv2.imshow("RGB", im)
-        #cv2.imshow("DEPTH", out)
+        cv2.imshow("DEPTH", out)
         cv2.waitKey(1)
 
 
