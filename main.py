@@ -21,7 +21,7 @@ def fun(turtle):
     fun_step %= 7
     turtle.play_sound(fun_step)
     time.sleep(0.4)
-    turtle.cmd_velocity(angular=1)
+    turtle.cmd_velocity(linear=0,angular=0.5)
 
 
 # stop robot
@@ -112,7 +112,6 @@ def main():
             turtle.cmd_velocity(linear=0.0)
         else:
             fun(turtle)
-            turtle.cmd_velocity(linear=0)
         depth = turtle.get_depth_image()
         k_depth = turtle.get_depth_K()
         k_rgb = turtle.get_rgb_K()
