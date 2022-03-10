@@ -175,9 +175,13 @@ def main():
 
         red_sort = sorted(blue_cones,key= lambda cone: cone.distance)
         if len(red_sort) > 1 and red_sort[0].angle is not None and red_sort[1].angle is not None:
-            print(red_sort[0].angle,red_sort[1].angle)
             if abs(abs(red_sort[0].angle) - abs(red_sort[1].angle)) > 0.05:
+                print(-pid.get_new_output(abs(red_sort[0].angle) - abs(red_sort[1].angle)))
                 turtle.cmd_velocity(linear=0.0,angular=-pid.get_new_output(abs(red_sort[0].angle) - abs(red_sort[1].angle)))
+            else:
+                turtle.cmd_velocity(linear=0.0, angular=0.0)
+        else:
+            turtle.cmd_velocity(linear=0.0, angular=0.0)
 
         cv2.imshow("RGB", im)
         cv2.waitKey(1)
