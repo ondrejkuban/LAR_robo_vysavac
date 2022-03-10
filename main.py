@@ -168,7 +168,7 @@ def main():
         draw_rectangles(out, red_cones)
         draw_rectangles(out, green_cones)
         draw_rectangles(out, blue_cones)
-        turtle.cmd_velocity(linear=pid.get_new_output())
+        #turtle.cmd_velocity(linear=pid.get_new_output())
         cv2.imshow("RGB", im)
         cv2.waitKey(1)
 
