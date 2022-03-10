@@ -104,13 +104,13 @@ def draw_rectangles(image, cones: list):
 
 
 def calculate_euclidean(points):
-    return points[0]#round(np.sqrt(points[0]**2 + points[1]**2),3)
+    return round(points[0],3)#round(np.sqrt(points[0]**2 + points[1]**2),3)
 
 
 def main():
     global stop
     turtle = Turtlebot(pc=True, rgb=True, depth=True)
-    cv2.namedWindow(WINDOW_D)  # display depth
+    #cv2.namedWindow(WINDOW_D)  # display depth
     cv2.namedWindow(WINDOW)  # display rgb image
     turtle.register_bumper_event_cb(bumper_callBack);
 
@@ -155,7 +155,7 @@ def main():
         draw_rectangles(out, blue_cones)
 
         cv2.imshow("RGB", im)
-        cv2.imshow("DEPTH", out)
+        #cv2.imshow("DEPTH", out)
         cv2.waitKey(1)
 
 
