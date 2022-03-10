@@ -21,7 +21,7 @@ def fun(turtle):
     fun_step %= 7
     turtle.play_sound(fun_step)
     time.sleep(0.4)
-    turtle.cmd_velocity(linear=0,angular=0.5)
+    turtle.cmd_velocity(linear=0, angular=0.5)
 
 
 # stop robot
@@ -100,19 +100,23 @@ def get_cones_for_color(image, threshold: tuple):
 def draw_rectangles(image, cones: list):
     for cone in cones:
         cv2.rectangle(image, cone.pt1, cone.pt2, color=get_threshold_for_color(cone.color), thickness=2)
-        cv2.putText(image,str(cone.distance),cone.pt1,cv2.FONT_ITALIC,1,get_threshold_for_color(cone.color),2)
+        cv2.putText(image, str(cone.distance), cone.pt1, cv2.FONT_ITALIC, 1, get_threshold_for_color(cone.color), 2)
 
 
-def calculate_euclidean(points):
-    return round(points[2],3)#round(np.sqrt(points[0]**2 + points[1]**2),3)
+def calculate_euclidean(points):  # points[2] for x and points[0] for y
+    return round(np.sqrt(points[2] ** 2 + points[0] ** 2), 3)
+
+
+def get_distances_for_cones(point_cloud, cones):
+    for cone in cones:
+        cone.distance = calculate_euclidean(point_cloud[cone.center[1]][cone.center[0]])
 
 
 def main():
     global stop
     turtle = Turtlebot(pc=True, rgb=True, depth=True)
-    #cv2.namedWindow(WINDOW_D)  # display depth
     cv2.namedWindow(WINDOW)  # display rgb image
-    turtle.register_bumper_event_cb(bumper_callBack);
+    turtle.register_bumper_event_cb(bumper_callBack)
 
     while not turtle.is_shutting_down():
         # get point cloud
@@ -122,10 +126,7 @@ def main():
             fun(turtle)
         depth = turtle.get_depth_image()
         point_cloud = turtle.get_point_cloud()
-        k_depth = turtle.get_depth_K()
-        k_rgb = turtle.get_rgb_K()
         rgb = turtle.get_rgb_image()
-
 
         hsv = cv2.cvtColor(rgb, cv2.COLOR_BGR2HSV)
         get_cones_for_color(hsv, ColorsThresholds.BLUE)
@@ -134,13 +135,9 @@ def main():
         green_cones = get_cones_for_color(hsv, ColorsThresholds.GREEN)
         blue_cones = get_cones_for_color(hsv, ColorsThresholds.BLUE)
 
-        for cone in red_cones:
-            cone.distance = calculate_euclidean(point_cloud[cone.center[1]][cone.center[0]])
-        for cone in green_cones:
-            cone.distance = calculate_euclidean(point_cloud[cone.center[1]][cone.center[0]])
-        for cone in blue_cones:
-            cone.distance = calculate_euclidean(point_cloud[cone.center[1]][cone.center[0]])
-
+        get_distances_for_cones(point_cloud,red_cones)
+        get_distances_for_cones(point_cloud, green_cones)
+        get_distances_for_cones(point_cloud, blue_cones)
         # drawing rectangle
         im = rgb.copy()
         draw_rectangles(im, red_cones)
@@ -155,7 +152,6 @@ def main():
         draw_rectangles(out, blue_cones)
 
         cv2.imshow("RGB", im)
-        #cv2.imshow("DEPTH", out)
         cv2.waitKey(1)
 
 
