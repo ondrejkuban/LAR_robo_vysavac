@@ -21,7 +21,7 @@ def fun(turtle):
     fun_step %= 7
     turtle.play_sound(fun_step)
     time.sleep(0.4)
-    turtle.cmd_velocity(angular=1)
+    turtle.cmd_velocity(linear=0,angular=0.5)
 
 
 # stop robot
@@ -112,6 +112,7 @@ def main():
     turtle = Turtlebot(pc=True, rgb=True, depth=True)
     cv2.namedWindow(WINDOW_D)  # display depth
     cv2.namedWindow(WINDOW)  # display rgb image
+    turtle.register_bumper_event_cb(bumper_callBack);
 
     while not turtle.is_shutting_down():
         # get point cloud
@@ -119,7 +120,6 @@ def main():
             turtle.cmd_velocity(linear=0.0)
         else:
             fun(turtle)
-            turtle.cmd_velocity(linear=0)
         depth = turtle.get_depth_image()
         point_cloud = turtle.get_point_cloud()
         k_depth = turtle.get_depth_K()
