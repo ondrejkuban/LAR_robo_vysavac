@@ -16,11 +16,11 @@ fun_step = 0
 
 
 def fun(turtle):
-    #global fun_step
-    #fun_step += 1
-    #fun_step %= 7
-    #turtle.play_sound(fun_step)
-    #turtle.cmd_velocity(linear=0, angular=0.5)
+    # global fun_step
+    # fun_step += 1
+    # fun_step %= 7
+    # turtle.play_sound(fun_step)
+    # turtle.cmd_velocity(linear=0, angular=0.5)
     time.sleep(0.4)
 
 
@@ -62,7 +62,6 @@ class Cone:
         self.angle = None
 
 
-
 class PID:
     def __init__(self):
         self.p_gain = 1.5
@@ -70,16 +69,16 @@ class PID:
         self.d_gain = 1
         self.goal = 0
 
-    def get_new_output(self,measurement):
-        if self.p_gain*(measurement-self.goal) > 1:
+    def get_new_output(self, measurement):
+        if self.p_gain * (measurement - self.goal) > 1:
             return 1
-        if self.p_gain*(measurement-self.goal) < -1:
+        if self.p_gain * (measurement - self.goal) < -1:
             return -1
-        if -0.1 < self.p_gain*(measurement - self.goal) < 0:
+        if -0.1 < self.p_gain * (measurement - self.goal) < 0:
             return -0.1
-        if 0.1 > self.p_gain*(measurement - self.goal) > 0:
+        if 0.1 > self.p_gain * (measurement - self.goal) > 0:
             return 0.1
-        return self.p_gain*(measurement-self.goal)
+        return self.p_gain * (measurement - self.goal)
 
 
 def detection_is_valid(detection):
@@ -123,21 +122,30 @@ def get_cones_for_color(image, threshold: tuple):
 def draw_rectangles(image, cones: list):
     for cone in cones:
         cv2.rectangle(image, cone.pt1, cone.pt2, color=get_threshold_for_color(cone.color), thickness=2)
-        cv2.putText(image, str(cone.angle), cone.pt1, cv2.FONT_ITALIC, 1, get_threshold_for_color(cone.color), 2)
+        cv2.putText(image, str(cone.x + "  " + cone.y), cone.pt1, cv2.FONT_ITALIC, 1, get_threshold_for_color(cone.color), 2)
 
 
 def calculate_euclidean(first_point):  # points[2] for x and points[0] for y
-    return np.sqrt((first_point[0])**2 + (first_point[2])**2)
+    return np.sqrt((first_point[0]) ** 2 + (first_point[2]) ** 2)
 
 
 def get_distances_for_cones(point_cloud, cones):
     for cone in cones:
         out = calculate_euclidean(point_cloud[cone.center[1]][cone.center[0]])
         if not np.isnan(out):
-            cone.x = point_cloud[cone.center[1]][cone.center[0]][2]
-            cone.y = point_cloud[cone.center[1]][cone.center[0]][0]
+            cone.x = get_point_in_space(point_cloud,cone,2)
+            cone.y = get_point_in_space(point_cloud,cone,0)
             cone.distance = out
-            cone.angle = np.arcsin(cone.y/cone.distance)
+            cone.angle = np.arcsin(cone.y / cone.distance)
+
+
+def get_point_in_space(point_cloud, cone, axis):
+    points = []
+    for i in range(cone.pt1[0], cone.pt2[0]):
+        for j in range(cone.pt1[1], cone.pt2[1]):
+            if not np.isnan(point_cloud[j][i]):
+                points.append(point_cloud[j][i][axis])
+    return round(np.median(points),3)
 
 
 def main():
@@ -160,7 +168,7 @@ def main():
         green_cones = get_cones_for_color(hsv, ColorsThresholds.GREEN)
         blue_cones = get_cones_for_color(hsv, ColorsThresholds.BLUE)
 
-        get_distances_for_cones(point_cloud,red_cones)
+        get_distances_for_cones(point_cloud, red_cones)
         get_distances_for_cones(point_cloud, green_cones)
         get_distances_for_cones(point_cloud, blue_cones)
         # drawing rectangle
@@ -176,16 +184,18 @@ def main():
         draw_rectangles(out, green_cones)
         draw_rectangles(out, blue_cones)
         if not stop:
-            red_sort = sorted(blue_cones,key= lambda cone: cone.distance)
+            red_sort = sorted(blue_cones, key=lambda cone: cone.distance)
             if len(red_sort) > 1 and red_sort[0].angle is not None and red_sort[1].angle is not None:
                 if abs(abs(red_sort[0].angle) - abs(red_sort[1].angle)) > 0.15:
                     print(-pid.get_new_output(abs(red_sort[0].angle) - abs(red_sort[1].angle)))
                     if abs(red_sort[0].angle) > abs(red_sort[1].angle):
                         turtle.cmd_velocity(linear=0,
-                                            angular=-pid.get_new_output(abs(red_sort[1].angle) - abs(red_sort[0].angle)))
+                                            angular=-pid.get_new_output(
+                                                abs(red_sort[1].angle) - abs(red_sort[0].angle)))
                     else:
                         turtle.cmd_velocity(linear=0,
-                                            angular=-pid.get_new_output(abs(red_sort[0].angle) - abs(red_sort[1].angle)))
+                                            angular=-pid.get_new_output(
+                                                abs(red_sort[0].angle) - abs(red_sort[1].angle)))
 
 
                 else:
