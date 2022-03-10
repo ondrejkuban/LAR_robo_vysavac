@@ -184,22 +184,9 @@ def main():
         if not stop:
             red_sort = sorted(blue_cones, key=lambda cone: cone.distance)
             if len(red_sort) > 1 and red_sort[0].angle is not None and red_sort[1].angle is not None:
-                if abs(abs(red_sort[0].angle) - abs(red_sort[1].angle)) > 0.09:
-                    #print(abs(abs(red_sort[0].angle) - abs(red_sort[1].angle)))
-                    if abs(red_sort[0].angle) > abs(red_sort[1].angle):
-                        turtle.cmd_velocity(linear=0,
-                                            angular=-pid.get_new_output(
-                                                abs(red_sort[1].angle) - abs(red_sort[0].angle)))
-                        print("turn left: "+str(pid.get_new_output(
-                                                abs(red_sort[1].angle) - abs(red_sort[0].angle))))
-                    else:
-                        turtle.cmd_velocity(linear=0,
-                                            angular=pid.get_new_output(
-                                                abs(red_sort[0].angle) - abs(red_sort[1].angle)))
-                        print("turn right: " + str(pid.get_new_output(
-                            abs(red_sort[0].angle) - abs(red_sort[1].angle))))
-
-
+                error = (red_sort[0].angle + red_sort[1].angle)/2
+                if abs(error) > 0.09:
+                    turtle.cmd_velocity(linear=0,angular=pid.get_new_output(error))
                 else:
                     turtle.cmd_velocity(linear=0.2, angular=0.0)
             elif len(red_sort) > 0 and red_sort[0].angle is not None:
