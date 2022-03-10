@@ -188,14 +188,14 @@ def main():
                 if abs(error) > 0.09:
                     turtle.cmd_velocity(linear=0,angular=-pid.get_new_output(error))
                 else:
-                    turtle.cmd_velocity(linear=0.8, angular=0.0)
+                    turtle.cmd_velocity(linear=0.65, angular=0.0)
             elif len(red_sort) > 0 and red_sort[0].angle is not None:
                 if red_sort[0].center[0] > 320 and red_sort[0].distance>0.55:
                     turtle.cmd_velocity(linear=0.0, angular=-0.35)
                 else:
                     turtle.cmd_velocity(linear=0.0, angular=0.35)
             else:
-                turtle.cmd_velocity(linear=0.8, angular=0.0)
+                turtle.cmd_velocity(linear=0.65, angular=0.0)
         else:
             fun(turtle)
         cv2.imshow("RGB", im)
