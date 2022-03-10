@@ -63,7 +63,7 @@ class Cone:
 
 class PID:
     def __init__(self):
-        self.p_gain = 3
+        self.p_gain = 1
         self.i_gain = 1
         self.d_gain = 1
         self.goal = 0
@@ -172,7 +172,8 @@ def main():
         draw_rectangles(out, blue_cones)
 
         red_sort = sorted(red_cones,key= lambda cone: cone.distance)
-        turtle.cmd_velocity(linear=0.1,angular=pid.get_new_output(red_sort[0].angle-red_sort[1].angle))
+        if len(red_sort) > 1:
+            turtle.cmd_velocity(linear=0.2,angular=-pid.get_new_output(red_sort[0].angle-red_sort[1].angle))
         cv2.imshow("RGB", im)
         cv2.waitKey(1)
 
