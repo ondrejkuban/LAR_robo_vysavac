@@ -132,7 +132,6 @@ def get_distances_for_cones(point_cloud, cones):
             cone.y = point_cloud[cone.center[1]][cone.center[0]][0]
             cone.distance = out
             cone.angle = np.arcsin(cone.y/cone.distance)
-            print(cone.angle)
 
 
 def main():
@@ -141,7 +140,6 @@ def main():
     cv2.namedWindow(WINDOW)  # display rgb image
     turtle.register_bumper_event_cb(bumper_callBack)
     pid = PID()
-    red_cones = []
     while not turtle.is_shutting_down():
         # get point cloud
         #if not stop:
@@ -155,11 +153,11 @@ def main():
         hsv = cv2.cvtColor(rgb, cv2.COLOR_BGR2HSV)
         get_cones_for_color(hsv, ColorsThresholds.BLUE)
         # creating mask to find rectangles
-        new_red_cones = get_cones_for_color(hsv, ColorsThresholds.RED)
+        red_cones = get_cones_for_color(hsv, ColorsThresholds.RED)
         green_cones = get_cones_for_color(hsv, ColorsThresholds.GREEN)
         blue_cones = get_cones_for_color(hsv, ColorsThresholds.BLUE)
 
-        get_distances_for_cones(point_cloud,new_red_cones)
+        get_distances_for_cones(point_cloud,red_cones)
         get_distances_for_cones(point_cloud, green_cones)
         get_distances_for_cones(point_cloud, blue_cones)
         # drawing rectangle
