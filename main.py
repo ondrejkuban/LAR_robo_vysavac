@@ -61,6 +61,8 @@ class Cone:
         self.y = None
         self.angle = None
 
+
+
 class PID:
     def __init__(self):
         self.p_gain = 1
@@ -118,8 +120,8 @@ def draw_rectangles(image, cones: list):
         cv2.putText(image, str(cone.angle), cone.pt1, cv2.FONT_ITALIC, 1, get_threshold_for_color(cone.color), 2)
 
 
-def calculate_euclidean(points):  # points[2] for x and points[0] for y
-    return round(np.sqrt(points[2] ** 2 + points[0] ** 2), 3)
+def calculate_euclidean(first_point,second_point = (0,0)):  # points[2] for x and points[0] for y
+    return np.sqrt((first_point[0]-second_point[0])**2 + (first_point[0]-second_point[0])**2)
 
 
 def get_distances_for_cones(point_cloud, cones):
@@ -138,6 +140,7 @@ def main():
     cv2.namedWindow(WINDOW)  # display rgb image
     turtle.register_bumper_event_cb(bumper_callBack)
     pid = PID()
+    red_cones = []
     while not turtle.is_shutting_down():
         # get point cloud
         #if not stop:
@@ -151,11 +154,11 @@ def main():
         hsv = cv2.cvtColor(rgb, cv2.COLOR_BGR2HSV)
         get_cones_for_color(hsv, ColorsThresholds.BLUE)
         # creating mask to find rectangles
-        red_cones = get_cones_for_color(hsv, ColorsThresholds.RED)
+        new_red_cones = get_cones_for_color(hsv, ColorsThresholds.RED)
         green_cones = get_cones_for_color(hsv, ColorsThresholds.GREEN)
         blue_cones = get_cones_for_color(hsv, ColorsThresholds.BLUE)
 
-        get_distances_for_cones(point_cloud,red_cones)
+        get_distances_for_cones(point_cloud,new_red_cones)
         get_distances_for_cones(point_cloud, green_cones)
         get_distances_for_cones(point_cloud, blue_cones)
         # drawing rectangle
@@ -173,7 +176,9 @@ def main():
 
         red_sort = sorted(red_cones,key= lambda cone: cone.distance)
         if len(red_sort) > 1 and red_sort[0].angle is not None and red_sort[1].angle is not None:
-            turtle.cmd_velocity(linear=0.2,angular=-pid.get_new_output(red_sort[0].angle-red_sort[1].angle))
+            if abs(abs(red_sort[0].angle) - abs(red_sort[1].angle)) > 0.05:
+                turtle.cmd_velocity(linear=0.0,angular=-pid.get_new_output(abs(red_sort[0].angle) - abs(red_sort[1].angle)))
+
         cv2.imshow("RGB", im)
         cv2.waitKey(1)
 
