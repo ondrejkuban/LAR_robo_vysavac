@@ -142,10 +142,7 @@ def main():
     pid = PID()
     while not turtle.is_shutting_down():
         # get point cloud
-        #if not stop:
-           # turtle.cmd_velocity(linear=0.0)
-        #else:
-           # fun(turtle)
+
         depth = turtle.get_depth_image()
         point_cloud = turtle.get_point_cloud()
         rgb = turtle.get_rgb_image()
@@ -172,24 +169,25 @@ def main():
         draw_rectangles(out, red_cones)
         draw_rectangles(out, green_cones)
         draw_rectangles(out, blue_cones)
+        if not stop:
+            red_sort = sorted(blue_cones,key= lambda cone: cone.distance)
+            if len(red_sort) > 1 and red_sort[0].angle is not None and red_sort[1].angle is not None:
+                if abs(abs(red_sort[0].angle) - abs(red_sort[1].angle)) > 0.05:
+                    print(-pid.get_new_output(abs(red_sort[0].angle) - abs(red_sort[1].angle)))
+                    if abs(red_sort[0].angle) > abs(red_sort[1].angle):
+                        turtle.cmd_velocity(linear=0,
+                                            angular=-pid.get_new_output(abs(red_sort[1].angle) - abs(red_sort[0].angle)))
+                    else:
+                        turtle.cmd_velocity(linear=0,
+                                            angular=-pid.get_new_output(abs(red_sort[0].angle) - abs(red_sort[1].angle)))
 
-        red_sort = sorted(blue_cones,key= lambda cone: cone.distance)
-        if len(red_sort) > 1 and red_sort[0].angle is not None and red_sort[1].angle is not None:
-            if abs(abs(red_sort[0].angle) - abs(red_sort[1].angle)) > 0.05:
-                print(-pid.get_new_output(abs(red_sort[0].angle) - abs(red_sort[1].angle)))
-                if abs(red_sort[0].angle) > abs(red_sort[1].angle):
-                    turtle.cmd_velocity(linear=0,
-                                        angular=-pid.get_new_output(abs(red_sort[1].angle) - abs(red_sort[0].angle)))
+
                 else:
-                    turtle.cmd_velocity(linear=0,
-                                        angular=-pid.get_new_output(abs(red_sort[0].angle) - abs(red_sort[1].angle)))
-
-
+                    turtle.cmd_velocity(linear=0.5, angular=0.0)
             else:
-                turtle.cmd_velocity(linear=0.5, angular=0.0)
+                turtle.cmd_velocity(linear=0.0, angular=0.0)
         else:
-            turtle.cmd_velocity(linear=0.0, angular=0.0)
-
+            fun(turtle)
         cv2.imshow("RGB", im)
         cv2.waitKey(1)
 
