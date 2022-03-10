@@ -132,6 +132,7 @@ def get_distances_for_cones(point_cloud, cones):
             cone.y = point_cloud[cone.center[1]][cone.center[0]][0]
             cone.distance = out
             cone.angle = np.arcsin(cone.y/cone.distance)
+            print(cone.angle)
 
 
 def main():
