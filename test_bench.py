@@ -82,7 +82,7 @@ def draw_rectangles(image, cones: list):
 
 
 def calculate_euclidean(points):
-    return round(np.sqrt(points[0]**2 + points[1]**2),3)
+    return round(np.sqrt(points[0]**2 + points[1]**2), 3)
 
 # init
 rgb_image = matlab_data[0]['image_rgb']

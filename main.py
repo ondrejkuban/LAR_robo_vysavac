@@ -57,6 +57,8 @@ class Cone:
         self.size = size
         self.center = (position[0] + size[0] // 2, position[1] + size[1] // 2)
         self.distance = -1
+        self.x = None
+        self.y = None
 
 
 def detection_is_valid(detection):
@@ -111,6 +113,8 @@ def get_distances_for_cones(point_cloud, cones):
     for cone in cones:
         out = calculate_euclidean(point_cloud[cone.center[1]][cone.center[0]])
         if not np.isnan(out):
+            cone.x = point_cloud[cone.center[1]][cone.center[0]][2]
+            cone.y = point_cloud[cone.center[1]][cone.center[0]][0]
             cone.distance = out
 
 
