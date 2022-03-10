@@ -55,6 +55,8 @@ class Cone:
         self.pt1 = position
         self.pt2 = (position[0] + size[0], position[1] + size[1])
         self.size = size
+        self.center = (position[0] + size[0] // 2, position[1] + size[1] // 2)
+        self.distance = -1
 
 
 def detection_is_valid(detection):
@@ -98,6 +100,11 @@ def get_cones_for_color(image, threshold: tuple):
 def draw_rectangles(image, cones: list):
     for cone in cones:
         cv2.rectangle(image, cone.pt1, cone.pt2, color=get_threshold_for_color(cone.color), thickness=2)
+        cv2.putText(image,str(cone.distance),cone.pt1,cv2.FONT_ITALIC,1,get_threshold_for_color(cone.color),2)
+
+
+def calculate_euclidean(points):
+    return round(np.sqrt(points[0]**2 + points[1]**2),3)
 
 
 def main():
@@ -114,21 +121,28 @@ def main():
             fun(turtle)
             turtle.cmd_velocity(linear=0)
         depth = turtle.get_depth_image()
+        point_cloud = turtle.get_point_cloud()
         k_depth = turtle.get_depth_K()
         k_rgb = turtle.get_rgb_K()
         rgb = turtle.get_rgb_image()
 
-        M = k_depth @ np.linalg.inv(k_rgb)
-        warped_rgb = cv2.warpPerspective(rgb, M, (640, 480))
-        hsv = cv2.cvtColor(warped_rgb, cv2.COLOR_BGR2HSV)
+
+        hsv = cv2.cvtColor(rgb, cv2.COLOR_BGR2HSV)
         get_cones_for_color(hsv, ColorsThresholds.BLUE)
         # creating mask to find rectangles
         red_cones = get_cones_for_color(hsv, ColorsThresholds.RED)
         green_cones = get_cones_for_color(hsv, ColorsThresholds.GREEN)
         blue_cones = get_cones_for_color(hsv, ColorsThresholds.BLUE)
 
+        for cone in red_cones:
+            cone.distance = calculate_euclidean(point_cloud[cone.center[1]][cone.center[0]])
+        for cone in green_cones:
+            cone.distance = calculate_euclidean(point_cloud[cone.center[1]][cone.center[0]])
+        for cone in blue_cones:
+            cone.distance = calculate_euclidean(point_cloud[cone.center[1]][cone.center[0]])
+
         # drawing rectangle
-        im = warped_rgb.copy()
+        im = rgb.copy()
         draw_rectangles(im, red_cones)
         draw_rectangles(im, green_cones)
         draw_rectangles(im, blue_cones)
