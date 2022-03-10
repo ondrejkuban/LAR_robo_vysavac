@@ -65,7 +65,7 @@ class Cone:
 
 class PID:
     def __init__(self):
-        self.p_gain = 3
+        self.p_gain = 1.5
         self.i_gain = 1
         self.d_gain = 1
         self.goal = 0
@@ -186,7 +186,7 @@ def main():
 
 
             else:
-                turtle.cmd_velocity(linear=0.0, angular=0.0)
+                turtle.cmd_velocity(linear=0.5, angular=0.0)
         else:
             turtle.cmd_velocity(linear=0.0, angular=0.0)
 
