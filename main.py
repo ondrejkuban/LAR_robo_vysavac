@@ -186,7 +186,7 @@ def main():
             if len(red_sort) > 1 and red_sort[0].angle is not None and red_sort[1].angle is not None:
                 error = (red_sort[0].angle + red_sort[1].angle)/2
                 if abs(error) > 0.09:
-                    turtle.cmd_velocity(linear=0,angular=pid.get_new_output(error))
+                    turtle.cmd_velocity(linear=0,angular=-pid.get_new_output(error))
                 else:
                     turtle.cmd_velocity(linear=0.2, angular=0.0)
             elif len(red_sort) > 0 and red_sort[0].angle is not None:
