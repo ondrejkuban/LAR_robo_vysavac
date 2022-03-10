@@ -65,7 +65,7 @@ class Cone:
 
 class PID:
     def __init__(self):
-        self.p_gain = 1
+        self.p_gain = 3
         self.i_gain = 1
         self.d_gain = 1
         self.goal = 0
