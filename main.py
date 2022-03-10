@@ -193,7 +193,7 @@ def main():
                     else:
                         turtle.cmd_velocity(linear=0,
                                             angular=-pid.get_new_output(
-                                                abs(red_sort[1].angle) - abs(red_sort[0].angle)))
+                                                abs(red_sort[0].angle) - abs(red_sort[1].angle)))
 
 
                 else:
