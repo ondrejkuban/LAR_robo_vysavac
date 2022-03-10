@@ -178,10 +178,10 @@ def main():
             if abs(abs(red_sort[0].angle) - abs(red_sort[1].angle)) > 0.05:
                 print(-pid.get_new_output(abs(red_sort[0].angle) - abs(red_sort[1].angle)))
                 if abs(red_sort[0].angle) > abs(red_sort[1].angle):
-                    turtle.cmd_velocity(linear=0.1,
+                    turtle.cmd_velocity(linear=0,
                                         angular=-pid.get_new_output(abs(red_sort[1].angle) - abs(red_sort[0].angle)))
                 else:
-                    turtle.cmd_velocity(linear=0.1,
+                    turtle.cmd_velocity(linear=0,
                                         angular=-pid.get_new_output(abs(red_sort[0].angle) - abs(red_sort[1].angle)))
 
                 Rate(1).sleep()
