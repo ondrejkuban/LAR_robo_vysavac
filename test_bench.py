@@ -1,70 +1,115 @@
 import cv2
-import scipy.io
+from scipy.io import loadmat
 import numpy as np
+import skimage.exposure
 
-# tresholds
-dark_blue = (90, 100, 20)
-light_blue = (110, 255, 255)
-dark_red = (0, 100, 50)
-light_red = (5, 255, 255)
-dark_green = (45, 70, 20)
-light_green = (75, 255, 255)
-#init
-mat = scipy.io.loadmat('2022-03-03-15-32-23.mat')
-rgb = mat['image_rgb']
-depth = mat['image_depth']
+matlab_data = [loadmat('2022-03-03-15-30-32.mat'),
+               loadmat('2022-03-03-15-31-04.mat'),
+               loadmat('2022-03-03-15-31-31.mat'),
+               loadmat('2022-03-03-15-31-43.mat'),
+               loadmat('2022-03-03-15-32-07.mat'),
+               loadmat('2022-03-03-15-32-23.mat')]
+
+surface_threshold = 400
+
+
+# color class
+class Color:
+    INVALID = 0
+    RED = 1
+    GREEN = 2
+    BLUE = 3
+
+
+class ColorsThresholds:
+    #       dark           light
+    RED = ((0, 100, 50), (5, 255, 255))
+    GREEN = ((45, 70, 20), (75, 255, 255))
+    BLUE = ((90, 100, 20), (110, 255, 255))
+
+
+class Cone:
+    def __init__(self, color: int, position: tuple, size: tuple):
+        self.color = color
+        self.pt1 = position
+        self.pt2 = (position[0] + size[0], position[1] + size[1])
+        self.size = size
+
+
+def detection_is_valid(detection):
+    if detection[4] < surface_threshold:
+        return False
+    if detection[2] * 2 > detection[3]:
+        return False
+    return True
+
+
+def get_color_for_threshold(threshold):
+    return {
+        ColorsThresholds.RED: Color.RED,
+        ColorsThresholds.GREEN: Color.GREEN,
+        ColorsThresholds.BLUE: Color.BLUE
+    }.get(threshold)
+
+
+def get_threshold_for_color(color):
+    return {
+        Color.RED: (0, 0, 255),
+        Color.GREEN: (0, 255, 0),
+        Color.BLUE: (255, 0, 0)
+    }.get(color)
+
+
+def get_cones_for_color(image, threshold: tuple):
+    mask = cv2.inRange(image, threshold[0], threshold[1])
+    detections = cv2.connectedComponentsWithStats(mask.astype(np.uint8))
+
+    results = []
+    for i in range(1, detections[0]):
+        if detection_is_valid(detections[2][i]):
+            results.append(Cone(get_color_for_threshold(threshold),
+                                (detections[2][i][0], detections[2][i][1]),
+                                (detections[2][i][2], detections[2][i][3])))
+
+    return results
+
+
+def draw_rectangles(image, cones: list):
+    for cone in cones:
+        cv2.rectangle(image, cone.pt1, cone.pt2, color=get_threshold_for_color(cone.color), thickness=2)
+
+
+# init
+rgb_image = matlab_data[0]['image_rgb']
+depth_image = matlab_data[0]['image_depth']
+k_depth = matlab_data[0]['K_depth']
+k_rgb = matlab_data[0]['K_rgb']
+
 cv2.namedWindow("RGB")
 cv2.namedWindow("DEPTH")
 while True:
+    M = k_depth @ np.linalg.inv(k_rgb)
+    warped_rgb = cv2.warpPerspective(rgb_image, M, (640, 480))
+    hsv = cv2.cvtColor(warped_rgb, cv2.COLOR_BGR2HSV)
+    get_cones_for_color(hsv, ColorsThresholds.BLUE)
+    # creating mask to find rectangles
+    red_cones = get_cones_for_color(hsv, ColorsThresholds.RED)
+    green_cones = get_cones_for_color(hsv, ColorsThresholds.GREEN)
+    blue_cones = get_cones_for_color(hsv, ColorsThresholds.BLUE)
 
-    #convert to hsv
-    hsv = cv2.cvtColor(rgb, cv2.COLOR_BGR2HSV)
+    # drawing rectangle
+    im = warped_rgb.copy()
+    draw_rectangles(im, red_cones)
+    draw_rectangles(im, green_cones)
+    draw_rectangles(im, blue_cones)
 
-    #creating mask to find rectangles
-    maskb = cv2.inRange(hsv, dark_blue, light_blue)
-    maskr = cv2.inRange(hsv, dark_red, light_red)
-    maskg = cv2.inRange(hsv, dark_green, light_green)
-    result = cv2.bitwise_and(rgb, rgb, mask=maskb)
+    minmax = cv2.minMaxLoc(depth_image)
+    max = np.ceil(minmax[1])
+    out = cv2.convertScaleAbs(depth_image, alpha=255 / max)
+    draw_rectangles(out, red_cones)
+    draw_rectangles(out, green_cones)
+    draw_rectangles(out, blue_cones)
 
-    #finding rectangles
-    outb = cv2.connectedComponentsWithStats(maskb.astype(np.uint8))
-    outr = cv2.connectedComponentsWithStats(maskr.astype(np.uint8))
-    outg = cv2.connectedComponentsWithStats(maskg.astype(np.uint8))
-
-    #finding biggest rectangles for each color
-    max = 0
-    max_b = []
-    for i in range(1, outb[0]):
-        if max < outb[2][i][4]:
-            max = outb[2][i][4]
-            max_b = outb[2][i]
-    max = 0
-    max_r = []
-    for i in range(1, outr[0]):
-        if max < outr[2][i][4]:
-            max = outr[2][i][4]
-            max_r = outr[2][i]
-    max = 0
-    max_g = []
-    for i in range(1, outg[0]):
-        if max < outg[2][i][4]:
-            max = outg[2][i][4]
-            max_g = outg[2][i]
-    print(max_g[0], max_g[1], max_g[0] + max_g[2], max_g[1] + max_g[3])
-
-    #drawing rectangle
-    im = rgb.copy()
-    cv2.rectangle(im, (max_b[0], max_b[1]), (max_b[0] + max_b[2], max_b[1] + max_b[3]), (0, 255, 0), 2)
-    cv2.rectangle(im, (max_r[0], max_r[1]), (max_r[0] + max_r[2], max_r[1] + max_r[3]), (0, 0, 255),
-                  2)
-    cv2.rectangle(im, (max_g[0], max_g[1]), (max_g[0] + max_g[2], max_g[1] + max_g[3]), (255, 0, 255),
-                  2)
-    #finding distance to green
-    dep = []
-    for i in range(max_g[0], max_g[2] + max_g[0]):
-        for j in range(max_g[1], max_g[3] + max_g[1]):
-            dep.append(depth[i][j])
-    cv2.putText(im, str(np.median(dep)), (max_g[0], max_g[1]), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (36, 255, 12), 2)
     cv2.imshow("RGB", im)
-    cv2.imshow("DEPTH", depth)
+    cv2.imshow("DEPTH", out)
     cv2.waitKey(1)

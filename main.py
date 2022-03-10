@@ -8,11 +8,12 @@ import time
 x_range = (-0.3, 0.3)
 z_range = (0.3, 3.0)
 
-WINDOW_D = 'obstacles' #depth
-WINDOW = 'markers'
+WINDOW_D = 'DEPTH'  # depth
+WINDOW = 'RGB'
 
 stop = False
 fun_step = 0
+
 
 def fun(turtle):
     global fun_step
@@ -22,18 +23,88 @@ def fun(turtle):
     time.sleep(0.4)
     turtle.cmd_velocity(angular=1)
 
-#stop robot
+
+# stop robot
 def bumper_callBack(msg):
     global stop
     stop = True
     print('Bumper was activated, new state is STOP')
 
+
+surface_threshold = 400
+
+
+# color class
+class Color:
+    INVALID = 0
+    RED = 1
+    GREEN = 2
+    BLUE = 3
+
+
+class ColorsThresholds:
+    #       dark           light
+    RED = ((0, 100, 50), (5, 255, 255))
+    GREEN = ((45, 70, 20), (75, 255, 255))
+    BLUE = ((90, 100, 20), (110, 255, 255))
+
+
+class Cone:
+    def __init__(self, color: int, position: tuple, size: tuple):
+        self.color = color
+        self.pt1 = position
+        self.pt2 = (position[0] + size[0], position[1] + size[1])
+        self.size = size
+
+
+def detection_is_valid(detection):
+    if detection[4] < surface_threshold:
+        return False
+    if detection[2] * 2 > detection[3]:
+        return False
+    return True
+
+
+def get_color_for_threshold(threshold):
+    return {
+        ColorsThresholds.RED: Color.RED,
+        ColorsThresholds.GREEN: Color.GREEN,
+        ColorsThresholds.BLUE: Color.BLUE
+    }.get(threshold)
+
+
+def get_threshold_for_color(color):
+    return {
+        Color.RED: (0, 0, 255),
+        Color.GREEN: (0, 255, 0),
+        Color.BLUE: (255, 0, 0)
+    }.get(color)
+
+
+def get_cones_for_color(image, threshold: tuple):
+    mask = cv2.inRange(image, threshold[0], threshold[1])
+    detections = cv2.connectedComponentsWithStats(mask.astype(np.uint8))
+
+    results = []
+    for i in range(1, detections[0]):
+        if detection_is_valid(detections[2][i]):
+            results.append(Cone(get_color_for_threshold(threshold),
+                                (detections[2][i][0], detections[2][i][1]),
+                                (detections[2][i][2], detections[2][i][3])))
+
+    return results
+
+
+def draw_rectangles(image, cones: list):
+    for cone in cones:
+        cv2.rectangle(image, cone.pt1, cone.pt2, color=get_threshold_for_color(cone.color), thickness=2)
+
+
 def main():
     global stop
-    turtle = Turtlebot(pc=True, rgb = True, depth = True)
-    cv2.namedWindow(WINDOW_D)   #display depth
-    cv2.namedWindow(WINDOW)     #display rgb image
-   
+    turtle = Turtlebot(pc=True, rgb=True, depth=True)
+    #cv2.namedWindow(WINDOW_D)  # display depth
+    cv2.namedWindow(WINDOW)  # display rgb image
 
     while not turtle.is_shutting_down():
         # get point cloud
@@ -42,58 +113,33 @@ def main():
         else:
             fun(turtle)
             turtle.cmd_velocity(linear=0)
-        pc = turtle.get_point_cloud()
+       # pc = turtle.get_dep
         rgb = turtle.get_rgb_image()
-        
-        #conversion to hsv
+
+        #M = k_depth @ np.linalg.inv(k_rgb)
+        #warped_rgb = cv2.warpPerspective(rgb_image, M, (640, 480))
         hsv = cv2.cvtColor(rgb, cv2.COLOR_BGR2HSV)
-        dark_blue = (50,255,20)
-        light_blue = (160,100,180)
-        maskk = cv2.inRange(hsv,(90, 100, 20), (110, 255, 255))
-        result = cv2.bitwise_and(rgb,rgb,mask=maskk)
-        if (pc is None) or (rgb is None):
-            continue
-        out = cv2.connectedComponentsWithStats(maskk.astype(np.uint8))
-        max = 0
-        max_o = []
-        for i in range(1,out[0]):
-            if max < out[2][i][4]:
-                max = out[2][i][4]
-                max_o = out[2][i]
-        cv2.rectangle(rgb, (max_o[0],max_o[1]), (max_o[0] + max_o[2], max_o[1] + max_o[3]), (255,0,0), 2)
-        #img_map, contours, hierarchy = cv2.findContours()
-        
-        # mask out floor points
-        mask = pc[:, :, 1] > x_range[0]
-        
-        # mask point too far and close
-        mask = np.logical_and(mask, pc[:, :, 2] > z_range[0])
-        mask = np.logical_and(mask, pc[:, :, 2] < z_range[1])
+        get_cones_for_color(hsv, ColorsThresholds.BLUE)
+        # creating mask to find rectangles
+        red_cones = get_cones_for_color(hsv, ColorsThresholds.RED)
+        green_cones = get_cones_for_color(hsv, ColorsThresholds.GREEN)
+        blue_cones = get_cones_for_color(hsv, ColorsThresholds.BLUE)
 
-        if np.count_nonzero(mask) <= 0:
-            continue
+        # drawing rectangle
+        im = rgb.copy()
+        draw_rectangles(im, red_cones)
+        draw_rectangles(im, green_cones)
+        draw_rectangles(im, blue_cones)
 
-        # empty image
-        image = np.zeros(mask.shape)
+        #minmax = cv2.minMaxLoc(depth_image)
+        #max = np.ceil(minmax[1])
+        #out = cv2.convertScaleAbs(depth_image, alpha=255 / max)
+        #draw_rectangles(out, red_cones)
+        #draw_rectangles(out, green_cones)
+        #draw_rectangles(out, blue_cones)
 
-        # assign depth i.e. distance to image
-        image[mask] = np.int8(pc[:, :, 2][mask] / 3.0 * 255)
-        im_color = cv2.applyColorMap(255 - image.astype(np.uint8),
-                                     cv2.COLORMAP_JET)
-
-        # draw markers in the image
-        markers = detector.detect_markers(rgb)
-
-        #draw markers in the image
-        detector.draw_markers(rgb, markers)
-
-        #Callback of bumper activation
-        turtle.register_bumper_event_cb(bumper_callBack)
-
-        # show image
-        cv2.imshow(WINDOW_D, rgb)
-        cv2.imshow(WINDOW,maskk)
-        print(max_o)
+        cv2.imshow("RGB", im)
+        #cv2.imshow("DEPTH", out)
         cv2.waitKey(1)
 
 
