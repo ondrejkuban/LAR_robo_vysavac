@@ -60,7 +60,7 @@ class Cone:
 def detection_is_valid(detection):
     if detection[4] < surface_threshold:
         return False
-    if detection[2] * 2 > detection[3]:
+    if detection[2] * 3 > detection[3]:
         return False
     return True
 
