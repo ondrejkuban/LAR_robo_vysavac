@@ -104,7 +104,7 @@ def draw_rectangles(image, cones: list):
 
 
 def calculate_euclidean(points):
-    return round(points[1],3)#round(np.sqrt(points[0]**2 + points[1]**2),3)
+    return round(points[2],3)#round(np.sqrt(points[0]**2 + points[1]**2),3)
 
 
 def main():
