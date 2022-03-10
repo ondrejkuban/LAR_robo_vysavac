@@ -120,8 +120,8 @@ def draw_rectangles(image, cones: list):
         cv2.putText(image, str(cone.angle), cone.pt1, cv2.FONT_ITALIC, 1, get_threshold_for_color(cone.color), 2)
 
 
-def calculate_euclidean(first_point,second_point = (0,0)):  # points[2] for x and points[0] for y
-    return np.sqrt((first_point[0]-second_point[0])**2 + (first_point[0]-second_point[0])**2)
+def calculate_euclidean(first_point):  # points[2] for x and points[0] for y
+    return np.sqrt((first_point[0])**2 + (first_point[1])**2)
 
 
 def get_distances_for_cones(point_cloud, cones):
@@ -132,7 +132,6 @@ def get_distances_for_cones(point_cloud, cones):
             cone.y = point_cloud[cone.center[1]][cone.center[0]][0]
             cone.distance = out
             cone.angle = np.arcsin(cone.y/cone.distance)
-            print(cone.angle,cone.y,cone.distance)
 
 
 def main():
