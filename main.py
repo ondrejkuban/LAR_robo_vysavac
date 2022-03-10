@@ -131,12 +131,10 @@ def calculate_euclidean(first_point):  # points[2] for x and points[0] for y
 
 def get_distances_for_cones(point_cloud, cones):
     for cone in cones:
-        out = calculate_euclidean(point_cloud[cone.center[1]][cone.center[0]])
-        if not np.isnan(out):
-            cone.x = get_point_in_space(point_cloud,cone,2)
-            cone.y = get_point_in_space(point_cloud,cone,0)
-            cone.distance = out
-            cone.angle = np.arcsin(cone.y / cone.distance)
+        cone.x = get_point_in_space(point_cloud,cone,2)
+        cone.y = get_point_in_space(point_cloud,cone,0)
+        cone.distance = calculate_euclidean((cone.x,cone.y))
+        cone.angle = np.arcsin(cone.y / cone.distance)
 
 
 def get_point_in_space(point_cloud, cone, axis):
