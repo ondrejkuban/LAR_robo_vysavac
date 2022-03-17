@@ -15,6 +15,7 @@ SURFACE_THRESHOLD = 400
 stop = False
 fun_step = 0
 
+
 # color class
 class Color:
     INVALID = 0
@@ -22,11 +23,12 @@ class Color:
     GREEN = 2
     BLUE = 3
 
+
 class ColorsThresholds:
     #       dark           light
-    RED =   ((0, 100, 50), (5, 255, 255))
+    RED = ((0, 100, 50), (5, 255, 255))
     GREEN = ((45, 70, 20), (75, 255, 255))
-    BLUE =  ((90, 100, 20), (110, 255, 255))
+    BLUE = ((90, 100, 20), (110, 255, 255))
 
 
 class Cone:
@@ -40,6 +42,7 @@ class Cone:
         self.x = None
         self.y = None
         self.angle = None
+
 
 class PID:
     def __init__(self):
@@ -59,6 +62,7 @@ class PID:
             return 0.1
         return self.p_gain * (measurement - self.goal)
 
+
 class DetectedCones:
     def __init__(self):
         self.red = None
@@ -72,9 +76,9 @@ class DetectedCones:
         get_distances_for_cones(point_cloud, self.red)
         get_distances_for_cones(point_cloud, self.green)
         get_distances_for_cones(point_cloud, self.blue)
-        self.red.sort(key=lambda cone: cone.distance)    #bude fungovat??? (dostanu cone a sort podle jeji distance)
-        self.green.sort(key=lambda cone: cone.distance)  #bude fungovat???
-        self.blue.sort(key=lambda cone: cone.distance)   #bude fungovat???
+        self.red.sort(key=lambda cone: cone.distance)  # bude fungovat??? (dostanu cone a sort podle jeji distance)
+        self.green.sort(key=lambda cone: cone.distance)  # bude fungovat???
+        self.blue.sort(key=lambda cone: cone.distance)  # bude fungovat???
 
     def draw_cones(self, image):
         draw_rectangles(image, self.red)
@@ -83,17 +87,18 @@ class DetectedCones:
 
     def get_closest_pair(self):
         closest_cone = None
-        closest_cone = min(x for x in self if x is not None)  #moje duvera v tuhle radku je maximalne 5 (slovy pět)%
-        if closest_cone.color == 1 and len(self.red > 1): #red
-            return [self.red[0],self.red[1]]
-        elif closest_cone.color == 2 and len(self.green > 1): #green
-            return [self.green[0],self.green[1]]
-        elif closest_cone.color == 3 and len(self.blue > 1): #blue
-            return [self.blue[0],self.blue[1]]
+        closest_cone = min(x for x in self if x is not None)  # moje duvera v tuhle radku je maximalne 5 (slovy pět)%
+        if closest_cone.color == 1 and len(self.red > 1):  # red
+            return [self.red[0], self.red[1]]
+        elif closest_cone.color == 2 and len(self.green > 1):  # green
+            return [self.green[0], self.green[1]]
+        elif closest_cone.color == 3 and len(self.blue > 1):  # blue
+            return [self.blue[0], self.blue[1]]
         return closest_cone
         ## chci navratit nejblizsi dvojici
         ## pokud neni dvojice vrat nejblizsi
         ## pokud neni nejblizsi vrat None
+
 
 def detection_is_valid(detection):
     if detection[4] < SURFACE_THRESHOLD:
@@ -105,15 +110,15 @@ def detection_is_valid(detection):
 
 def get_color_for_threshold(threshold):
     return {
-        ColorsThresholds.RED:   Color.RED,
+        ColorsThresholds.RED: Color.RED,
         ColorsThresholds.GREEN: Color.GREEN,
-        ColorsThresholds.BLUE:  Color.BLUE
+        ColorsThresholds.BLUE: Color.BLUE
     }.get(threshold)
 
 
 def get_threshold_for_color(color):
     return {
-        Color.RED:  (0, 0, 255),
+        Color.RED: (0, 0, 255),
         Color.GREEN: (0, 255, 0),
         Color.BLUE: (255, 0, 0)
     }.get(color)
@@ -146,9 +151,9 @@ def calculate_euclidean(first_point):  # points[2] for x and points[0] for y
 
 def get_distances_for_cones(point_cloud, cones):
     for cone in cones:
-        cone.x = get_point_in_space(point_cloud,cone,2)
-        cone.y = get_point_in_space(point_cloud,cone,0)
-        cone.distance = calculate_euclidean((cone.x,cone.y))
+        cone.x = get_point_in_space(point_cloud, cone, 2)
+        cone.y = get_point_in_space(point_cloud, cone, 0)
+        cone.distance = calculate_euclidean((cone.x, cone.y))
         cone.angle = np.arcsin(cone.y / cone.distance)
 
 
@@ -158,7 +163,7 @@ def get_point_in_space(point_cloud, cone, axis):
         for j in range(cone.pt1[1], cone.pt2[1]):
             if not np.isnan(point_cloud[j][i][axis]):
                 points.append(point_cloud[j][i][axis])
-    return round(np.median(points),3)
+    return round(np.median(points), 3)
 
 
 def fun(turtle):
@@ -168,6 +173,7 @@ def fun(turtle):
     # turtle.play_sound(fun_step)
     # turtle.cmd_velocity(linear=0, angular=0.5)
     time.sleep(0.4)
+
 
 # stop robot
 def bumper_callBack(msg):
@@ -190,57 +196,33 @@ def main():
         rgb = turtle.get_rgb_image()
 
         hsv = cv2.cvtColor(rgb, cv2.COLOR_BGR2HSV)
-        ## Pokud se nepletu tenhle radek lze beztrestne smazat
-
-
-        ## CELE UKLIDIT POD DETECTED CONES ##
-        # creating mask to find rectangles
-        '''red_cones,maskR = get_cones_for_color(hsv, ColorsThresholds.RED)
-        green_cones,maskG = get_cones_for_color(hsv, ColorsThresholds.GREEN)
-        blue_cones,maskB = get_cones_for_color(hsv, ColorsThresholds.BLUE)
-
-        get_distances_for_cones(point_cloud, red_cones)
-        get_distances_for_cones(point_cloud, green_cones)
-        get_distances_for_cones(point_cloud, blue_cones)
-
         im = rgb.copy()
-        draw_rectangles(im, red_cones)
-        draw_rectangles(im, green_cones)
-        draw_rectangles(im, blue_cones)'''
-        im = rgb.copy()
-        ##                                 ##
-        detectedCones = DetectedCones() # -> detectedCones.red, green, blue
-        detectedCones.detect_cones(hsv,point_cloud)
-        detectedCones.draw_cones(im) # -> az na konec, prekresli puvodni obrazek mohlo by se s nim pak hure pracovat
+
+        detectedCones = DetectedCones()  # -> detectedCones.red, green, blue
+        detectedCones.detect_cones(hsv, point_cloud)
+        detectedCones.draw_cones(im)  # -> az na konec, prekresli puvodni obrazek mohlo by se s nim pak hure pracovat
 
         # drawing rectangle
 
         minmax = cv2.minMaxLoc(depth)
         max = np.ceil(minmax[1])
         out = cv2.convertScaleAbs(depth, alpha=255 / max)
-        ##                                 ##
-        ###draw_rectangles(out, red_cones)
-       ## draw_rectangles(out, green_cones)
-        #draw_rectangles(out, blue_cones)
-        ##                                 ##
+
         detectedCones.draw_cones(out)
         if not stop:
-            ##                             ##
-            #red_sort = sorted(blue_cones, key=lambda cone: cone.distance)
-            #                              ##
-            ## automaticky seradim v detectedCones.detect_cones
-            if len(detectedCones.red) > 1 and detectedCones.red[0].angle is not None and detectedCones.red[1].angle is not None:
-                error = (detectedCones.red[0].angle + detectedCones.red[1].angle)/2
+            if len(detectedCones.red) > 1 and detectedCones.red[0].angle is not None and detectedCones.red[
+                1].angle is not None:
+                error = (detectedCones.red[0].angle + detectedCones.red[1].angle) / 2
                 if abs(error) > 0.09:
-                    turtle.cmd_velocity(linear=0,angular=-pid.get_new_output(error))
+                    turtle.cmd_velocity(linear=0, angular=-pid.get_new_output(error))
                 else:
                     turtle.cmd_velocity(linear=0.65, angular=0.0)
             elif len(detectedCones.red) > 0 and detectedCones.red[0].angle is not None:
-                if detectedCones.red[0].center[0] > 320 and detectedCones.red[0].distance>0.55:
+                if detectedCones.red[0].center[0] > 320 and detectedCones.red[0].distance > 0.55:
                     turtle.cmd_velocity(linear=0.0, angular=-0.35)
                 else:
                     turtle.cmd_velocity(linear=0.0, angular=0.35)
-            else: #pojede rovne pokud nic nenajde????
+            else:  # pojede rovne pokud nic nenajde????
                 turtle.cmd_velocity(linear=0.65, angular=0.0)
         else:
             fun(turtle)
