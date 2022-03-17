@@ -242,10 +242,11 @@ def main():
                 print(angle,dist1,dist2)
                 state = 1
         elif state == 1:
+            print(turtle.get_odometry()[2])
             if turtle.get_odometry()[2] < angle - 0.1:
-                turtle.cmd_velocity(linear=0, angular=-0.5)
+                turtle.cmd_velocity(linear=0, angular=-0.3)
             elif turtle.get_odometry()[2] > angle + 0.1:
-                turtle.cmd_velocity(linear=0, angular=0.5)
+                turtle.cmd_velocity(linear=0, angular=0.3)
             else:
                 state = 2
         elif state == 2:
