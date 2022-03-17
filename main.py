@@ -176,6 +176,7 @@ def fun(turtle):
     # fun_step += 1
     # fun_step %= 7
     # turtle.play_sound(fun_step)
+    global t
     if get_time - t < 10:
         turtle.cmd_velocity(linear=0, angular=1)
     else:
