@@ -178,7 +178,7 @@ def fun(turtle):
     # turtle.play_sound(fun_step)
     global t
     print(turtle.get_odometry())
-    if turtle.get_odometry()[2] < np.pi*2:
+    if abs(turtle.get_odometry()[2]) < np.pi:
         turtle.cmd_velocity(linear=0, angular=1)
     else:
         turtle.cmd_velocity(linear=0, angular=0)
@@ -190,6 +190,7 @@ def bumper_callBack(msg):
     global stop
     global t
     t = get_time()
+
     stop = True
     print('Bumper was activated, new state is STOP')
 
@@ -245,6 +246,7 @@ def main():
                     turtle.cmd_velocity(linear=0.0, angular=0.35)
             else:  # pojede rovne pokud nic nenajde????
                 turtle.cmd_velocity(linear=0.65, angular=0.0)'''
+            turtle.reset_odometry()
         else:
             fun(turtle)
         cv2.imshow("RGB", im)
