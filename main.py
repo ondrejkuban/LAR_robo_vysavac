@@ -87,7 +87,10 @@ class DetectedCones:
 
     def get_closest_pair(self):
         all_cones = self.red + self.green + self.blue
-        closest_cone = min(all_cones, key=lambda cone: cone.distance)  # moje duvera v tuhle radku je maximalne 5 (slovy pět)%
+        if len(all_cones)>0:
+            closest_cone = min(all_cones, key=lambda cone: cone.distance)# moje duvera v tuhle radku je maximalne 5 (slovy pět)%
+        else:
+            return []
         if closest_cone.color == 1 and len(self.red) > 1:  # red
             return [self.red[0], self.red[1]]
         elif closest_cone.color == 2 and len(self.green) > 1:  # green
