@@ -12,7 +12,7 @@ WINDOW_D = 'DEPTH'  # depth
 WINDOW = 'RGB'
 SURFACE_THRESHOLD = 400
 
-stop = True
+stop = False
 fun_step = 0
 
 
@@ -175,7 +175,7 @@ def fun(turtle):
     # fun_step %= 7
     # turtle.play_sound(fun_step)
     turtle.cmd_velocity(linear=0, angular=1)
-    time.sleep(2)
+    time.sleep(10)
     global stop
     stop = False
 
