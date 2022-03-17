@@ -72,9 +72,9 @@ class DetectedCones:
         get_distances_for_cones(point_cloud, self.red)
         get_distances_for_cones(point_cloud, self.green)
         get_distances_for_cones(point_cloud, self.blue)
-        sorted(self.red, key=lambda cone: cone.distance)    #bude fungovat??? (dostanu cone a sort podle jeji distance)
-        sorted(self.green, key=lambda cone: cone.distance)  #bude fungovat???
-        sorted(self.blue, key=lambda cone: cone.distance)   #bude fungovat???
+        self.red.sort(key=lambda cone: cone.distance)    #bude fungovat??? (dostanu cone a sort podle jeji distance)
+        self.green.sort(key=lambda cone: cone.distance)  #bude fungovat???
+        self.blue.sort(key=lambda cone: cone.distance)   #bude fungovat???
 
     def draw_cones(self, image):
         draw_rectangles(image, self.red)
@@ -131,7 +131,7 @@ def get_cones_for_color(image, threshold: tuple):
                                 (detections[2][i][0], detections[2][i][1]),
                                 (detections[2][i][2], detections[2][i][3])))
 
-    return results, mask
+    return results
 
 
 def draw_rectangles(image, cones: list):
@@ -180,7 +180,6 @@ def main():
     global stop
     turtle = Turtlebot(pc=True, rgb=True, depth=True)
     cv2.namedWindow(WINDOW)  # display rgb image
-    cv2.namedWindow("MASK")
     turtle.register_bumper_event_cb(bumper_callBack)
     pid = PID()
     while not turtle.is_shutting_down():
@@ -196,7 +195,7 @@ def main():
 
         ## CELE UKLIDIT POD DETECTED CONES ##
         # creating mask to find rectangles
-        red_cones,maskR = get_cones_for_color(hsv, ColorsThresholds.RED)
+        '''red_cones,maskR = get_cones_for_color(hsv, ColorsThresholds.RED)
         green_cones,maskG = get_cones_for_color(hsv, ColorsThresholds.GREEN)
         blue_cones,maskB = get_cones_for_color(hsv, ColorsThresholds.BLUE)
 
@@ -207,11 +206,12 @@ def main():
         im = rgb.copy()
         draw_rectangles(im, red_cones)
         draw_rectangles(im, green_cones)
-        draw_rectangles(im, blue_cones)
+        draw_rectangles(im, blue_cones)'''
+        im = rgb.copy()
         ##                                 ##
-        # detectedCones = DetectedCones() # -> detectedCones.red, green, blue
-        # detectedCones.detect_cones(im,point_cloud)
-        # detectedCones.draw_cones(im) # -> az na konec, prekresli puvodni obrazek mohlo by se s nim pak hure pracovat
+        detectedCones = DetectedCones() # -> detectedCones.red, green, blue
+        detectedCones.detect_cones(hsv,point_cloud)
+        detectedCones.draw_cones(im) # -> az na konec, prekresli puvodni obrazek mohlo by se s nim pak hure pracovat
 
         # drawing rectangle
 
@@ -219,24 +219,24 @@ def main():
         max = np.ceil(minmax[1])
         out = cv2.convertScaleAbs(depth, alpha=255 / max)
         ##                                 ##
-        draw_rectangles(out, red_cones)
-        draw_rectangles(out, green_cones)
-        draw_rectangles(out, blue_cones)
+        ###draw_rectangles(out, red_cones)
+       ## draw_rectangles(out, green_cones)
+        #draw_rectangles(out, blue_cones)
         ##                                 ##
-        #detectedCones.draw_cones(out)
+        detectedCones.draw_cones(out)
         if not stop:
             ##                             ##
-            red_sort = sorted(blue_cones, key=lambda cone: cone.distance)
+            #red_sort = sorted(blue_cones, key=lambda cone: cone.distance)
             #                              ##
             ## automaticky seradim v detectedCones.detect_cones
-            if len(red_sort) > 1 and red_sort[0].angle is not None and red_sort[1].angle is not None:
-                error = (red_sort[0].angle + red_sort[1].angle)/2
+            if len(detectedCones.red) > 1 and detectedCones.red[0].angle is not None and detectedCones.red[1].angle is not None:
+                error = (detectedCones.red[0].angle + detectedCones.red[1].angle)/2
                 if abs(error) > 0.09:
                     turtle.cmd_velocity(linear=0,angular=-pid.get_new_output(error))
                 else:
                     turtle.cmd_velocity(linear=0.65, angular=0.0)
-            elif len(red_sort) > 0 and red_sort[0].angle is not None:
-                if red_sort[0].center[0] > 320 and red_sort[0].distance>0.55:
+            elif len(detectedCones.red) > 0 and detectedCones.red[0].angle is not None:
+                if detectedCones.red[0].center[0] > 320 and detectedCones.red[0].distance>0.55:
                     turtle.cmd_velocity(linear=0.0, angular=-0.35)
                 else:
                     turtle.cmd_velocity(linear=0.0, angular=0.35)
@@ -245,7 +245,7 @@ def main():
         else:
             fun(turtle)
         cv2.imshow("RGB", im)
-        cv2.imshow("MASK",maskB)
+
         cv2.waitKey(1)
 
 
