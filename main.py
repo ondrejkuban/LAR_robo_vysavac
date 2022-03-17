@@ -227,8 +227,15 @@ def main():
             goal2 = (pair[1].y-pair[0].y+(pair[0].x+pair[1].x)/2,pair[0].x-pair[1].x+(pair[0].y+pair[1].y)/2)
             dist1 = np.sqrt(goal1[0]**2+goal1[1]**2)
             dist2 = np.sqrt(goal2[0]**2+goal2[1]**2)
-
-
+            angle = 0
+            if dist1 < dist2:
+                angle = np.arcsin(goal1[1]/dist1)
+            else:
+                angle = np.arcsin(goal2[1]/dist2)
+            while turtle.get_odometry()[2] < angle-0.1:
+                turtle.cmd_velocity(linear=0,angular=0.5)
+            while turtle.get_odometry()[2] > angle+0.1:
+                turtle.cmd_velocity(linear=0, angular=-0.5)
         if not stop:
 
             '''
