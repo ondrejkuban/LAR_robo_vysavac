@@ -243,13 +243,13 @@ def main():
                 state = 1
         elif state == 1:
             if turtle.get_odometry()[2] < angle - 0.1:
-                turtle.cmd_velocity(linear=0, angular=0.5)
-            elif turtle.get_odometry()[2] > angle + 0.1:
                 turtle.cmd_velocity(linear=0, angular=-0.5)
+            elif turtle.get_odometry()[2] > angle + 0.1:
+                turtle.cmd_velocity(linear=0, angular=0.5)
             else:
                 state = 2
         elif state == 2:
-            print("picovina")
+            print("lol")
             turtle.cmd_velocity(linear=0, angular=0)
 
         cv2.waitKey(1)
