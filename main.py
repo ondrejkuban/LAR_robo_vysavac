@@ -204,6 +204,7 @@ def main():
     turtle.register_bumper_event_cb(bumper_callBack)
     pid = PID()
     angle = 0
+    distance = 0
     while not turtle.is_shutting_down():
         # get point cloud
         depth = turtle.get_depth_image()
@@ -237,8 +238,10 @@ def main():
                 angle = 0
                 if dist1 < dist2:
                     angle = np.pi/2 - np.arcsin(goal1[0] / dist1)
+                    distance = dist1
                 else:
                     angle = np.pi/2 - np.arcsin(goal2[0] / dist2)
+                    distance = dist2
                 print(angle,dist1,dist2)
                 turtle.reset_odometry()
                 state = 1
@@ -249,10 +252,17 @@ def main():
             elif turtle.get_odometry()[2] > angle + 0.05:
                 turtle.cmd_velocity(linear=0, angular=-0.3)
             else:
+                turtle.reset_odometry()
                 state = 2
         elif state == 2:
-            print("lol")
-            turtle.cmd_velocity(linear=0, angular=0)
+            odom = turtle.get_odometry()
+            if np.sqrt(odom[0]**2 + odom[1]**2) < distance:
+                turtle.cmd_velocity(linear=0.6, angular=0)
+            else:
+                state = 3
+        elif state == 3:
+            print("mega dobry kamo")
+            turtle.cmd_velocity(linear=0.0, angular=0)
 
         cv2.waitKey(1)
 
