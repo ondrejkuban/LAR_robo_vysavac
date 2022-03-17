@@ -239,12 +239,13 @@ def main():
                     angle = 90 - np.arcsin(goal1[0] / dist1)
                 else:
                     angle = 90 - np.arcsin(goal2[0] / dist2)
+                print(angle,dist1,dist2)
                 state = 1
         elif state == 1:
             if turtle.get_odometry()[2] < angle - 0.1:
-                turtle.cmd_velocity(linear=0, angular=-0.5)
+                turtle.cmd_velocity(linear=0, angular=-0.0)
             elif turtle.get_odometry()[2] > angle + 0.1:
-                turtle.cmd_velocity(linear=0, angular=0.5)
+                turtle.cmd_velocity(linear=0, angular=0.0)
             else:
                 state = 2
         elif state == 2:
