@@ -177,7 +177,7 @@ def fun(turtle):
     # fun_step %= 7
     # turtle.play_sound(fun_step)
     global t
-    if get_time - t < 10:
+    if turtle.get_odometry()[2] < np.pi*2:
         turtle.cmd_velocity(linear=0, angular=1)
     else:
         turtle.cmd_velocity(linear=0, angular=0)
