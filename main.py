@@ -236,9 +236,9 @@ def main():
                 dist2 = np.sqrt(goal2[0] ** 2 + goal2[1] ** 2)
                 angle = 0
                 if dist1 < dist2:
-                    angle = 90 - np.arcsin(goal1[0] / dist1)
+                    angle = np.pi/2 - np.arcsin(goal1[0] / dist1)
                 else:
-                    angle = 90 - np.arcsin(goal2[0] / dist2)
+                    angle = np.pi/2 - np.arcsin(goal2[0] / dist2)
                 print(angle,dist1,dist2)
                 state = 1
         elif state == 1:
