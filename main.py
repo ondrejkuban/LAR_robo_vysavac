@@ -257,7 +257,7 @@ def main():
         elif state == 2:
             odom = turtle.get_odometry()
             if np.sqrt(odom[0]**2 + odom[1]**2) < distance:
-                turtle.cmd_velocity(linear=0.6, angular=0)
+                turtle.cmd_velocity(linear=0.3, angular=0)
             else:
                 state = 3
         elif state == 3:
