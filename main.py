@@ -177,6 +177,7 @@ def fun(turtle):
     # fun_step %= 7
     # turtle.play_sound(fun_step)
     global t
+    print(turtle.get_odometry())
     if turtle.get_odometry()[2] < np.pi*2:
         turtle.cmd_velocity(linear=0, angular=1)
     else:
@@ -225,10 +226,7 @@ def main():
             goal2 = (pair[1].y-pair[0].y+(pair[0].x+pair[1].x)/2,pair[0].x-pair[1].x+(pair[0].y+pair[1].y)/2)
             dist1 = np.sqrt(goal1[0]**2+goal1[1]**2)
             dist2 = np.sqrt(goal2[0]**2+goal2[1]**2)
-            if dist1 > dist2:
-                print(goal2,dist2)
-            else:
-                print(goal1,dist1)
+
 
         if not stop:
 
