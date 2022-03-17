@@ -207,8 +207,9 @@ def main():
         minmax = cv2.minMaxLoc(depth)
         max = np.ceil(minmax[1])
         out = cv2.convertScaleAbs(depth, alpha=255 / max)
-
         detectedCones.draw_cones(out)
+        pair = detectedCones.get_closest_pair()
+        print(pair[0].distance,pair[1].distance)
         if not stop:
             if len(detectedCones.red) > 1 and detectedCones.red[0].angle is not None and detectedCones.red[
                 1].angle is not None:
