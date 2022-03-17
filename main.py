@@ -240,6 +240,7 @@ def main():
                 else:
                     angle = np.pi/2 - np.arcsin(goal2[0] / dist2)
                 print(angle,dist1,dist2)
+                turtle.reset_odometry()
                 state = 1
         elif state == 1:
             print(turtle.get_odometry()[2])
