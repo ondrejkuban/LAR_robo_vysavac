@@ -198,12 +198,13 @@ def bumper_callBack(msg):
 def main():
     global stop
     turtle = Turtlebot(pc=True, rgb=True, depth=True)
+    state = 0
     cv2.namedWindow(WINDOW)  # display rgb image
     turtle.register_bumper_event_cb(bumper_callBack)
     pid = PID()
+    angle = 0
     while not turtle.is_shutting_down():
         # get point cloud
-
         depth = turtle.get_depth_image()
         point_cloud = turtle.get_point_cloud()
         rgb = turtle.get_rgb_image()
@@ -221,42 +222,31 @@ def main():
         max = np.ceil(minmax[1])
         out = cv2.convertScaleAbs(depth, alpha=255 / max)
         detectedCones.draw_cones(out)
-        pair = detectedCones.get_closest_pair()
-        if len(pair)>1:
-            goal1 = (pair[0].y-pair[1].y+(pair[0].x+pair[1].x)/2,pair[1].x-pair[0].x+(pair[0].y+pair[1].y)/2)
-            goal2 = (pair[1].y-pair[0].y+(pair[0].x+pair[1].x)/2,pair[0].x-pair[1].x+(pair[0].y+pair[1].y)/2)
-            dist1 = np.sqrt(goal1[0]**2+goal1[1]**2)
-            dist2 = np.sqrt(goal2[0]**2+goal2[1]**2)
-            angle = 0
-            if dist1 < dist2:
-                angle = np.arcsin(goal1[1]/dist1)
-            else:
-                angle = np.arcsin(goal2[1]/dist2)
-            while turtle.get_odometry()[2] < angle-0.1:
-                turtle.cmd_velocity(linear=0,angular=0.5)
-            while turtle.get_odometry()[2] > angle+0.1:
-                turtle.cmd_velocity(linear=0, angular=-0.5)
-        if not stop:
 
-            '''
-            if len(detectedCones.red) > 1 and detectedCones.red[0].angle is not None and detectedCones.red[
-                1].angle is not None:
-                error = (detectedCones.red[0].angle + detectedCones.red[1].angle) / 2
-                if abs(error) > 0.09:
-                    turtle.cmd_velocity(linear=0, angular=-pid.get_new_output(error))
-                else:
-                    turtle.cmd_velocity(linear=0.65, angular=0.0)
-            elif len(detectedCones.red) > 0 and detectedCones.red[0].angle is not None:
-                if detectedCones.red[0].center[0] > 320 and detectedCones.red[0].distance > 0.55:
-                    turtle.cmd_velocity(linear=0.0, angular=-0.35)
-                else:
-                    turtle.cmd_velocity(linear=0.0, angular=0.35)
-            else:  # pojede rovne pokud nic nenajde????
-                turtle.cmd_velocity(linear=0.65, angular=0.0)'''
-            turtle.reset_odometry()
-        else:
-            fun(turtle)
         cv2.imshow("RGB", im)
+        if state == 0:
+            pair = detectedCones.get_closest_pair()
+            if len(pair)>1:
+                goal1 = (pair[0].y-pair[1].y+(pair[0].x+pair[1].x)/2,pair[1].x-pair[0].x+(pair[0].y+pair[1].y)/2)
+                goal2 = (pair[1].y-pair[0].y+(pair[0].x+pair[1].x)/2,pair[0].x-pair[1].x+(pair[0].y+pair[1].y)/2)
+                dist1 = np.sqrt(goal1[0]**2+goal1[1]**2)
+                dist2 = np.sqrt(goal2[0]**2+goal2[1]**2)
+                angle = 0
+                if dist1 < dist2:
+                    angle = np.arcsin(goal1[1]/dist1)
+                else:
+                    angle = np.arcsin(goal2[1]/dist2)
+                state = 1
+        elif state == 1:
+            if turtle.get_odometry()[2] < angle-0.1:
+                turtle.cmd_velocity(linear=0,angular=0.5)
+            elif turtle.get_odometry()[2] > angle+0.1:
+                turtle.cmd_velocity(linear=0, angular=-0.5)
+            else:
+                state = 2
+        elif state == 2:
+            print("picovina")
+            turtle.cmd_velocity(linear=0, angular=0)
 
         cv2.waitKey(1)
 
