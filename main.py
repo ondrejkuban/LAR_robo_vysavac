@@ -12,7 +12,7 @@ WINDOW_D = 'DEPTH'  # depth
 WINDOW = 'RGB'
 SURFACE_THRESHOLD = 400
 
-stop = False
+stop = True
 fun_step = 0
 
 
@@ -209,7 +209,15 @@ def main():
         out = cv2.convertScaleAbs(depth, alpha=255 / max)
         detectedCones.draw_cones(out)
         pair = detectedCones.get_closest_pair()
-        print(pair[0].distance,pair[1].distance)
+        goal1 = (pair[0].y-pair[1].y+(pair[0].x+pair[1].x)/2,pair[1].x-pair[0].x+(pair[0].y+pair[1].y)/2)
+        goal2 = (pair[1].y-pair[0].y+(pair[0].x+pair[1].x)/2,pair[0].x-pair[1].x+(pair[0].y+pair[1].y)/2)
+        dist1 = np.sqrt(goal1[0]**2+goal1[1]**2)
+        dist2 = np.sqrt(goal2[0]**2+goal2[1]**2)
+        if dist1 > dist2:
+            print(goal2,dist2)
+        else:
+            print(goal1,dist1)
+
         if not stop:
             if len(detectedCones.red) > 1 and detectedCones.red[0].angle is not None and detectedCones.red[
                 1].angle is not None:
