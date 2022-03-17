@@ -89,8 +89,9 @@ class DetectedCones:
 
     def get_closest_pair(self):
         all_cones = self.red + self.green + self.blue
-        if len(all_cones)>0:
-            closest_cone = min(all_cones, key=lambda cone: cone.distance)# moje duvera v tuhle radku je maximalne 5 (slovy pět)%
+        if len(all_cones) > 0:
+            closest_cone = min(all_cones,
+                               key=lambda cone: cone.distance)  # moje duvera v tuhle radku je maximalne 5 (slovy pět)%
         else:
             return []
         if closest_cone.color == 1 and len(self.red) > 1:  # red
@@ -147,7 +148,8 @@ def get_cones_for_color(image, threshold: tuple):
 def draw_rectangles(image, cones: list):
     for cone in cones:
         cv2.rectangle(image, cone.pt1, cone.pt2, color=get_threshold_for_color(cone.color), thickness=2)
-        cv2.putText(image, str(round(cone.distance,2)), cone.pt1, cv2.FONT_ITALIC, 1, get_threshold_for_color(cone.color), 2)
+        cv2.putText(image, str(round(cone.distance, 2)), cone.pt1, cv2.FONT_ITALIC, 1,
+                    get_threshold_for_color(cone.color), 2)
 
 
 def calculate_euclidean(first_point):  # points[2] for x and points[0] for y
@@ -182,7 +184,6 @@ def fun(turtle):
         turtle.cmd_velocity(linear=0, angular=1)
     else:
         turtle.cmd_velocity(linear=0, angular=0)
-
 
 
 # stop robot
@@ -226,21 +227,23 @@ def main():
         cv2.imshow("RGB", im)
         if state == 0:
             pair = detectedCones.get_closest_pair()
-            if len(pair)>1:
-                goal1 = (pair[0].y-pair[1].y+(pair[0].x+pair[1].x)/2,pair[1].x-pair[0].x+(pair[0].y+pair[1].y)/2)
-                goal2 = (pair[1].y-pair[0].y+(pair[0].x+pair[1].x)/2,pair[0].x-pair[1].x+(pair[0].y+pair[1].y)/2)
-                dist1 = np.sqrt(goal1[0]**2+goal1[1]**2)
-                dist2 = np.sqrt(goal2[0]**2+goal2[1]**2)
+            if len(pair) > 1:
+                center = ((pair[0].x + pair[1].x) / 2, (pair[0].y + pair[1].y) / 2)
+                goal1 = (center[0] + (pair[1].y - pair[0].y) / 2, center[1] + (pair[0].x - pair[1].x) / 2)
+                goal2 = (center[0] - (pair[1].y - pair[0].y) / 2, center[1] - (pair[0].x - pair[1].x) / 2)
+                print("goal1",goal1,"goal2",goal2)
+                dist1 = np.sqrt(goal1[0] ** 2 + goal1[1] ** 2)
+                dist2 = np.sqrt(goal2[0] ** 2 + goal2[1] ** 2)
                 angle = 0
                 if dist1 < dist2:
-                    angle = np.arcsin(goal1[1]/dist1)
+                    angle = 90 - np.arcsin(goal1[0] / dist1)
                 else:
-                    angle = np.arcsin(goal2[1]/dist2)
+                    angle = 90 - np.arcsin(goal2[0] / dist2)
                 state = 1
         elif state == 1:
-            if turtle.get_odometry()[2] < angle-0.1:
-                turtle.cmd_velocity(linear=0,angular=0.5)
-            elif turtle.get_odometry()[2] > angle+0.1:
+            if turtle.get_odometry()[2] < angle - 0.1:
+                turtle.cmd_velocity(linear=0, angular=0.5)
+            elif turtle.get_odometry()[2] > angle + 0.1:
                 turtle.cmd_velocity(linear=0, angular=-0.5)
             else:
                 state = 2
