@@ -142,7 +142,7 @@ def get_cones_for_color(image, threshold: tuple):
 def draw_rectangles(image, cones: list):
     for cone in cones:
         cv2.rectangle(image, cone.pt1, cone.pt2, color=get_threshold_for_color(cone.color), thickness=2)
-        cv2.putText(image, str(cone.distance), cone.pt1, cv2.FONT_ITALIC, 1, get_threshold_for_color(cone.color), 2)
+        cv2.putText(image, str(round(cone.distance,2)), cone.pt1, cv2.FONT_ITALIC, 1, get_threshold_for_color(cone.color), 2)
 
 
 def calculate_euclidean(first_point):  # points[2] for x and points[0] for y
