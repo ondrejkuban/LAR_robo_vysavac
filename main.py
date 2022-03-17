@@ -171,8 +171,10 @@ def fun(turtle):
     # fun_step += 1
     # fun_step %= 7
     # turtle.play_sound(fun_step)
-    # turtle.cmd_velocity(linear=0, angular=0.5)
-    time.sleep(0.4)
+    turtle.cmd_velocity(linear=0, angular=1)
+    time.sleep(2)
+    global stop
+    stop = False
 
 
 # stop robot
@@ -219,6 +221,8 @@ def main():
             print(goal1,dist1)
 
         if not stop:
+
+            '''
             if len(detectedCones.red) > 1 and detectedCones.red[0].angle is not None and detectedCones.red[
                 1].angle is not None:
                 error = (detectedCones.red[0].angle + detectedCones.red[1].angle) / 2
@@ -232,7 +236,7 @@ def main():
                 else:
                     turtle.cmd_velocity(linear=0.0, angular=0.35)
             else:  # pojede rovne pokud nic nenajde????
-                turtle.cmd_velocity(linear=0.65, angular=0.0)
+                turtle.cmd_velocity(linear=0.65, angular=0.0)'''
         else:
             fun(turtle)
         cv2.imshow("RGB", im)
