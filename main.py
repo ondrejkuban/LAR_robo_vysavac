@@ -131,7 +131,7 @@ def get_cones_for_color(image, threshold: tuple):
                                 (detections[2][i][0], detections[2][i][1]),
                                 (detections[2][i][2], detections[2][i][3])))
 
-    return results
+    return results, mask
 
 
 def draw_rectangles(image, cones: list):
@@ -180,6 +180,7 @@ def main():
     global stop
     turtle = Turtlebot(pc=True, rgb=True, depth=True)
     cv2.namedWindow(WINDOW)  # display rgb image
+    cv2.namedWindow("MASK")
     turtle.register_bumper_event_cb(bumper_callBack)
     pid = PID()
     while not turtle.is_shutting_down():
@@ -191,13 +192,13 @@ def main():
 
         hsv = cv2.cvtColor(rgb, cv2.COLOR_BGR2HSV)
         ## Pokud se nepletu tenhle radek lze beztrestne smazat
-        get_cones_for_color(hsv, ColorsThresholds.BLUE)
+
 
         ## CELE UKLIDIT POD DETECTED CONES ##
         # creating mask to find rectangles
-        red_cones = get_cones_for_color(hsv, ColorsThresholds.RED)
-        green_cones = get_cones_for_color(hsv, ColorsThresholds.GREEN)
-        blue_cones = get_cones_for_color(hsv, ColorsThresholds.BLUE)
+        red_cones,maskR = get_cones_for_color(hsv, ColorsThresholds.RED)
+        green_cones,maskG = get_cones_for_color(hsv, ColorsThresholds.GREEN)
+        blue_cones,maskB = get_cones_for_color(hsv, ColorsThresholds.BLUE)
 
         get_distances_for_cones(point_cloud, red_cones)
         get_distances_for_cones(point_cloud, green_cones)
@@ -244,6 +245,7 @@ def main():
         else:
             fun(turtle)
         cv2.imshow("RGB", im)
+        cv2.imshow("MASK",maskB)
         cv2.waitKey(1)
 
 
