@@ -244,6 +244,7 @@ def main():
                     distance = dist2
                 print(angle,dist1,dist2)
                 turtle.reset_odometry()
+                distance -= distance*0.05
                 state = 1
         elif state == 1:
             print(turtle.get_odometry()[2])
