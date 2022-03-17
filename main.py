@@ -1,6 +1,7 @@
 from __future__ import print_function
 from robolab_turtlebot import Turtlebot, Rate
-from robolab_turtlebot import detector
+from robolab_turtlebot import detector, get_time
+
 import numpy as np
 import cv2
 import time
@@ -13,6 +14,7 @@ WINDOW = 'RGB'
 SURFACE_THRESHOLD = 400
 
 stop = False
+t = 0
 fun_step = 0
 
 
@@ -97,7 +99,7 @@ class DetectedCones:
             return [self.green[0], self.green[1]]
         elif closest_cone.color == 3 and len(self.blue) > 1:  # blue
             return [self.blue[0], self.blue[1]]
-        return closest_cone
+        return [closest_cone]
         ## chci navratit nejblizsi dvojici
         ## pokud neni dvojice vrat nejblizsi
         ## pokud neni nejblizsi vrat None
@@ -174,15 +176,18 @@ def fun(turtle):
     # fun_step += 1
     # fun_step %= 7
     # turtle.play_sound(fun_step)
-    turtle.cmd_velocity(linear=0, angular=1)
-    time.sleep(10)
-    global stop
-    stop = False
+    if get_time - t < 10:
+        turtle.cmd_velocity(linear=0, angular=1)
+    else:
+        turtle.cmd_velocity(linear=0, angular=0)
+
 
 
 # stop robot
 def bumper_callBack(msg):
     global stop
+    global t
+    t = get_time()
     stop = True
     print('Bumper was activated, new state is STOP')
 
