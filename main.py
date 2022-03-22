@@ -6,6 +6,8 @@ import numpy as np
 import cv2
 import time
 
+from cone_detections import DetectedCones
+
 x_range = (-0.3, 0.3)
 z_range = (0.3, 3.0)
 
@@ -18,159 +20,67 @@ t = 0
 fun_step = 0
 
 
-# color class
-class Color:
-    INVALID = 0
-    RED = 1
-    GREEN = 2
-    BLUE = 3
-
-
-class ColorsThresholds:
-    #       dark           light
-    RED = ((0, 100, 50), (5, 255, 255))
-    GREEN = ((45, 70, 20), (75, 255, 255))
-    BLUE = ((90, 100, 20), (110, 255, 255))
-
-
-class Cone:
-    def __init__(self, color: int, position: tuple, size: tuple):
-        self.color = color
-        self.pt1 = position
-        self.pt2 = (position[0] + size[0], position[1] + size[1])
-        self.size = size
-        self.center = (position[0] + size[0] // 2, position[1] + size[1] // 2)
-        self.distance = -1
-        self.x = None
-        self.y = None
+class StateMachine:
+    def __init__(self, turtle):
+        self.current_state = self.idle
+        self.turtle = turtle
+        self.detected_cones = None
         self.angle = None
+        self.distance = None
 
+    def run_state(self):
+        self.current_state()
 
-class PID:
-    def __init__(self):
-        self.p_gain = 1.25
-        self.i_gain = 1
-        self.d_gain = 1
-        self.goal = 0
+    def idle(self):
+        print("IDLE")
+        self.turtle.cmd_velocity(linear=0.0, angular=0)
 
-    def get_new_output(self, measurement):
-        if self.p_gain * (measurement - self.goal) > 1:
-            return 1
-        if self.p_gain * (measurement - self.goal) < -1:
-            return -1
-        if -0.1 < self.p_gain * (measurement - self.goal) < 0:
-            return -0.1
-        if 0.1 > self.p_gain * (measurement - self.goal) > 0:
-            return 0.1
-        return self.p_gain * (measurement - self.goal)
+    def detect_cones(self):
+        point_cloud = self.turtle.get_point_cloud()
+        rgb_image = self.turtle.get_rgb_image()
+        image_copy = rgb_image.copy()
+        self.detected_cones = DetectedCones()  # -> detectedCones.red, green, blue
+        self.detected_cones.detect_cones(rgb_image, point_cloud)
+        self.detected_cones.draw_cones(
+            image_copy)  # -> az na konec, prekresli puvodni obrazek mohlo by se s nim pak hure pracovat
+        cv2.imshow("RGB", image_copy)
+        self.current_state = self.estimate_cones_position
 
+    def estimate_cones_position(self):
+        pair = self.detected_cones.get_closest_pair()
+        if len(pair) > 1:
+            center = ((pair[0].x + pair[1].x) / 2, (pair[0].y + pair[1].y) / 2)
+            goal1 = (center[0] + (pair[1].y - pair[0].y) / 2, center[1] + (pair[0].x - pair[1].x) / 2)
+            goal2 = (center[0] - (pair[1].y - pair[0].y) / 2, center[1] - (pair[0].x - pair[1].x) / 2)
+            print("goal1", goal1, "goal2", goal2)
+            dist1 = np.sqrt(goal1[0] ** 2 + goal1[1] ** 2)
+            dist2 = np.sqrt(goal2[0] ** 2 + goal2[1] ** 2)
+            if dist1 < dist2:
+                self.angle = np.pi / 2 - np.arcsin(goal1[0] / dist1)
+                distance = dist1
+            else:
+                self.angle = np.arcsin(goal2[0] / dist2) - np.pi / 2
+                distance = dist2
+            print(self.angle, dist1, dist2)
+            self.turtle.reset_odometry()
+            self.distance -= distance * 0.05
+            self.current_state = self.turn_turtle_to_angle
 
-class DetectedCones:
-    def __init__(self):
-        self.red = None
-        self.green = None
-        self.blue = None
-
-    def detect_cones(self, image, point_cloud):
-        self.red = get_cones_for_color(image, ColorsThresholds.RED)
-        self.green = get_cones_for_color(image, ColorsThresholds.GREEN)
-        self.blue = get_cones_for_color(image, ColorsThresholds.BLUE)
-        get_distances_for_cones(point_cloud, self.red)
-        get_distances_for_cones(point_cloud, self.green)
-        get_distances_for_cones(point_cloud, self.blue)
-        self.red.sort(key=lambda cone: cone.distance)  # bude fungovat??? (dostanu cone a sort podle jeji distance)
-        self.green.sort(key=lambda cone: cone.distance)  # bude fungovat???
-        self.blue.sort(key=lambda cone: cone.distance)  # bude fungovat???
-
-    def draw_cones(self, image):
-        draw_rectangles(image, self.red)
-        draw_rectangles(image, self.green)
-        draw_rectangles(image, self.blue)
-
-    def get_closest_pair(self):
-        all_cones = self.red + self.green + self.blue
-        if len(all_cones) > 0:
-            closest_cone = min(all_cones,
-                               key=lambda cone: cone.distance)  # moje duvera v tuhle radku je maximalne 5 (slovy pět)%
+    def turn_turtle_to_angle(self):
+        if self.turtle.get_odometry()[2] < self.angle - 0.05:
+            self.turtle.cmd_velocity(linear=0, angular=0.3)
+        elif self.turtle.get_odometry()[2] > self.angle + 0.05:
+            self.turtle.cmd_velocity(linear=0, angular=-0.3)
         else:
-            return []
-        if closest_cone.color == 1 and len(self.red) > 1:  # red
-            return [self.red[0], self.red[1]]
-        elif closest_cone.color == 2 and len(self.green) > 1:  # green
-            return [self.green[0], self.green[1]]
-        elif closest_cone.color == 3 and len(self.blue) > 1:  # blue
-            return [self.blue[0], self.blue[1]]
-        return [closest_cone]
-        ## chci navratit nejblizsi dvojici
-        ## pokud neni dvojice vrat nejblizsi
-        ## pokud neni nejblizsi vrat None
+            self.turtle.reset_odometry()
+            self.current_state = self.drive_turtle_to_position
 
-
-def detection_is_valid(detection):
-    if detection[4] < SURFACE_THRESHOLD:
-        return False
-    if detection[2] * 2 > detection[3]:
-        return False
-    return True
-
-
-def get_color_for_threshold(threshold):
-    return {
-        ColorsThresholds.RED: Color.RED,
-        ColorsThresholds.GREEN: Color.GREEN,
-        ColorsThresholds.BLUE: Color.BLUE
-    }.get(threshold)
-
-
-def get_threshold_for_color(color):
-    return {
-        Color.RED: (0, 0, 255),
-        Color.GREEN: (0, 255, 0),
-        Color.BLUE: (255, 0, 0)
-    }.get(color)
-
-
-# Return "array of Cones" from image
-def get_cones_for_color(image, threshold: tuple):
-    mask = cv2.inRange(image, threshold[0], threshold[1])
-    detections = cv2.connectedComponentsWithStats(mask.astype(np.uint8))
-
-    results = []
-    for i in range(1, detections[0]):
-        if detection_is_valid(detections[2][i]):
-            results.append(Cone(get_color_for_threshold(threshold),
-                                (detections[2][i][0], detections[2][i][1]),
-                                (detections[2][i][2], detections[2][i][3])))
-
-    return results
-
-
-def draw_rectangles(image, cones: list):
-    for cone in cones:
-        cv2.rectangle(image, cone.pt1, cone.pt2, color=get_threshold_for_color(cone.color), thickness=2)
-        cv2.putText(image, str(round(cone.distance, 2)), cone.pt1, cv2.FONT_ITALIC, 1,
-                    get_threshold_for_color(cone.color), 2)
-
-
-def calculate_euclidean(first_point):  # points[2] for x and points[0] for y
-    return np.sqrt((first_point[0]) ** 2 + (first_point[1]) ** 2)
-
-
-def get_distances_for_cones(point_cloud, cones):
-    for cone in cones:
-        cone.x = get_point_in_space(point_cloud, cone, 2)
-        cone.y = get_point_in_space(point_cloud, cone, 0)
-        cone.distance = calculate_euclidean((cone.x, cone.y))
-        cone.angle = np.arcsin(cone.y / cone.distance)
-
-
-def get_point_in_space(point_cloud, cone, axis):
-    points = []
-    for i in range(cone.pt1[0], cone.pt2[0]):
-        for j in range(cone.pt1[1], cone.pt2[1]):
-            if not np.isnan(point_cloud[j][i][axis]):
-                points.append(point_cloud[j][i][axis])
-    return round(np.median(points), 3)
+    def drive_turtle_to_position(self):
+        odom = self.turtle.get_odometry()
+        if np.sqrt(odom[0] ** 2 + odom[1] ** 2) < self.distance:
+            self.turtle.cmd_velocity(linear=0.3, angular=0)
+        else:
+            self.current_state = self.idle
 
 
 def fun(turtle):
@@ -187,7 +97,7 @@ def fun(turtle):
 
 
 # stop robot
-def bumper_callBack(msg):
+def bumper_cb(msg):
     global stop
     global t
     t = get_time()
@@ -201,69 +111,21 @@ def main():
     turtle = Turtlebot(pc=True, rgb=True, depth=True)
     state = 0
     cv2.namedWindow(WINDOW)  # display rgb image
-    turtle.register_bumper_event_cb(bumper_callBack)
-    pid = PID()
+    turtle.register_bumper_event_cb(bumper_cb)
     angle = 0
     distance = 0
+    state_machine = StateMachine(turtle)
     while not turtle.is_shutting_down():
         # get point cloud
-        depth = turtle.get_depth_image()
         point_cloud = turtle.get_point_cloud()
-        rgb = turtle.get_rgb_image()
-
-        hsv = cv2.cvtColor(rgb, cv2.COLOR_BGR2HSV)
-        im = rgb.copy()
-
-        detectedCones = DetectedCones()  # -> detectedCones.red, green, blue
-        detectedCones.detect_cones(hsv, point_cloud)
-        detectedCones.draw_cones(im)  # -> az na konec, prekresli puvodni obrazek mohlo by se s nim pak hure pracovat
-
-        # drawing rectangle
-
-        minmax = cv2.minMaxLoc(depth)
-        max = np.ceil(minmax[1])
-        out = cv2.convertScaleAbs(depth, alpha=255 / max)
-        detectedCones.draw_cones(out)
-
-        cv2.imshow("RGB", im)
-        if state == 0:
-            pair = detectedCones.get_closest_pair()
-            if len(pair) > 1:
-                center = ((pair[0].x + pair[1].x) / 2, (pair[0].y + pair[1].y) / 2)
-                goal1 = (center[0] + (pair[1].y - pair[0].y) / 2, center[1] + (pair[0].x - pair[1].x) / 2)
-                goal2 = (center[0] - (pair[1].y - pair[0].y) / 2, center[1] - (pair[0].x - pair[1].x) / 2)
-                print("goal1",goal1,"goal2",goal2)
-                dist1 = np.sqrt(goal1[0] ** 2 + goal1[1] ** 2)
-                dist2 = np.sqrt(goal2[0] ** 2 + goal2[1] ** 2)
-                angle = 0
-                if dist1 < dist2:
-                    angle = np.pi/2 - np.arcsin(goal1[0] / dist1)
-                    distance = dist1
-                else:
-                    angle = np.pi/2 - np.arcsin(goal2[0] / dist2)
-                    distance = dist2
-                print(angle,dist1,dist2)
-                turtle.reset_odometry()
-                distance -= distance*0.05
-                state = 1
-        elif state == 1:
-            print(turtle.get_odometry()[2])
-            if turtle.get_odometry()[2] < angle - 0.05:
-                turtle.cmd_velocity(linear=0, angular=0.3)
-            elif turtle.get_odometry()[2] > angle + 0.05:
-                turtle.cmd_velocity(linear=0, angular=-0.3)
-            else:
-                turtle.reset_odometry()
-                state = 2
-        elif state == 2:
-            odom = turtle.get_odometry()
-            if np.sqrt(odom[0]**2 + odom[1]**2) < distance:
-                turtle.cmd_velocity(linear=0.3, angular=0)
-            else:
-                state = 3
-        elif state == 3:
-            print("mega dobry kamo")
-            turtle.cmd_velocity(linear=0.0, angular=0)
+        rgb_image = turtle.get_rgb_image()
+        image_copy = rgb_image.copy()
+        detected_cones = DetectedCones()  # -> detectedCones.red, green, blue
+        detected_cones.detect_cones(rgb_image, point_cloud)
+        detected_cones.draw_cones(
+            image_copy)  # -> az na konec, prekresli puvodni obrazek mohlo by se s nim pak hure pracovat
+        cv2.imshow("RGB", image_copy)
+        state_machine.run_state()
 
         cv2.waitKey(1)
 
