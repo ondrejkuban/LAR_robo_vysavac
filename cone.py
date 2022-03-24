@@ -10,7 +10,7 @@ class ColorsThresholds:
     #       dark           light
     RED = ((0, 100, 50), (5, 255, 230))
     GREEN = ((40, 40, 10), (80, 255, 230))
-    BLUE = ((90, 100, 30), (110, 255, 200))
+    BLUE = ((95, 10, 60), (115, 255, 160))
 
 
 class Cone:
