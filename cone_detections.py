@@ -5,17 +5,18 @@ import numpy as np
 SURFACE_THRESHOLD = 400
 
 class DetectedCones:
-    def __init__(self):
+    def __init__(self,turtle):
         self.red = None
         self.green = None
         self.blue = None
+        self.turtle = turtle
         self.all = []
 
     def detect_cones(self, image, point_cloud):
         hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
-        self.red = get_cones_for_color(hsv, ColorsThresholds.RED)
-        self.green = get_cones_for_color(hsv, ColorsThresholds.GREEN)
-        self.blue = get_cones_for_color(hsv, ColorsThresholds.BLUE)
+        self.red = get_cones_for_color(hsv, ColorsThresholds.RED,self.turtle)
+        self.green = get_cones_for_color(hsv, ColorsThresholds.GREEN,self.turtle)
+        self.blue = get_cones_for_color(hsv, ColorsThresholds.BLUE,self.turtle)
         get_distances_for_cones(point_cloud, self.red)
         get_distances_for_cones(point_cloud, self.green)
         get_distances_for_cones(point_cloud, self.blue)
@@ -61,16 +62,18 @@ def detection_is_valid(detection):
     return True
 
 
-def get_cones_for_color(image, threshold: tuple):
+def get_cones_for_color(image, threshold: tuple,turtle):
     mask = cv2.inRange(image, threshold[0], threshold[1])
     detections = cv2.connectedComponentsWithStats(mask.astype(np.uint8))
 
     results = []
     for i in range(1, detections[0]):
         if detection_is_valid(detections[2][i]):
-            results.append(Cone(get_color_for_threshold(threshold),
+            cone = Cone(get_color_for_threshold(threshold),
                                 (detections[2][i][0], detections[2][i][1]),
-                                (detections[2][i][2], detections[2][i][3])))
+                                (detections[2][i][2], detections[2][i][3]))
+            cone.odo = turtle.get_odometry()[2]
+            results.append(cone)
 
     return results
 
