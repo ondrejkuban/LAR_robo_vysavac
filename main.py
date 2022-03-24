@@ -142,7 +142,7 @@ def main():
                 plt.scatter(cone.x, cone.y, s=10,color='green')
             if cone.color is Color.BLUE:
                 plt.scatter(cone.x, cone.y, s=10,color='blue')
-        plt.show()
+        plt.pause(0.001)
         cv2.waitKey(1)
 
 
