@@ -63,7 +63,7 @@ class StateMachine:
                 self.current_state = self.idle
             else:
                 self.counter+=1
-            self.current_state = self.look_around2
+                self.current_state = self.look_around2
 
     def detect_cones(self):
         point_cloud = self.turtle.get_point_cloud()
@@ -145,6 +145,7 @@ def main():
     angle = 0
     distance = 0
     state_machine = StateMachine(turtle)
+    turtle.reset_odometry()
     plt.ion()
 
     while not turtle.is_shutting_down():
