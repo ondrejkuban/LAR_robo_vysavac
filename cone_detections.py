@@ -20,14 +20,11 @@ class DetectedCones:
         get_distances_for_cones(point_cloud, self.green)
         get_distances_for_cones(point_cloud, self.blue)
         for cone in self.red:
-            if cone not in self.all:
-                self.all.append(cone)
+            self.all.append(cone)
         for cone in self.green:
-            if cone not in self.all:
-                self.all.append(cone)
+            self.all.append(cone)
         for cone in self.blue:
-            if cone not in self.all:
-                self.all.append(cone)
+            self.all.append(cone)
         self.red.sort(key=lambda cone: cone.distance)  # bude fungovat??? (dostanu cone a sort podle jeji distance)
         self.green.sort(key=lambda cone: cone.distance)  # bude fungovat???
         self.blue.sort(key=lambda cone: cone.distance)  # bude fungovat???
