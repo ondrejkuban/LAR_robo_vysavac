@@ -70,7 +70,7 @@ class DetectedCones:
 def detection_is_valid(detection):
     if detection[4] < SURFACE_THRESHOLD:
         return False
-    if detection[2] * 2 > detection[3]:
+    if detection[2] * 2.5 > detection[3]:
         return False
     return True
 
@@ -86,7 +86,7 @@ def get_cones_for_color(image, threshold: tuple, turtle):
                         (detections[2][i][0], detections[2][i][1]),
                         (detections[2][i][2], detections[2][i][3]))
             cone.odo = turtle.get_odometry()[2]
-            if cone.pt1[0] < 20 or cone.pt2[0] > 620:
+            if cone.pt1[0] < 10 or cone.pt2[0] > 630:
                 pass
             else:
                 results.append(cone)
