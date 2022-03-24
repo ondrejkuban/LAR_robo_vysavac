@@ -14,12 +14,12 @@ class DetectedCones:
 
     def detect_cones(self, image, point_cloud):
         hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
-        self.red = get_cones_for_color(hsv, ColorsThresholds.RED,self.turtle)
-        self.green = get_cones_for_color(hsv, ColorsThresholds.GREEN,self.turtle)
-        self.blue = get_cones_for_color(hsv, ColorsThresholds.BLUE,self.turtle)
-        get_distances_for_cones(point_cloud, self.red)
-        get_distances_for_cones(point_cloud, self.green)
-        get_distances_for_cones(point_cloud, self.blue)
+        self.red,mask_r = get_cones_for_color(hsv, ColorsThresholds.RED,self.turtle)
+        self.green,mask_g = get_cones_for_color(hsv, ColorsThresholds.GREEN,self.turtle)
+        self.blue,mask_b = get_cones_for_color(hsv, ColorsThresholds.BLUE,self.turtle)
+        get_distances_for_cones(point_cloud, self.red,mask_r)
+        get_distances_for_cones(point_cloud, self.green,mask_g)
+        get_distances_for_cones(point_cloud, self.blue,mask_b)
         for cone in self.red:
             self.all.append(cone)
         for cone in self.green:
@@ -78,7 +78,7 @@ def get_cones_for_color(image, threshold: tuple,turtle):
             else:
                 results.append(cone)
 
-    return results
+    return results , mask
 
 
 def draw_rectangles(image, cones: list):
@@ -92,18 +92,19 @@ def calculate_euclidean(first_point):  # points[2] for x and points[0] for y
     return np.sqrt((first_point[0]) ** 2 + (first_point[1]) ** 2)
 
 
-def get_distances_for_cones(point_cloud, cones):
+def get_distances_for_cones(point_cloud, cones,mask):
     for cone in cones:
-        cone.x = get_point_in_space(point_cloud, cone, 2)
-        cone.y = get_point_in_space(point_cloud, cone, 0)
+        cone.x = get_point_in_space(point_cloud, cone, 2,mask)
+        cone.y = get_point_in_space(point_cloud, cone, 0,mask)
         cone.distance = calculate_euclidean((cone.x, cone.y))
         cone.angle = np.arcsin(cone.y / cone.distance)
 
 
-def get_point_in_space(point_cloud, cone, axis):
+def get_point_in_space(point_cloud, cone, axis,mask):
     points = []
     for i in range(cone.pt1[0], cone.pt2[0]):
         for j in range(cone.pt1[1], cone.pt2[1]):
-            if not np.isnan(point_cloud[j][i][axis]):
-                points.append(point_cloud[j][i][axis])
+            if mask[j][i] == 1:
+                if not np.isnan(point_cloud[j][i][axis]):
+                    points.append(point_cloud[j][i][axis])
     return round(np.median(points), 3)
