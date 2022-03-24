@@ -1,11 +1,12 @@
-from cone import ColorsThresholds, Cone, get_color_for_threshold, get_threshold_for_color
+from cone import ColorsThresholds, Cone, get_color_for_threshold, get_threshold_for_color,Color
 import cv2
 import numpy as np
 
 SURFACE_THRESHOLD = 400
 
+
 class DetectedCones:
-    def __init__(self,turtle):
+    def __init__(self, turtle):
         self.red = None
         self.green = None
         self.blue = None
@@ -14,12 +15,12 @@ class DetectedCones:
 
     def detect_cones(self, image, point_cloud):
         hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
-        self.red,mask_r = get_cones_for_color(hsv, ColorsThresholds.RED,self.turtle)
-        self.green,mask_g = get_cones_for_color(hsv, ColorsThresholds.GREEN,self.turtle)
-        self.blue,mask_b = get_cones_for_color(hsv, ColorsThresholds.BLUE,self.turtle)
-        get_distances_for_cones(point_cloud, self.red,mask_r)
-        get_distances_for_cones(point_cloud, self.green,mask_g)
-        get_distances_for_cones(point_cloud, self.blue,mask_b)
+        self.red, mask_r = get_cones_for_color(hsv, ColorsThresholds.RED, self.turtle)
+        self.green, mask_g = get_cones_for_color(hsv, ColorsThresholds.GREEN, self.turtle)
+        self.blue, mask_b = get_cones_for_color(hsv, ColorsThresholds.BLUE, self.turtle)
+        get_distances_for_cones(point_cloud, self.red, mask_r)
+        get_distances_for_cones(point_cloud, self.green, mask_g)
+        get_distances_for_cones(point_cloud, self.blue, mask_b)
         for cone in self.red:
             self.all.append(cone)
         for cone in self.green:
@@ -29,6 +30,18 @@ class DetectedCones:
         self.red.sort(key=lambda cone: cone.distance)  # bude fungovat??? (dostanu cone a sort podle jeji distance)
         self.green.sort(key=lambda cone: cone.distance)  # bude fungovat???
         self.blue.sort(key=lambda cone: cone.distance)  # bude fungovat???
+
+    def add_cone(self,cone):
+        self.all.append(cone)
+        if cone.color == Color.RED:
+            self.red.append(cone)
+        elif cone.color == Color.GREEN:
+            self.green.append(cone)
+        elif cone.color == Color.BLUE:
+            self.blue.append(cone)
+        self.red.sort(key=lambda cone: cone.distance)  # bude fungovat??? (dostanu cone a sort podle jeji distance)
+        self.green.sort(key=lambda cone: cone.distance)  # bude fungovat???
+        self.blue.sort(key=lambda cone: cone.distance)
 
     def draw_cones(self, image):
         draw_rectangles(image, self.red)
@@ -62,7 +75,7 @@ def detection_is_valid(detection):
     return True
 
 
-def get_cones_for_color(image, threshold: tuple,turtle):
+def get_cones_for_color(image, threshold: tuple, turtle):
     mask = cv2.inRange(image, threshold[0], threshold[1])
     detections = cv2.connectedComponentsWithStats(mask.astype(np.uint8))
 
@@ -70,15 +83,15 @@ def get_cones_for_color(image, threshold: tuple,turtle):
     for i in range(1, detections[0]):
         if detection_is_valid(detections[2][i]):
             cone = Cone(get_color_for_threshold(threshold),
-                                (detections[2][i][0], detections[2][i][1]),
-                                (detections[2][i][2], detections[2][i][3]))
+                        (detections[2][i][0], detections[2][i][1]),
+                        (detections[2][i][2], detections[2][i][3]))
             cone.odo = turtle.get_odometry()[2]
-            if cone.pt1[0] < 20 or cone.pt2[0]>620:
+            if cone.pt1[0] < 20 or cone.pt2[0] > 620:
                 pass
             else:
                 results.append(cone)
 
-    return results , mask
+    return results, mask
 
 
 def draw_rectangles(image, cones: list):
@@ -92,15 +105,15 @@ def calculate_euclidean(first_point):  # points[2] for x and points[0] for y
     return np.sqrt((first_point[0]) ** 2 + (first_point[1]) ** 2)
 
 
-def get_distances_for_cones(point_cloud, cones,mask):
+def get_distances_for_cones(point_cloud, cones, mask):
     for cone in cones:
-        cone.x = get_point_in_space(point_cloud, cone, 2,mask)
-        cone.y = get_point_in_space(point_cloud, cone, 0,mask)
+        cone.x = get_point_in_space(point_cloud, cone, 2, mask)
+        cone.y = get_point_in_space(point_cloud, cone, 0, mask)
         cone.distance = calculate_euclidean((cone.x, cone.y))
         cone.angle = np.arcsin(cone.y / cone.distance)
 
 
-def get_point_in_space(point_cloud, cone, axis,mask):
+def get_point_in_space(point_cloud, cone, axis, mask):
     points = []
     for i in range(cone.pt1[0], cone.pt2[0]):
         for j in range(cone.pt1[1], cone.pt2[1]):

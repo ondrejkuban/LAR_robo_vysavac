@@ -30,9 +30,6 @@ class Cone:
         return self.angle - self.odo - 0.05 < other.angle - other.odo < self.angle - self.odo + 0.05
 
 
-
-
-
 def get_color_for_threshold(threshold):
     return {
         ColorsThresholds.RED: Color.RED,
