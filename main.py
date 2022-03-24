@@ -28,10 +28,11 @@ class StateMachine:
         self.angle = None
         self.distance = None
         self.look_around_angle = 90
+        self.counter =1
 
     def run_state(self):
         self.current_state()
-        self.detect_cones()
+
 
     def idle(self):
         print("IDLE")
@@ -39,17 +40,27 @@ class StateMachine:
 
     def look_around1(self):
         print(self.turtle.get_odometry()[2])
-        if self.turtle.get_odometry()[2] > -np.pi/2.5:
-            self.turtle.cmd_velocity(linear=0, angular=-0.3)
+        if self.turtle.get_odometry()[2] > -np.pi/2:
+            self.turtle.cmd_velocity(linear=0, angular=-1)
         else:
+            time.sleep(0.4)
+            self.detect_cones()
+            time.sleep(0.2)
             self.current_state = self.look_around2
 
-
     def look_around2(self):
-        if self.turtle.get_odometry()[2] < np.pi / 2.5:
+
+        if self.turtle.get_odometry()[2] < -np.pi/2 + (np.pi / 4)*self.counter:
             self.turtle.cmd_velocity(linear=0, angular=0.3)
         else:
-            self.current_state = self.look_around1
+            time.sleep(0.4)
+            self.detected_cones()
+            time.sleep(0.2)
+            if self.counter > 4:
+                self.current_state = self.idle
+            else:
+                self.counter+=1
+            self.current_state = self.look_around2
 
     def detect_cones(self):
         point_cloud = self.turtle.get_point_cloud()
@@ -137,11 +148,11 @@ def main():
         state_machine.run_state()
         for cone in state_machine.detected_cones.all:
             if cone.color is Color.RED:
-                plt.scatter(cone.angle-turtle.get_odometry()[2], cone.distance, s=10,color='red')
+                plt.scatter(cone.angle-turtle.get_odometry()[2], cone.distance, s=40,color='red')
             if cone.color is Color.GREEN:
-                plt.scatter(cone.angle-turtle.get_odometry()[2], cone.distance, s=10,color='green')
+                plt.scatter(cone.angle-turtle.get_odometry()[2], cone.distance, s=40,color='green')
             if cone.color is Color.BLUE:
-                plt.scatter(cone.angle-turtle.get_odometry()[2], cone.distance, s=10,color='blue')
+                plt.scatter(cone.angle-turtle.get_odometry()[2], cone.distance, s=40,color='blue')
         plt.pause(0.001)
         cv2.waitKey(1)
 
