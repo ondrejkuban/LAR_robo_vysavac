@@ -82,7 +82,7 @@ class StateMachine:
             for new_cone in self.new_detected_cones.all:
                 if abs((new_cone.angle - new_cone.odo) - (cone.angle - cone.odo)) < 0.1 \
                         and new_cone.color == cone.color and abs(new_cone.distance - cone.distance) < 40:
-                    pass
+                    continue
                 else:
                     self.detected_cones.add_cone(new_cone)
 
