@@ -46,6 +46,7 @@ class StateMachine:
             time.sleep(0.4)
             self.detect_cones()
             time.sleep(0.2)
+            self.detected_cones = None
             self.current_state = self.look_around2
 
     def look_around2(self):
@@ -60,6 +61,7 @@ class StateMachine:
                 self.current_state = self.idle
             else:
                 self.counter+=1
+            self.detected_cones = None
             self.current_state = self.look_around2
 
     def detect_cones(self):
