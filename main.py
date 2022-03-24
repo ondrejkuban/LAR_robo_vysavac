@@ -38,6 +38,7 @@ class StateMachine:
         self.turtle.cmd_velocity(linear=0.0, angular=0)
 
     def look_around1(self):
+        print(self.turtle.get_odometry()[2])
         if self.turtle.get_odometry()[2] > -np.pi/2:
             self.turtle.cmd_velocity(linear=0, angular=-0.3)
         else:
