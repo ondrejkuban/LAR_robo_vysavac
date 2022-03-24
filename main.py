@@ -55,7 +55,7 @@ class StateMachine:
         point_cloud = self.turtle.get_point_cloud()
         rgb_image = self.turtle.get_rgb_image()
         image_copy = rgb_image.copy()
-        self.detected_cones = DetectedCones()  # -> detectedCones.red, green, blue
+        self.detected_cones = DetectedCones(self.turtle)  # -> detectedCones.red, green, blue
         self.detected_cones.detect_cones(rgb_image, point_cloud)
         self.detected_cones.draw_cones(
             image_copy)  # -> az na konec, prekresli puvodni obrazek mohlo by se s nim pak hure pracovat
