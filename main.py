@@ -78,6 +78,7 @@ class StateMachine:
         # self.current_state = self.estimate_cones_position
 
     def merge_new_cones(self):
+        print(self.detected_cones.all)
         for cone in self.detected_cones.all:
             for new_cone in self.new_detected_cones.all:
                 if abs((new_cone.angle - new_cone.odo) - (cone.angle - cone.odo)) < 0.1 \
