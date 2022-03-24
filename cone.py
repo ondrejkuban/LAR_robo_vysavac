@@ -27,7 +27,8 @@ class Cone:
         self.odo = None
 
     def __eq__(self, other):
-        return self.angle - self.odo - 0.05 < other.angle - other.odo < self.angle - self.odo + 0.05
+        return ((self.angle - self.odo - 0.05 < other.angle - other.odo < self.angle - self.odo + 0.05) and \
+               abs(self.distance - other.distance) < 50) and self.color == other.color
 
 
 def get_color_for_threshold(threshold):
