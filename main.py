@@ -44,7 +44,7 @@ class StateMachine:
 
         print(self.turtle.get_odometry()[2])
         if self.turtle.get_odometry()[2] > -np.pi / 2:
-            self.turtle.cmd_velocity(linear=0, angular=-0.8)
+            self.turtle.cmd_velocity(linear=0, angular=-0.5)
         else:
             time.sleep(0.4)
             self.detect_cones()
@@ -55,7 +55,7 @@ class StateMachine:
         self.new_detected_cones = None
 
         if self.turtle.get_odometry()[2] < -np.pi / 2 + (np.pi / 6) * self.counter:
-            self.turtle.cmd_velocity(linear=0, angular=0.5)
+            self.turtle.cmd_velocity(linear=0, angular=0.3)
         else:
             time.sleep(0.4)
             self.detect_cones()
