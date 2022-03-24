@@ -205,6 +205,8 @@ def main():
     pid = PID()
     angle = 0
     distance = 0
+    turtle.reset_odometry()
+
     while not turtle.is_shutting_down():
         # get point cloud
         depth = turtle.get_depth_image()
