@@ -135,14 +135,14 @@ def main():
 
     while not turtle.is_shutting_down():
         state_machine.run_state()
-        for cone in state_machine.detected_cones.all:
-            if cone.color is Color.RED:
-                plt.scatter(cone.x, cone.y, s=10,color='red')
-            if cone.color is Color.GREEN:
-                plt.scatter(cone.x, cone.y, s=10,color='green')
-            if cone.color is Color.BLUE:
-                plt.scatter(cone.x, cone.y, s=10,color='blue')
-        plt.show()
+      #  for cone in state_machine.detected_cones.all:
+          #  if cone.color is Color.RED:
+           #     plt.scatter(cone.x, cone.y, s=10,color='red')
+           # if cone.color is Color.GREEN:
+           #     plt.scatter(cone.x, cone.y, s=10,color='green')
+          #  if cone.color is Color.BLUE:
+          #      plt.scatter(cone.x, cone.y, s=10,color='blue')
+        #plt.show()
         cv2.waitKey(1)
 
 
