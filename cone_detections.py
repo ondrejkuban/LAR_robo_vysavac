@@ -1,8 +1,8 @@
-from main import SURFACE_THRESHOLD
 from cone import ColorsThresholds, Cone, get_color_for_threshold, get_threshold_for_color
 import cv2
 import numpy as np
 
+SURFACE_THRESHOLD = 400
 
 class DetectedCones:
     def __init__(self):

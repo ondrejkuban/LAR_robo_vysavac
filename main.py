@@ -14,7 +14,6 @@ z_range = (0.3, 3.0)
 
 WINDOW_D = 'DEPTH'  # depth
 WINDOW = 'RGB'
-SURFACE_THRESHOLD = 400
 
 stop = False
 t = 0
