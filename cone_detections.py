@@ -7,9 +7,9 @@ SURFACE_THRESHOLD = 400
 
 class DetectedCones:
     def __init__(self, turtle):
-        self.red = None
-        self.green = None
-        self.blue = None
+        self.red = []
+        self.green = []
+        self.blue = []
         self.turtle = turtle
         self.all = []
 
