@@ -22,7 +22,7 @@ fun_step = 0
 
 class StateMachine:
     def __init__(self, turtle):
-        self.current_state = self.look_around1
+        self.current_state = self.idle
         self.turtle = turtle
         self.detected_cones = DetectedCones(turtle)
         self.new_detected_cones = None
@@ -72,9 +72,9 @@ class StateMachine:
         image_copy = rgb_image.copy()
         self.new_detected_cones = DetectedCones(self.turtle)  # -> detectedCones.red, green, blue
         self.new_detected_cones.detect_cones(rgb_image, point_cloud)
-        self.new_detected_cones.draw_cones(
-            image_copy)  # -> az na konec, prekresli puvodni obrazek mohlo by se s nim pak hure pracovat
-        cv2.imshow("RGB", image_copy)
+       # self.new_detected_cones.draw_cones(
+           # image_copy)  # -> az na konec, prekresli puvodni obrazek mohlo by se s nim pak hure pracovat
+        cv2.imshow("RGB", self.new_detected_cones.mask)
         self.merge_new_cones()
         # self.current_state = self.estimate_cones_position
 

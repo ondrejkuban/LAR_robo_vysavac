@@ -12,6 +12,7 @@ class DetectedCones:
         self.blue = []
         self.turtle = turtle
         self.all = []
+        self.mask = None
 
     def detect_cones(self, image, point_cloud):
         hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
@@ -21,6 +22,7 @@ class DetectedCones:
         get_distances_for_cones(point_cloud, self.red, mask_r)
         get_distances_for_cones(point_cloud, self.green, mask_g)
         get_distances_for_cones(point_cloud, self.blue, mask_b)
+        self.mask = mask_b
         for cone in self.red:
             self.all.append(cone)
         for cone in self.green:
