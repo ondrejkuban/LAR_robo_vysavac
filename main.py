@@ -39,15 +39,15 @@ class StateMachine:
 
     def look_around1(self):
         print(self.turtle.get_odometry()[2])
-        if self.turtle.get_odometry()[2] > -np.pi/2:
-            self.turtle.cmd_velocity(linear=0, angular=-0.3)
+        if self.turtle.get_odometry()[2] > -np.pi/3:
+            self.turtle.cmd_velocity(linear=0, angular=-0.2)
         else:
             self.current_state = self.look_around2
 
 
     def look_around2(self):
-        if self.turtle.get_odometry()[2] < np.pi / 2:
-            self.turtle.cmd_velocity(linear=0, angular=0.3)
+        if self.turtle.get_odometry()[2] < np.pi / 3:
+            self.turtle.cmd_velocity(linear=0, angular=0.2)
         else:
             self.current_state = self.idle
 
