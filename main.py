@@ -24,25 +24,25 @@ class StateMachine:
     def __init__(self, turtle):
         self.current_state = self.look_around1
         self.turtle = turtle
-        self.detected_cones = None
+        self.detected_cones = DetectedCones(turtle)
+        self.new_detected_cones = None
         self.angle = None
         self.distance = None
         self.look_around_angle = 90
-        self.counter =1
+        self.counter = 1
 
     def run_state(self):
         self.current_state()
-
 
     def idle(self):
         print("IDLE")
         self.turtle.cmd_velocity(linear=0.0, angular=0)
 
     def look_around1(self):
-        self.detected_cones = None
+        self.new_detected_cones = None
 
         print(self.turtle.get_odometry()[2])
-        if self.turtle.get_odometry()[2] > -np.pi/2:
+        if self.turtle.get_odometry()[2] > -np.pi / 2:
             self.turtle.cmd_velocity(linear=0, angular=-0.5)
         else:
             time.sleep(0.4)
@@ -51,9 +51,9 @@ class StateMachine:
             self.current_state = self.look_around2
 
     def look_around2(self):
-        self.detected_cones = None
+        self.new_detected_cones = None
 
-        if self.turtle.get_odometry()[2] < -np.pi/2 + (np.pi / 6)*self.counter:
+        if self.turtle.get_odometry()[2] < -np.pi / 2 + (np.pi / 6) * self.counter:
             self.turtle.cmd_velocity(linear=0, angular=0.3)
         else:
             time.sleep(0.4)
@@ -62,19 +62,29 @@ class StateMachine:
             if self.counter > 6:
                 self.current_state = self.idle
             else:
-                self.counter+=1
+                self.counter += 1
                 self.current_state = self.look_around2
 
     def detect_cones(self):
         point_cloud = self.turtle.get_point_cloud()
         rgb_image = self.turtle.get_rgb_image()
         image_copy = rgb_image.copy()
-        self.detected_cones = DetectedCones(self.turtle)  # -> detectedCones.red, green, blue
-        self.detected_cones.detect_cones(rgb_image, point_cloud)
-        self.detected_cones.draw_cones(
+        self.new_detected_cones = DetectedCones(self.turtle)  # -> detectedCones.red, green, blue
+        self.new_detected_cones.detect_cones(rgb_image, point_cloud)
+        self.new_detected_cones.draw_cones(
             image_copy)  # -> az na konec, prekresli puvodni obrazek mohlo by se s nim pak hure pracovat
         cv2.imshow("RGB", image_copy)
-        #self.current_state = self.estimate_cones_position
+        self.merge_new_cones()
+        # self.current_state = self.estimate_cones_position
+
+    def merge_new_cones(self):
+        for cone in self.detected_cones:
+            for new_cone in self.new_detected_cones:
+                if abs((new_cone.angle - new_cone.odo) - (cone.angle - cone.odo)) < 0.1 \
+                        and new_cone.color == cone.color and abs(new_cone.distance - cone.distance) < 40:
+                    pass
+                else:
+                    self.detected_cones.add_cone(new_cone)
 
     def estimate_cones_position(self):
         pair = self.detected_cones.get_closest_pair()
@@ -153,11 +163,11 @@ def main():
         if state_machine.detected_cones is not None:
             for cone in state_machine.detected_cones.all:
                 if cone.color is Color.RED:
-                    plt.scatter(cone.angle-turtle.get_odometry()[2], cone.distance, s=40,color='red')
+                    plt.scatter(cone.angle - turtle.get_odometry()[2], cone.distance, s=40, color='red')
                 if cone.color is Color.GREEN:
-                    plt.scatter(cone.angle-turtle.get_odometry()[2], cone.distance, s=40,color='green')
+                    plt.scatter(cone.angle - turtle.get_odometry()[2], cone.distance, s=40, color='green')
                 if cone.color is Color.BLUE:
-                    plt.scatter(cone.angle-turtle.get_odometry()[2], cone.distance, s=40,color='blue')
+                    plt.scatter(cone.angle - turtle.get_odometry()[2], cone.distance, s=40, color='blue')
         plt.pause(0.001)
         cv2.waitKey(1)
 
