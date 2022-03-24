@@ -73,7 +73,10 @@ def get_cones_for_color(image, threshold: tuple,turtle):
                                 (detections[2][i][0], detections[2][i][1]),
                                 (detections[2][i][2], detections[2][i][3]))
             cone.odo = turtle.get_odometry()[2]
-            results.append(cone)
+            if cone.pt1[0] < 20 or cone.pt2[0]>620:
+                pass
+            else:
+                results.append(cone)
 
     return results
 
