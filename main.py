@@ -131,6 +131,7 @@ def main():
     angle = 0
     distance = 0
     state_machine = StateMachine(turtle)
+    plt.ion()
 
     while not turtle.is_shutting_down():
         state_machine.run_state()
