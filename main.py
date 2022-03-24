@@ -54,7 +54,7 @@ class StateMachine:
             self.turtle.cmd_velocity(linear=0, angular=0.3)
         else:
             time.sleep(0.4)
-            self.detected_cones()
+            self.detect_cones()
             time.sleep(0.2)
             if self.counter > 4:
                 self.current_state = self.idle
