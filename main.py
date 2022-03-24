@@ -36,6 +36,7 @@ class StateMachine:
 
     def idle(self):
         print("IDLE")
+        self.current_state = self.detect_cones
         self.turtle.cmd_velocity(linear=0.0, angular=0)
 
     def look_around1(self):
@@ -74,7 +75,7 @@ class StateMachine:
         self.new_detected_cones.draw_cones(
             image_copy)  # -> az na konec, prekresli puvodni obrazek mohlo by se s nim pak hure pracovat
         cv2.imshow("RGB", image_copy)
-        self.merge_new_cones()
+        #self.merge_new_cones()
         # self.current_state = self.estimate_cones_position
 
     def merge_new_cones(self):
