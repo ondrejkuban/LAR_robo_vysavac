@@ -27,7 +27,7 @@ class Cone:
         self.odo = None
 
     def __eq__(self, other):
-        return self.angle - self.odo - 0.03 < other.angle - other.odo < self.angle - self.odo + 0.03
+        return self.angle - self.odo - 0.05 < other.angle - other.odo < self.angle - self.odo + 0.05
 
 
 
