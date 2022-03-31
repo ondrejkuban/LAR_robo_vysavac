@@ -108,9 +108,10 @@ class StateMachine:
             self.current_state = self.turn_to_middle
 
     def turn_to_middle(self):
-        if self.turtle.get_odometry()[2] > -0.05:
+        print(self.turtle.get_odometry()[2])
+        if self.turtle.get_odometry()[2] > -0.09:
             self.turtle.cmd_velocity(linear=0, angular=-0.3)
-        elif self.turtle.get_odometry()[2]< 0.05:
+        elif self.turtle.get_odometry()[2]< 0.09:
             self.turtle.cmd_velocity(linear=0, angular=0.3)
         else:
             time.sleep(0.7)
