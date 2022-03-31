@@ -111,7 +111,7 @@ class StateMachine:
             
             print(self.angle, dist1, dist2)
             self.distance -= 0.1
-            self.distance -= self.distance * 0.06
+            #elf.distance -= self.distance * 0.06
             self.current_state = self.turn_to_middle
 
     def turn_to_middle(self):
