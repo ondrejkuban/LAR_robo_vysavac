@@ -92,6 +92,7 @@ k_rgb = matlab_data[0]['K_rgb']
 point_cloud = matlab_data[0]['point_cloud']
 cv2.namedWindow("RGB")
 cv2.namedWindow("DEPTH")
+print(rgb_image[481][420])
 while True:
     #M = k_depth @ np.linalg.inv(k_rgb)
    # warped_rgb = cv2.warpPerspective(rgb_image, M, (640, 480))

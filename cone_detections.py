@@ -118,7 +118,7 @@ def get_distances_for_cones(point_cloud, cones, mask):
 def get_point_in_space(point_cloud, cone, axis, mask):
     points = []
     for i in range(cone.pt1[0], cone.pt2[0]):
-        for j in range(cone.pt1[1], cone.pt2[1]):
+        for j in range(cone.pt1[1], cone.pt2[1]-(cone.pt2[1]-cone.pt1[1])//1.5):
             if mask[j][i] == 255:
                 if not np.isnan(point_cloud[j][i][axis]):
                     points.append(point_cloud[j][i][axis])
