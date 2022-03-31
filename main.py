@@ -101,10 +101,10 @@ class StateMachine:
             dist1 = np.sqrt(goal1[0] ** 2 + goal1[1] ** 2)
             dist2 = np.sqrt(goal2[0] ** 2 + goal2[1] ** 2)
             if dist1 < dist2:
-                self.angle = np.arcsin(goal1[0] / dist1) - np.pi / 2
+                self.angle = np.arcsin(goal1[0] / dist1)
                 self.distance = dist1
             else:
-                self.angle = np.pi / 2 - np.arcsin(goal2[0] / dist2)
+                self.angle = -np.arcsin(goal2[0] / dist2)
                 self.angle = -self.angle
                 self.distance = dist2
             
