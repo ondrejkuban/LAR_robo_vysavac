@@ -92,6 +92,7 @@ class StateMachine:
             print("goal1", goal1, "goal2", goal2)
             dist1 = np.sqrt(goal1[0] ** 2 + goal1[1] ** 2)
             dist2 = np.sqrt(goal2[0] ** 2 + goal2[1] ** 2)
+            distance = 0.0
             if dist1 < dist2:
                 self.angle = np.pi / 2 - np.arcsin(goal1[0] / dist1)
                 distance = dist1
