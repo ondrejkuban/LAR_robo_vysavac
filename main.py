@@ -105,6 +105,7 @@ class StateMachine:
                 self.distance = dist1
             else:
                 self.angle = np.pi / 2 - np.arcsin(goal2[0] / dist2)
+                self.angle = -self.angle
                 self.distance = dist2
             
             print(self.angle, dist1, dist2)
