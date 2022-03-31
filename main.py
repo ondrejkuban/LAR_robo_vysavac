@@ -86,9 +86,14 @@ class StateMachine:
     def estimate_cones_position(self):
         pair = self.detected_cones.get_closest_pair()
         if len(pair) > 1:
-            center = ((pair[0].x + pair[1].x) / 2, (pair[0].y + pair[1].y) / 2)
-            goal1 = (center[0] + (pair[1].y - pair[0].y) / 2, center[1] + (pair[0].x - pair[1].x) / 2)
-            goal2 = (center[0] - (pair[1].y - pair[0].y) / 2, center[1] - (pair[0].x - pair[1].x) / 2)
+            first = (pair[0].distance * np.sin(pair[0].angle - pair[0].odo),
+                     pair[0].distance * np.cos(pair[0].angle - pair[0].odo))
+            second = (pair[1].distance * np.sin(pair[1].angle - pair[1].odo),
+                     pair[1].distance * np.cos(pair[1].angle - pair[1].odo))
+            
+            center = ((first[0] + second[0]) / 2, (first[1] + second[1]) / 2)
+            goal1 = (center[0] + (second[1] - first[1]) / 2, center[1] + (first[0] - second[0]) / 2)
+            goal2 = (center[0] - (second[1] - first[1]) / 2, center[1] - (first[0] - second[0]) / 2)
             print("goal1", goal1, "goal2", goal2)
             dist1 = np.sqrt(goal1[0] ** 2 + goal1[1] ** 2)
             dist2 = np.sqrt(goal2[0] ** 2 + goal2[1] ** 2)
@@ -99,6 +104,7 @@ class StateMachine:
             else:
                 self.angle = np.arcsin(goal2[0] / dist2) - np.pi / 2
                 distance = dist2
+            
             print(self.angle, dist1, dist2)
             self.turtle.reset_odometry()
             self.distance -= distance * 0.05
