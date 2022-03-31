@@ -44,7 +44,7 @@ class StateMachine:
         self.new_detected_cones = None
         print(self.turtle.get_odometry()[2])
         if self.turtle.get_odometry()[2] > -np.pi / 2:
-            self.turtle.cmd_velocity(linear=0, angular=-0.5)
+            self.turtle.cmd_velocity(linear=0, angular=-0.8)
         else:
             time.sleep(0.4)
             self.detect_cones()
@@ -55,7 +55,7 @@ class StateMachine:
         self.new_detected_cones = None
 
         if self.turtle.get_odometry()[2] < -np.pi / 2 + (np.pi / 9) * self.counter:
-            self.turtle.cmd_velocity(linear=0, angular=0.5)
+            self.turtle.cmd_velocity(linear=0, angular=0.65)
         else:
             self.turtle.cmd_velocity(linear=0, angular=0)
             time.sleep(0.2)
@@ -141,6 +141,7 @@ class StateMachine:
             self.current_state = self.calc_turn_to_goal
 
     def calc_turn_to_goal(self):
+        self.distance += 0.1
         center_dist = self.center[0]**2 + self.center[1]**2
         parameter1 = self.distance**2 + (0.25*np.sqrt(3))**2 - center_dist
         parameter2 = 2*self.distance*(0.25*np.sqrt(3))
@@ -151,9 +152,9 @@ class StateMachine:
 
     def turn_to_goal(self):
         if self.turtle.get_odometry()[2] < self.angle_to_turn - 0.05:
-            self.turtle.cmd_velocity(linear=0, angular=0.5)
+            self.turtle.cmd_velocity(linear=0, angular=0.3)
         elif self.turtle.get_odometry()[2] > self.angle_to_turn + 0.05:
-            self.turtle.cmd_velocity(linear=0, angular=-0.5)
+            self.turtle.cmd_velocity(linear=0, angular=-0.3)
         else:
             self.turtle.reset_odometry()
             self.current_state = self.drive_through
