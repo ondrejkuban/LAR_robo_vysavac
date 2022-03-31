@@ -29,6 +29,8 @@ class StateMachine:
         self.angle = None
         self.distance = None
         self.counter = 1
+        self.center = None
+        self.angle_to_turn = None
 
     def run_state(self):
         self.current_state()
@@ -93,9 +95,9 @@ class StateMachine:
             print("first ",first," second ",second)
 
 
-            center = ((first[0] + second[0]) / 2, (first[1] + second[1]) / 2)
-            goal1 = (center[0] + (second[1] - first[1]) / 2, center[1] + (first[0] - second[0]) / 2)
-            goal2 = (center[0] - (second[1] - first[1]) / 2, center[1] - (first[0] - second[0]) / 2)
+            self.center = ((first[0] + second[0]) / 2, (first[1] + second[1]) / 2)
+            goal1 = (self.center[0] + (second[1] - first[1]) / 2, self.center[1] + (first[0] - second[0]) / 2)
+            goal2 = (self.center[0] - (second[1] - first[1]) / 2, self.center[1] - (first[0] - second[0]) / 2)
             print("goal1", goal1, "goal2", goal2)
             dist1 = np.sqrt(goal1[0] ** 2 + goal1[1] ** 2)
             dist2 = np.sqrt(goal2[0] ** 2 + goal2[1] ** 2)
@@ -136,8 +138,30 @@ class StateMachine:
         if np.sqrt(odom[0] ** 2 + odom[1] ** 2) < self.distance:
             self.turtle.cmd_velocity(linear=0.3, angular=0)
         else:
-            self.current_state = self.idle
+            self.current_state = self.calc_turn_to_goal
 
+    def calc_turn_to_goal(self):
+        center_dist = self.center[0]**2 + self.center[1]**2
+        parameter1 = self.distance**2 + (0.25*np.sqrt(3))**2 - center_dist
+        parameter2 = 2*self.distance*(0.25*np.sqrt(3))
+        self.angle_to_turn =np.pi- np.arccos(parameter1/parameter2)
+        self.current_state = self.turn_turtle_to_angle
+
+    def turn_to_goal(self):
+        if self.turtle.get_odometry()[2] < self.angle_to_turn - 0.05:
+            self.turtle.cmd_velocity(linear=0, angular=0.3)
+        elif self.turtle.get_odometry()[2] > self.angle_to_turn + 0.05:
+            self.turtle.cmd_velocity(linear=0, angular=-0.3)
+        else:
+            self.turtle.reset_odometry()
+            self.current_state = self.drive_through
+
+    def drive_through(self):
+        odom = self.turtle.get_odometry()
+        if np.sqrt(odom[0] ** 2 + odom[1] ** 2) <  0.8:
+            self.turtle.cmd_velocity(linear=0.3, angular=0)
+        else:
+            self.current_state = self.idle
 
 def fun(turtle):
     # global fun_step
