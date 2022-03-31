@@ -111,6 +111,7 @@ class StateMachine:
         if self.turtle.get_odometry()[2] > 0:
             self.turtle.cmd_velocity(linear=0, angular=-0.3)
         else:
+            time.sleep(0.7)
             self.current_state = self.turn_turtle_to_angle
 
     def turn_turtle_to_angle(self):
