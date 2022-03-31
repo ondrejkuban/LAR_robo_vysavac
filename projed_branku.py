@@ -28,9 +28,9 @@ class Color:
 
 class ColorsThresholds:
     #       dark           light
-    RED = ((0, 100, 50), (5, 255, 255))
-    GREEN = ((45, 70, 20), (75, 255, 255))
-    BLUE = ((90, 100, 20), (110, 255, 255))
+    RED = ((0, 100, 50), (5, 255, 230))
+    GREEN = ((40, 40, 10), (80, 255, 230))
+    BLUE = ((85, 90, 50), (110, 255, 240))
 
 
 class Cone:
@@ -243,6 +243,7 @@ def main():
                     distance = dist1
                 else:
                     angle = np.pi/2 - np.arcsin(goal2[0] / dist2)
+                    angle = -angle
                     distance = dist2
                 print(angle,dist1,dist2)
                 turtle.reset_odometry()
