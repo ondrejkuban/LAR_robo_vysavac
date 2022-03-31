@@ -53,13 +53,13 @@ class StateMachine:
     def look_around2(self):
         self.new_detected_cones = None
 
-        if self.turtle.get_odometry()[2] < -np.pi / 2 + (np.pi / 6) * self.counter:
+        if self.turtle.get_odometry()[2] < -np.pi / 2 + (np.pi / 9) * self.counter:
             self.turtle.cmd_velocity(linear=0, angular=0.3)
         else:
             time.sleep(0.4)
             self.detect_cones()
             time.sleep(0.2)
-            if self.counter > 6:
+            if self.counter > 8:
                 self.current_state = self.estimate_cones_position
             else:
                 self.counter += 1
@@ -109,7 +109,7 @@ class StateMachine:
                 self.distance = dist2
             
             print(self.angle, dist1, dist2)
-            self.distance -= self.distance * 0.05
+            self.distance -= self.distance * 0.06
             self.current_state = self.turn_to_middle
 
     def turn_to_middle(self):
