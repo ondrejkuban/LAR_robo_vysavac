@@ -145,7 +145,7 @@ class StateMachine:
         parameter1 = self.distance**2 + (0.25*np.sqrt(3))**2 - center_dist
         parameter2 = 2*self.distance*(0.25*np.sqrt(3))
         self.angle_to_turn =np.pi- np.arccos(parameter1/parameter2)
-        self.current_state = self.turn_turtle_to_angle
+        self.current_state = self.turn_to_goal
 
     def turn_to_goal(self):
         if self.turtle.get_odometry()[2] < self.angle_to_turn - 0.05:
