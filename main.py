@@ -97,17 +97,16 @@ class StateMachine:
             print("goal1", goal1, "goal2", goal2)
             dist1 = np.sqrt(goal1[0] ** 2 + goal1[1] ** 2)
             dist2 = np.sqrt(goal2[0] ** 2 + goal2[1] ** 2)
-            distance = 0.0
             if dist1 < dist2:
                 self.angle = np.pi / 2 - np.arcsin(goal1[0] / dist1)
-                distance = dist1
+                self.distance = dist1
             else:
                 self.angle = np.arcsin(goal2[0] / dist2) - np.pi / 2
-                distance = dist2
+                self.distance = dist2
             
             print(self.angle, dist1, dist2)
             self.turtle.reset_odometry()
-            self.distance -= distance * 0.05
+            self.distance -= self.distance * 0.05
             self.current_state = self.turn_turtle_to_angle
 
     def turn_turtle_to_angle(self):
