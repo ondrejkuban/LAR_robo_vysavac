@@ -136,7 +136,7 @@ class StateMachine:
     def drive_turtle_to_position(self):
         odom = self.turtle.get_odometry()
         if np.sqrt(odom[0] ** 2 + odom[1] ** 2) < self.distance:
-            self.turtle.cmd_velocity(linear=0.5, angular=0)
+            self.turtle.cmd_velocity(linear=0.25, angular=0)
         else:
             self.current_state = self.calc_turn_to_goal
 
