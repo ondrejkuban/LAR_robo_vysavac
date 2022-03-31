@@ -86,10 +86,14 @@ class StateMachine:
     def estimate_cones_position(self):
         pair = self.detected_cones.get_closest_pair()
         if len(pair) > 1:
-            first = (pair[0].distance * np.sin(pair[0].angle - pair[0].odo),
-                     pair[0].distance * np.cos(pair[0].angle - pair[0].odo))
-            second = (pair[1].distance * np.sin(pair[1].angle - pair[1].odo),
-                     pair[1].distance * np.cos(pair[1].angle - pair[1].odo))
+            print()
+            first = (pair[0].distance * np.sin(pair[0].odo - pair[0].angle),
+                     pair[0].distance * np.cos(pair[0].odo - pair[0].angle))
+            second = (pair[1].distance * np.sin(pair[1].odo - pair[1].angle),
+                     pair[1].distance * np.cos(pair[1].odo - pair[1].angle))
+            print("first ",first," second ",second)
+
+
             center = ((first[0] + second[0]) / 2, (first[1] + second[1]) / 2)
             goal1 = (center[0] + (second[1] - first[1]) / 2, center[1] + (first[0] - second[0]) / 2)
             goal2 = (center[0] - (second[1] - first[1]) / 2, center[1] - (first[0] - second[0]) / 2)
@@ -174,11 +178,11 @@ def main():
         if state_machine.detected_cones is not None:
             for cone in state_machine.detected_cones.all:
                 if cone.color is Color.RED:
-                    plt.scatter(cone.angle-cone.odo, cone.distance, s=40, color='red')
+                    plt.scatter(cone.odo-cone.angle, cone.distance, s=40, color='red')
                 if cone.color is Color.GREEN:
-                    plt.scatter(cone.angle -cone.odo, cone.distance, s=40, color='green')
+                    plt.scatter(cone.odo-cone.angle, cone.distance, s=40, color='green')
                 if cone.color is Color.BLUE:
-                    plt.scatter(cone.angle -cone.odo, cone.distance, s=40, color='blue')
+                    plt.scatter(cone.odo-cone.angle, cone.distance, s=40, color='blue')
         plt.pause(0.001)
         cv2.waitKey(1)
 
