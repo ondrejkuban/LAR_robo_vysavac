@@ -65,7 +65,7 @@ class StateMachine:
                 self.current_state = self.estimate_cones_position
             else:
                 self.counter += 1
-                self.current_state = self.look_around2
+                self.current_state = self.close_look_around
 
     def look_around2(self):
         self.new_detected_cones = None
