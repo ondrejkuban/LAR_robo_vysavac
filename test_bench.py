@@ -137,7 +137,7 @@ def get_threshold_for_color(color):
 # Return "array of Cones" from image
 def get_cones_for_color(image, threshold):
     print(threshold[0])
-    mask = cv2.inRange(image,  threshold[0],  threshold[1])
+    mask = cv2.inRange(image,  tuple(threshold[0]),  tuple(threshold[1]))
     detections = cv2.connectedComponentsWithStats(mask.astype(np.uint8))
 
     results = []
