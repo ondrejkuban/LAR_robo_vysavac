@@ -167,7 +167,11 @@ class StateMachine:
             self.turtle.cmd_velocity(linear=0, angular=-0.4)
         else:
             self.turtle.reset_odometry()
-            self.current_state = self.drive_through
+            if self.ready_to_drive_through:
+                self.current_state = self.drive_through
+            else:
+                self.ready_to_drive_through = True
+                self.current_state = self.look_around1
 
     def drive_through(self):
         odom = self.turtle.get_odometry()
