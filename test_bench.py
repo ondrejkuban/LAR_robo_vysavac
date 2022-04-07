@@ -214,6 +214,15 @@ def updateVL(val):
 def updateSL(val):
     ColorsThresholds.BLUE[1][2] = val
 
+def updateHD(val):
+    ColorsThresholds.BLUE[0][0] = val
+
+def updateVD(val):
+    ColorsThresholds.BLUE[0][1] = val
+
+def updateSD(val):
+    ColorsThresholds.BLUE[0][2] = val
+
 def main():
     global stop
     turtle = Turtlebot(pc=True, rgb=True, depth=True)
@@ -224,29 +233,59 @@ def main():
     angle = 0
     distance = 0
     turtle.reset_odometry()
-    axfreq = plt.axes([0.25, 0.1, 0.65, 0.03])
+    axfreq = plt.axes([0.0, 0.25, 0.0225, 0.63])
     freq_slider = Slider(
         ax=axfreq,
-        label='H',
+        label='HL',
         valmin=0,
         valmax=255,
         valinit=0,
+        orientation="vertical"
     )
 
     # Make a vertically oriented slider to control the amplitude
     axamp = plt.axes([0.1, 0.25, 0.0225, 0.63])
     amp_slider = Slider(
         ax=axamp,
-        label="S",
+        label="SL",
         valmin=0,
         valmax=255,
         valinit=0,
         orientation="vertical"
     )
-    ayamp = plt.axes([0.8, 0.25, 0.0225, 0.63])
+    ayamp = plt.axes([0.2, 0.25, 0.0225, 0.63])
     p_slider = Slider(
         ax=ayamp,
-        label="V",
+        label="VL",
+        valmin=0,
+        valmax=255,
+        valinit=0,
+        orientation="vertical"
+    )
+    axfreq = plt.axes([0.5, 0.25, 0.0225, 0.63])
+    freq_sliderD = Slider(
+        ax=axfreq,
+        label='HD',
+        valmin=0,
+        valmax=255,
+        valinit=0,
+        orientation="vertical"
+    )
+
+    # Make a vertically oriented slider to control the amplitude
+    axamp = plt.axes([0.6, 0.25, 0.0225, 0.63])
+    amp_sliderD= Slider(
+        ax=axamp,
+        label="SD",
+        valmin=0,
+        valmax=255,
+        valinit=0,
+        orientation="vertical"
+    )
+    ayamp = plt.axes([0.7, 0.25, 0.0225, 0.63])
+    p_sliderD = Slider(
+        ax=ayamp,
+        label="VD",
         valmin=0,
         valmax=255,
         valinit=0,
@@ -255,6 +294,9 @@ def main():
     freq_slider.on_changed(updateHL)
     amp_slider.on_changed(updateSL)
     p_slider.on_changed(updateVL)
+    freq_sliderD.on_changed(updateHD)
+    amp_sliderD.on_changed(updateSD)
+    p_sliderD.on_changed(updateVD)
     while not turtle.is_shutting_down():
         # get point cloud
         depth = turtle.get_depth_image()
