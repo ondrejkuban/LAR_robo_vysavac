@@ -86,7 +86,7 @@ class StateMachine:
 
     def estimate_cones_position(self):
         pair = self.detected_cones.get_closest_pair()
-        if len(pair) > 1:
+        if pair is not None:
             print()
             first = (pair[0].distance * np.sin(pair[0].odo - pair[0].angle),
                      pair[0].distance * np.cos(pair[0].odo - pair[0].angle))
