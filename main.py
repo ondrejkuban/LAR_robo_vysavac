@@ -97,8 +97,8 @@ class StateMachine:
 
             self.center = ((first[0] + second[0]) / 2, (first[1] + second[1]) / 2)
             hypotenuse = ((second[1] - first[1]) / 2)**2 + ((first[0] - second[0]) / 2)**2
-            scale = 0.5/hypotenuse
-            approach_point_deviation = [(second[1] - first[1]) / (2*scale),(first[0] - second[0]) / (2*scale)]
+            scale = 0.8/hypotenuse
+            approach_point_deviation = [((second[1] - first[1]) / 2)*scale,((first[0] - second[0]) / (2))*scale]
             goal1 = (self.center[0] + approach_point_deviation[0], self.center[1] + approach_point_deviation[1])
             goal2 = (self.center[0] - approach_point_deviation[0], self.center[1] - approach_point_deviation[1])
             print("goal1", goal1, "goal2", goal2)
