@@ -117,8 +117,8 @@ class StateMachine:
                 self.distance = dist2
             
             print(self.angle, dist1, dist2)
-            self.distance -= 0.1
-            #elf.distance -= self.distance * 0.06
+            #self.distance -= 0.1
+            self.distance -= self.distance * 0.06
             self.current_state = self.turn_to_middle
 
     def turn_to_middle(self):
@@ -221,6 +221,7 @@ def main():
     while not turtle.is_shutting_down():
         state_machine.run_state()
         if state_machine.detected_cones is not None:
+            plt.clf()
             for cone in state_machine.detected_cones.all:
                 if cone.color is Color.RED:
                     plt.scatter(cone.odo-cone.angle, cone.distance, s=40, color='red')
