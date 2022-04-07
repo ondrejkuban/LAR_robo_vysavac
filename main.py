@@ -145,8 +145,8 @@ class StateMachine:
         center_dist = self.center[0]**2 + self.center[1]**2
         parameter1 = self.distance**2 + (0.25*np.sqrt(3))**2 - center_dist
         parameter2 = 2*self.distance*(0.25*np.sqrt(3))
-        self.angle_to_turn =np.pi- np.arccos(parameter1/parameter2)
-        if self.angle>0:
+        self.angle_to_turn =np.pi/2 - np.arccos(parameter1/parameter2)
+        if self.angle<0:
             self.angle_to_turn = -self.angle_to_turn
         self.current_state = self.turn_to_goal
 
