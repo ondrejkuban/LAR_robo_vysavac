@@ -103,12 +103,12 @@ while True:
     green_cones = get_cones_for_color(hsv, ColorsThresholds.GREEN)
     blue_cones = get_cones_for_color(hsv, ColorsThresholds.BLUE)
 
-   # for cone in red_cones:
-    #    cone.distance = calculate_euclidean(point_cloud[cone.center[1]][cone.center[0]])
-    #for cone in green_cones:
-   #     cone.distance = calculate_euclidean(point_cloud[cone.center[1]][cone.center[0]])
-   # for cone in blue_cones:
-     #   cone.distance = calculate_euclidean(point_cloud[cone.center[1]][cone.center[0]])
+    for cone in red_cones:
+        cone.distance = calculate_euclidean(point_cloud[cone.center[1]][cone.center[0]])
+    for cone in green_cones:
+        cone.distance = calculate_euclidean(point_cloud[cone.center[1]][cone.center[0]])
+    for cone in blue_cones:
+        cone.distance = calculate_euclidean(point_cloud[cone.center[1]][cone.center[0]])
 
     # drawing rectangle
     im = rgb_image.copy()
