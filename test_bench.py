@@ -29,9 +29,9 @@ class Color:
 
 class ColorsThresholds:
     #       dark           light
-    RED = ((0, 100, 50), (5, 255, 230))
-    GREEN = ((40, 40, 10), (80, 255, 230))
-    BLUE = ((85, 90, 50), (110, 255, 240))
+    RED = [[0, 100, 50], [5, 255, 230]]
+    GREEN = [[40, 40, 10], [80, 255, 230]]
+    BLUE = [[85, 90, 50], [110, 255, 240]]
 
 
 class Cone:
@@ -274,7 +274,7 @@ def main():
        # detectedCones.draw_cones(out)
 
         cv2.imshow("RGB", detectedCones.maskb)
-        plt.show()
+        plt.pause(0.001)
         cv2.waitKey(1)
 
 
