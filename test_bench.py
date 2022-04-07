@@ -29,7 +29,7 @@ class Color:
 
 class ColorsThresholds:
     #       dark           light
-    RED = [[0, 100, 50], [5, 255, 230]]
+    RED = [[0, 116, 114], [6.5, 255, 255]]
     GREEN = [[39, 74, 54], [80, 255, 230]]
     BLUE = [[90, 89, 172], [106, 234, 255]]
 
