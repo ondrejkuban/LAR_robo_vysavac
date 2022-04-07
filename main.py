@@ -103,8 +103,9 @@ class StateMachine:
                 self.distance -= 0.1
                 self.current_state = self.turn_to_middle
                 return
-            goal1 = (self.center[0] + (second[1] - first[1]) / 2, self.center[1] + (first[0] - second[0]) / 2)
-            goal2 = (self.center[0] - (second[1] - first[1]) / 2, self.center[1] - (first[0] - second[0]) / 2)
+            scale = 0.5/((second[1] - first[1])**2+(first[0] - second[0])**2)
+            goal1 = (self.center[0] + ((second[1] - first[1]) / 2)*scale, self.center[1] + ((first[0] - second[0]) / 2)*scale)
+            goal2 = (self.center[0] - ((second[1] - first[1]) / 2)*scale, self.center[1] - ((first[0] - second[0]) / 2)*scale)
             print("goal1", goal1, "goal2", goal2)
             dist1 = np.sqrt(goal1[0] ** 2 + goal1[1] ** 2)
             dist2 = np.sqrt(goal2[0] ** 2 + goal2[1] ** 2)
