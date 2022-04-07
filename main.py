@@ -148,7 +148,12 @@ class StateMachine:
         if np.sqrt(odom[0] ** 2 + odom[1] ** 2) < self.distance:
             self.turtle.cmd_velocity(linear=0.25, angular=0)
         else:
-            self.current_state = self.calc_turn_to_goal
+            #self.current_state = self.calc_turn_to_goal
+            if self.ready_to_drive_through:
+                self.current_state = self.drive_through
+            else:
+                self.ready_to_drive_through = True
+                self.current_state = self.look_around1
 
     def calc_turn_to_goal(self):
         self.distance += 0.1
@@ -167,11 +172,6 @@ class StateMachine:
             self.turtle.cmd_velocity(linear=0, angular=-0.4)
         else:
             self.turtle.reset_odometry()
-            if self.ready_to_drive_through:
-                self.current_state = self.drive_through
-            else:
-                self.ready_to_drive_through = True
-                self.current_state = self.look_around1
 
     def drive_through(self):
         odom = self.turtle.get_odometry()
