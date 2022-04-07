@@ -171,7 +171,7 @@ class StateMachine:
                 self.ready_to_drive_through = True
                 self.turtle.reset_odometry()
                 self.detected_cones = DetectedCones(self.turtle) #throw out all detected cones
-                self.counter = 0
+                self.counter = 1
                 self.direction = 1 if self.angle-self.alpha > 0 else -1
                 self.current_state = self.close_look_around
 
