@@ -54,6 +54,7 @@ class StateMachine:
             self.current_state = self.look_around2
 
     def close_look_around(self):
+        print(self.direction,self.turtle.get_odometry()[2],self.counter)
         self.new_detected_cones = None
         if self.direction == 1:
             if self.turtle.get_odometry()[2] < (np.pi / 9) * self.counter:
