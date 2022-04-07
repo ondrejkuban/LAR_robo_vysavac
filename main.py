@@ -32,6 +32,8 @@ class StateMachine:
         self.center = None
         self.angle_to_turn = None
         self.ready_to_drive_through = False
+        self.direction = 1
+        self.alpha = None
 
     def run_state(self):
         self.current_state()
@@ -51,10 +53,10 @@ class StateMachine:
             self.detect_cones()
             self.current_state = self.look_around2
 
-    def close_look_around(self,direction=1):
+    def close_look_around(self,):
         self.new_detected_cones = None
 
-        if self.turtle.get_odometry()[2] > direction*(np.pi / 2 - (np.pi / 9)) * self.counter:
+        if self.turtle.get_odometry()[2] > self.direction*(np.pi / 2 - (np.pi / 9)) * self.counter:
             self.turtle.cmd_velocity(linear=0, angular=-0.65)
         else:
             self.turtle.cmd_velocity(linear=0, angular=0)
@@ -129,7 +131,7 @@ class StateMachine:
                 self.angle = -np.arcsin(goal2[0] / dist2)
                 self.angle = -self.angle
                 self.distance = dist2
-            
+            self.alpha = np.arcsin(self.center[0]/np.sqrt(self.center[0]**2+self.center[1]**2))
             print(self.angle, dist1, dist2)
             #self.distance -= 0.1
             self.distance -= self.distance * 0.06
@@ -170,7 +172,8 @@ class StateMachine:
                 self.turtle.reset_odometry()
                 self.detected_cones = DetectedCones(self.turtle) #throw out all detected cones
                 self.counter = 1
-                self.current_state = self.look_around1
+                self.direction = 1 if self.angle-self.alpha > 0 else -1
+                self.current_state = self.close_look_around
 
     def calc_turn_to_goal(self):
         self.distance += 0.1
