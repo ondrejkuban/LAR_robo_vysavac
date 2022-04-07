@@ -1,7 +1,8 @@
 from __future__ import print_function
 from robolab_turtlebot import Turtlebot, Rate
 from robolab_turtlebot import detector, get_time
-
+import matplotlib.pyplot as plt
+from matplotlib.widgets import Slider, Button
 import numpy as np
 import cv2
 import time
@@ -199,6 +200,18 @@ def bumper_callBack(msg):
     print('Bumper was activated, new state is STOP')
 
 
+def update(val):
+    print(val)
+
+def updateHL(val):
+    ColorsThresholds.BLUE[1][0] = val
+
+def updateVL(val):
+    ColorsThresholds.BLUE[1][1] = val
+
+def updateSL(val):
+    ColorsThresholds.BLUE[1][2] = val
+
 def main():
     global stop
     turtle = Turtlebot(pc=True, rgb=True, depth=True)
@@ -209,7 +222,37 @@ def main():
     angle = 0
     distance = 0
     turtle.reset_odometry()
+    axfreq = plt.axes([0.25, 0.1, 0.65, 0.03])
+    freq_slider = Slider(
+        ax=axfreq,
+        label='H',
+        valmin=0,
+        valmax=255,
+        valinit=0,
+    )
 
+    # Make a vertically oriented slider to control the amplitude
+    axamp = plt.axes([0.1, 0.25, 0.0225, 0.63])
+    amp_slider = Slider(
+        ax=axamp,
+        label="S",
+        valmin=0,
+        valmax=255,
+        valinit=0,
+        orientation="vertical"
+    )
+    ayamp = plt.axes([0.8, 0.25, 0.0225, 0.63])
+    p_slider = Slider(
+        ax=ayamp,
+        label="V",
+        valmin=0,
+        valmax=255,
+        valinit=0,
+        orientation="vertical"
+    )
+    freq_slider.on_changed(updateHL)
+    amp_slider.on_changed(updateSL)
+    p_slider.on_changed(updateVL)
     while not turtle.is_shutting_down():
         # get point cloud
         depth = turtle.get_depth_image()
@@ -230,8 +273,8 @@ def main():
         out = cv2.convertScaleAbs(depth, alpha=255 / max)
        # detectedCones.draw_cones(out)
 
-        cv2.imshow("RGB", detectedCones.maskg)
-
+        cv2.imshow("RGB", detectedCones.maskb)
+        plt.show()
         cv2.waitKey(1)
 
 
