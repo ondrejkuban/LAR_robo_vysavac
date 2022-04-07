@@ -65,7 +65,7 @@ class StateMachine:
                 self.current_state = self.estimate_cones_position
             else:
                 self.counter += 1
-                self.current_state = self.look_around2
+                self.current_state = self.close_look_around
 
     def look_around2(self):
         self.new_detected_cones = None
@@ -171,7 +171,7 @@ class StateMachine:
                 self.ready_to_drive_through = True
                 self.turtle.reset_odometry()
                 self.detected_cones = DetectedCones(self.turtle) #throw out all detected cones
-                self.counter = 1
+                self.counter = 0
                 self.direction = 1 if self.angle-self.alpha > 0 else -1
                 self.current_state = self.close_look_around
 
