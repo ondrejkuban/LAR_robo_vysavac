@@ -56,14 +56,14 @@ class DetectedCones:
             closest_cone = min(all_cones,
                                key=lambda cone: cone.distance)  # moje duvera v tuhle radku je maximalne 5 (slovy pět)%
         else:
-            return []
+            return None
         if closest_cone.color == 1 and len(self.red) > 1:  # red
             return [self.red[0], self.red[1]]
         elif closest_cone.color == 2 and len(self.green) > 1:  # green
             return [self.green[0], self.green[1]]
         elif closest_cone.color == 3 and len(self.blue) > 1:  # blue
             return [self.blue[0], self.blue[1]]
-        return [closest_cone]
+        return None
         # chci navratit nejblizsi dvojici
         # pokud neni dvojice vrat nejblizsi
         # pokud neni nejblizsi vrat None
