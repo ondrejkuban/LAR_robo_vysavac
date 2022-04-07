@@ -153,6 +153,9 @@ class StateMachine:
                 self.current_state = self.drive_through
             else:
                 self.ready_to_drive_through = True
+                self.turtle.reset_odometry()
+                self.detected_cones = DetectedCones(turtle) #throw out all detected cones
+                self.counter = 1
                 self.current_state = self.look_around1
 
     def calc_turn_to_goal(self):
