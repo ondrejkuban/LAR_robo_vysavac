@@ -274,7 +274,7 @@ def main():
        # detectedCones.draw_cones(out)
 
         cv2.imshow("RGB", detectedCones.maskb)
-        plt.show()
+        plt.pause(0.001)
         cv2.waitKey(1)
 
 
