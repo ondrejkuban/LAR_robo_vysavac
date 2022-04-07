@@ -70,11 +70,14 @@ class DetectedCones:
         self.red = None
         self.green = None
         self.blue = None
+        self.maskr = None
+        self.maskb = None
+        self.maskg = None
 
     def detect_cones(self, image, point_cloud):
-        self.red = get_cones_for_color(image, ColorsThresholds.RED)
-        self.green = get_cones_for_color(image, ColorsThresholds.GREEN)
-        self.blue = get_cones_for_color(image, ColorsThresholds.BLUE)
+        self.red,self.maskr = get_cones_for_color(image, ColorsThresholds.RED)
+        self.green,self.maskg = get_cones_for_color(image, ColorsThresholds.GREEN)
+        self.blue,self.maskb = get_cones_for_color(image, ColorsThresholds.BLUE)
         get_distances_for_cones(point_cloud, self.red)
         get_distances_for_cones(point_cloud, self.green)
         get_distances_for_cones(point_cloud, self.blue)
@@ -142,7 +145,7 @@ def get_cones_for_color(image, threshold: tuple):
                                 (detections[2][i][0], detections[2][i][1]),
                                 (detections[2][i][2], detections[2][i][3])))
 
-    return results
+    return results,mask
 
 
 def draw_rectangles(image, cones: list):
@@ -218,16 +221,16 @@ def main():
 
         detectedCones = DetectedCones()  # -> detectedCones.red, green, blue
         detectedCones.detect_cones(hsv, point_cloud)
-        detectedCones.draw_cones(im)  # -> az na konec, prekresli puvodni obrazek mohlo by se s nim pak hure pracovat
+        #detectedCones.draw_cones(im)  # -> az na konec, prekresli puvodni obrazek mohlo by se s nim pak hure pracovat
 
         # drawing rectangle
 
         minmax = cv2.minMaxLoc(depth)
         max = np.ceil(minmax[1])
         out = cv2.convertScaleAbs(depth, alpha=255 / max)
-        detectedCones.draw_cones(out)
+       # detectedCones.draw_cones(out)
 
-        cv2.imshow("RGB", im)
+        cv2.imshow("RGB", detectedCones.maskg)
 
         cv2.waitKey(1)
 
