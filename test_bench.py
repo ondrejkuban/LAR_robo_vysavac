@@ -31,7 +31,7 @@ class ColorsThresholds:
     #       dark           light
     RED = [[0, 100, 50], [5, 255, 230]]
     GREEN = [[40, 40, 10], [80, 255, 230]]
-    BLUE = [[85, 90, 50], [110, 255, 240]]
+    BLUE = [[90, 89, 172], [106, 234, 255]]
 
 
 class Cone:
