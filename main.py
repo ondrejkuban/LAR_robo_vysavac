@@ -98,7 +98,7 @@ class StateMachine:
             self.center = ((first[0] + second[0]) / 2, (first[1] + second[1]) / 2)
             if self.ready_to_drive_through:
                 dist1 = np.sqrt(self.center[0] ** 2 + self.center[1] ** 2)
-                self.angle = np.arcsin(center[0] / dist1)
+                self.angle = np.arcsin(self.center[0] / dist1)
                 self.distance = dist1
                 self.distance -= 0.1
                 self.current_state = self.turn_to_middle
