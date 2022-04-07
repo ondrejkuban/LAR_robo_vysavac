@@ -59,17 +59,25 @@ class StateMachine:
         if self.direction == 1:
             if self.turtle.get_odometry()[2] < (np.pi / 9) * self.counter:
                 self.turtle.cmd_velocity(linear=0, angular=0.65)
+            else:
+                self.turtle.cmd_velocity(linear=0, angular=0)
+                self.detect_cones()
+                if self.counter > 5 or self.detected_cones.get_closest_pair() is not None:
+                    self.current_state = self.estimate_cones_position
+                else:
+                    self.counter += 1
+                    self.current_state = self.close_look_around
         elif self.direction == -1:
             if self.turtle.get_odometry()[2] > -(np.pi / 9) * self.counter:
                 self.turtle.cmd_velocity(linear=0, angular=-0.65)
-        else:
-            self.turtle.cmd_velocity(linear=0, angular=0)
-            self.detect_cones()
-            if self.counter > 5 or self.detected_cones.get_closest_pair() is not None:
-                self.current_state = self.estimate_cones_position
             else:
-                self.counter += 1
-                self.current_state = self.close_look_around
+                self.turtle.cmd_velocity(linear=0, angular=0)
+                self.detect_cones()
+                if self.counter > 5 or self.detected_cones.get_closest_pair() is not None:
+                    self.current_state = self.estimate_cones_position
+                else:
+                    self.counter += 1
+                    self.current_state = self.close_look_around
 
     def look_around2(self):
         self.new_detected_cones = None
