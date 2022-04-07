@@ -57,7 +57,7 @@ class StateMachine:
         self.new_detected_cones = None
 
         if self.turtle.get_odometry()[2] > self.direction*(np.pi / 2 - (np.pi / 9)) * self.counter:
-            self.turtle.cmd_velocity(linear=0, angular=-0.65)
+            self.turtle.cmd_velocity(linear=0, angular=self.direction*0.65)
         else:
             self.turtle.cmd_velocity(linear=0, angular=0)
             self.detect_cones()
@@ -172,7 +172,7 @@ class StateMachine:
                 self.turtle.reset_odometry()
                 self.detected_cones = DetectedCones(self.turtle) #throw out all detected cones
                 self.counter = 1
-                self.direction = 1 if self.angle-self.alpha > 0 else -1
+                self.direction = -1 if self.angle-self.alpha > 0 else 1
                 self.current_state = self.close_look_around
 
     def calc_turn_to_goal(self):
