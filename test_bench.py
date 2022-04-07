@@ -1,16 +1,21 @@
-import cv2
-from scipy.io import loadmat
+from __future__ import print_function
+from robolab_turtlebot import Turtlebot, Rate
+from robolab_turtlebot import detector, get_time
+
 import numpy as np
-import skimage.exposure
+import cv2
+import time
 
-matlab_data = [loadmat('2022-03-03-15-30-32.mat'),
-               loadmat('2022-03-03-15-31-04.mat'),
-               loadmat('2022-03-03-15-31-31.mat'),
-               loadmat('2022-03-03-15-31-43.mat'),
-               loadmat('2022-03-03-15-32-07.mat'),
-               loadmat('2022-03-03-15-32-23.mat')]
+x_range = (-0.3, 0.3)
+z_range = (0.3, 3.0)
 
-surface_threshold = 400
+WINDOW_D = 'DEPTH'  # depth
+WINDOW = 'RGB'
+SURFACE_THRESHOLD = 400
+
+stop = False
+t = 0
+fun_step = 0
 
 
 # color class
@@ -23,9 +28,9 @@ class Color:
 
 class ColorsThresholds:
     #       dark           light
-    RED = ((0, 100, 50), (5, 255, 255))
-    GREEN = ((45, 70, 20), (75, 255, 255))
-    BLUE = ((90, 100, 20), (110, 255, 255))
+    RED = ((0, 100, 50), (5, 255, 230))
+    GREEN = ((40, 40, 10), (80, 255, 230))
+    BLUE = ((85, 90, 50), (110, 255, 240))
 
 
 class Cone:
@@ -34,11 +39,75 @@ class Cone:
         self.pt1 = position
         self.pt2 = (position[0] + size[0], position[1] + size[1])
         self.size = size
-        self.center = (position[0]+size[0]//2,position[1]+size[1]//2)
+        self.center = (position[0] + size[0] // 2, position[1] + size[1] // 2)
+        self.distance = -1
+        self.x = None
+        self.y = None
+        self.angle = None
+
+
+class PID:
+    def __init__(self):
+        self.p_gain = 1.25
+        self.i_gain = 1
+        self.d_gain = 1
+        self.goal = 0
+
+    def get_new_output(self, measurement):
+        if self.p_gain * (measurement - self.goal) > 1:
+            return 1
+        if self.p_gain * (measurement - self.goal) < -1:
+            return -1
+        if -0.1 < self.p_gain * (measurement - self.goal) < 0:
+            return -0.1
+        if 0.1 > self.p_gain * (measurement - self.goal) > 0:
+            return 0.1
+        return self.p_gain * (measurement - self.goal)
+
+
+class DetectedCones:
+    def __init__(self):
+        self.red = None
+        self.green = None
+        self.blue = None
+
+    def detect_cones(self, image, point_cloud):
+        self.red = get_cones_for_color(image, ColorsThresholds.RED)
+        self.green = get_cones_for_color(image, ColorsThresholds.GREEN)
+        self.blue = get_cones_for_color(image, ColorsThresholds.BLUE)
+        get_distances_for_cones(point_cloud, self.red)
+        get_distances_for_cones(point_cloud, self.green)
+        get_distances_for_cones(point_cloud, self.blue)
+        self.red.sort(key=lambda cone: cone.distance)  # bude fungovat??? (dostanu cone a sort podle jeji distance)
+        self.green.sort(key=lambda cone: cone.distance)  # bude fungovat???
+        self.blue.sort(key=lambda cone: cone.distance)  # bude fungovat???
+
+    def draw_cones(self, image):
+        draw_rectangles(image, self.red)
+        draw_rectangles(image, self.green)
+        draw_rectangles(image, self.blue)
+
+    def get_closest_pair(self):
+        all_cones = self.red + self.green + self.blue
+        if len(all_cones) > 0:
+            closest_cone = min(all_cones,
+                               key=lambda cone: cone.distance)  # moje duvera v tuhle radku je maximalne 5 (slovy pět)%
+        else:
+            return []
+        if closest_cone.color == 1 and len(self.red) > 1:  # red
+            return [self.red[0], self.red[1]]
+        elif closest_cone.color == 2 and len(self.green) > 1:  # green
+            return [self.green[0], self.green[1]]
+        elif closest_cone.color == 3 and len(self.blue) > 1:  # blue
+            return [self.blue[0], self.blue[1]]
+        return [closest_cone]
+        ## chci navratit nejblizsi dvojici
+        ## pokud neni dvojice vrat nejblizsi
+        ## pokud neni nejblizsi vrat None
 
 
 def detection_is_valid(detection):
-    if detection[4] < surface_threshold:
+    if detection[4] < SURFACE_THRESHOLD:
         return False
     if detection[2] * 2 > detection[3]:
         return False
@@ -61,6 +130,7 @@ def get_threshold_for_color(color):
     }.get(color)
 
 
+# Return "array of Cones" from image
 def get_cones_for_color(image, threshold: tuple):
     mask = cv2.inRange(image, threshold[0], threshold[1])
     detections = cv2.connectedComponentsWithStats(mask.astype(np.uint8))
@@ -78,51 +148,89 @@ def get_cones_for_color(image, threshold: tuple):
 def draw_rectangles(image, cones: list):
     for cone in cones:
         cv2.rectangle(image, cone.pt1, cone.pt2, color=get_threshold_for_color(cone.color), thickness=2)
-        cv2.putText(image,str(cone.distance),cone.pt1,cv2.FONT_ITALIC,1,get_threshold_for_color(cone.color),2)
+        cv2.putText(image, str(round(cone.distance, 2)), cone.pt1, cv2.FONT_ITALIC, 1,
+                    get_threshold_for_color(cone.color), 2)
 
 
-def calculate_euclidean(points):
-    return round(np.sqrt(points[0]**2 + points[1]**2), 3)
+def calculate_euclidean(first_point):  # points[2] for x and points[0] for y
+    return np.sqrt((first_point[0]) ** 2 + (first_point[1]) ** 2)
 
-# init
-rgb_image = matlab_data[0]['image_rgb']
-depth_image = matlab_data[0]['image_depth']
-k_depth = matlab_data[0]['K_depth']
-k_rgb = matlab_data[0]['K_rgb']
-point_cloud = matlab_data[0]['point_cloud']
-cv2.namedWindow("RGB")
-cv2.namedWindow("DEPTH")
-#print(rgb_image[481][420])
-while True:
-    #M = k_depth @ np.linalg.inv(k_rgb)
-   # warped_rgb = cv2.warpPerspective(rgb_image, M, (640, 480))
-    hsv = cv2.cvtColor(rgb_image, cv2.COLOR_BGR2HSV)
-    get_cones_for_color(hsv, ColorsThresholds.BLUE)
-    # creating mask to find rectangles
-    red_cones = get_cones_for_color(hsv, ColorsThresholds.RED)
-    green_cones = get_cones_for_color(hsv, ColorsThresholds.GREEN)
-    blue_cones = get_cones_for_color(hsv, ColorsThresholds.BLUE)
 
-    for cone in red_cones:
-        cone.distance = calculate_euclidean(point_cloud[cone.center[1]][cone.center[0]])
-    for cone in green_cones:
-        cone.distance = calculate_euclidean(point_cloud[cone.center[1]][cone.center[0]])
-    for cone in blue_cones:
-        cone.distance = calculate_euclidean(point_cloud[cone.center[1]][cone.center[0]])
+def get_distances_for_cones(point_cloud, cones):
+    for cone in cones:
+        cone.x = get_point_in_space(point_cloud, cone, 2)
+        cone.y = get_point_in_space(point_cloud, cone, 0)
+        cone.distance = calculate_euclidean((cone.x, cone.y))
+        cone.angle = np.arcsin(cone.y / cone.distance)
 
-    # drawing rectangle
-    im = rgb_image.copy()
-    draw_rectangles(im, red_cones)
-    draw_rectangles(im, green_cones)
-    draw_rectangles(im, blue_cones)
 
-    minmax = cv2.minMaxLoc(depth_image)
-    max = np.ceil(minmax[1])
-    out = cv2.convertScaleAbs(depth_image, alpha=255 / max)
-    draw_rectangles(out, red_cones)
-    draw_rectangles(out, green_cones)
-    draw_rectangles(out, blue_cones)
+def get_point_in_space(point_cloud, cone, axis):
+    points = []
+    for i in range(cone.pt1[0], cone.pt2[0]):
+        for j in range(cone.pt1[1], cone.pt2[1]):
+            if not np.isnan(point_cloud[j][i][axis]):
+                points.append(point_cloud[j][i][axis])
+    return round(np.median(points), 3)
 
-    cv2.imshow("RGB", im)
-    cv2.imshow("DEPTH", out)
-    cv2.waitKey(1)
+
+def fun(turtle):
+    # global fun_step
+    # fun_step += 1
+    # fun_step %= 7
+    # turtle.play_sound(fun_step)
+    global t
+    print(turtle.get_odometry())
+    if abs(turtle.get_odometry()[2]) < np.pi:
+        turtle.cmd_velocity(linear=0, angular=1)
+    else:
+        turtle.cmd_velocity(linear=0, angular=0)
+
+
+# stop robot
+def bumper_callBack(msg):
+    global stop
+    global t
+    t = get_time()
+
+    stop = True
+    print('Bumper was activated, new state is STOP')
+
+
+def main():
+    global stop
+    turtle = Turtlebot(pc=True, rgb=True, depth=True)
+    state = 0
+    cv2.namedWindow(WINDOW)  # display rgb image
+    turtle.register_bumper_event_cb(bumper_callBack)
+    pid = PID()
+    angle = 0
+    distance = 0
+    turtle.reset_odometry()
+
+    while not turtle.is_shutting_down():
+        # get point cloud
+        depth = turtle.get_depth_image()
+        point_cloud = turtle.get_point_cloud()
+        rgb = turtle.get_rgb_image()
+
+        hsv = cv2.cvtColor(rgb, cv2.COLOR_BGR2HSV)
+        im = rgb.copy()
+
+        detectedCones = DetectedCones()  # -> detectedCones.red, green, blue
+        detectedCones.detect_cones(hsv, point_cloud)
+        detectedCones.draw_cones(im)  # -> az na konec, prekresli puvodni obrazek mohlo by se s nim pak hure pracovat
+
+        # drawing rectangle
+
+        minmax = cv2.minMaxLoc(depth)
+        max = np.ceil(minmax[1])
+        out = cv2.convertScaleAbs(depth, alpha=255 / max)
+        detectedCones.draw_cones(out)
+
+        cv2.imshow("RGB", im)
+
+        cv2.waitKey(1)
+
+
+if __name__ == '__main__':
+    main()
