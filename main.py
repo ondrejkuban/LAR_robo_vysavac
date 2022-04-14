@@ -86,6 +86,7 @@ class StateMachine:
             self.turtle.cmd_velocity(linear=0, angular=0.65)
         else:
             self.turtle.cmd_velocity(linear=0, angular=0)
+            time.sleep(0.2)
             self.detect_cones()
             if self.counter > 8 or self.detected_cones.get_closest_pair() is not None:
                 self.current_state = self.estimate_cones_position
