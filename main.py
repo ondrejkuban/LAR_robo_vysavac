@@ -16,6 +16,7 @@ WINDOW_D = 'DEPTH'  # depth
 WINDOW = 'RGB'
 MIDDLE_DIST_PRESET = 0.5
 
+
 stop = False
 t = 0
 fun_step = 0
@@ -35,6 +36,8 @@ class StateMachine:
         self.ready_to_drive_through = False
         self.direction = 1
         self.alpha = None
+        self.look_around_angle = np.pi
+        self.look_around_steps = 8
 
     def run_state(self):
         self.current_state()
@@ -48,7 +51,7 @@ class StateMachine:
 
         self.new_detected_cones = None
         print(self.turtle.get_odometry()[2])
-        if self.turtle.get_odometry()[2] > -np.pi / 2:
+        if self.turtle.get_odometry()[2] > -self.look_around_angle / 2:
             self.turtle.cmd_velocity(linear=0, angular=-0.8)
         else:
             self.detect_cones()
@@ -58,7 +61,7 @@ class StateMachine:
         print(self.direction, self.turtle.get_odometry()[2], self.counter)
         self.new_detected_cones = None
         if self.direction == 1:
-            if self.turtle.get_odometry()[2] < (np.pi / 9) * self.counter:
+            if self.turtle.get_odometry()[2] < (self.look_around_angle / 9) * self.counter:
                 self.turtle.cmd_velocity(linear=0, angular=0.65)
             else:
                 self.turtle.cmd_velocity(linear=0, angular=0)
@@ -83,13 +86,13 @@ class StateMachine:
     def look_around2(self):
         self.new_detected_cones = None
 
-        if self.turtle.get_odometry()[2] < -np.pi / 2 + (np.pi / 9) * self.counter:
+        if self.turtle.get_odometry()[2] < -self.look_around_angle / 2 + (np.pi / 9) * self.counter:
             self.turtle.cmd_velocity(linear=0, angular=0.65)
         else:
             self.turtle.cmd_velocity(linear=0, angular=0)
             time.sleep(0.2)
             self.detect_cones()
-            if self.counter > 8 or self.detected_cones.get_closest_pair() is not None:
+            if self.counter > self.look_around_steps or self.detected_cones.get_closest_pair() is not None:
                 self.current_state = self.estimate_cones_position
             else:
                 self.counter += 1
@@ -222,7 +225,9 @@ class StateMachine:
         if np.sqrt(odom[0] ** 2 + odom[1] ** 2) < MIDDLE_DIST_PRESET + 0.1:
             self.turtle.cmd_velocity(linear=1, angular=0)
         else:
-            self.current_state = self.idle
+            self.look_around_angle = np.pi/2
+            self.look_around_steps = 5
+            self.current_state = self.look_around1
 
 
 def fun(turtle):
