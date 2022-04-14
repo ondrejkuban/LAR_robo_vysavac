@@ -96,7 +96,7 @@ class StateMachine:
 
     def look_aroud(self):
         self.new_detected_cones = None
-        if self.turtle < -np.pi / 2 + np.pi:
+        if self.turtle.get_odometry()[2] < -np.pi / 2 + np.pi:
             self.turtle.cmd_velocity(linear=0, angular=0.65)
             self.detect_cones()
         else:
