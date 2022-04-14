@@ -14,6 +14,7 @@ z_range = (0.3, 3.0)
 
 WINDOW_D = 'DEPTH'  # depth
 WINDOW = 'RGB'
+MIDDLE_DIST_PRESET = 0.5
 
 stop = False
 t = 0
@@ -138,7 +139,7 @@ class StateMachine:
                 self.distance -= 0.1
                 self.current_state = self.turn_to_middle
                 return
-            scale = 0.5 / ((second[1] - first[1]) ** 2 + (first[0] - second[0]) ** 2)
+            scale = MIDDLE_DIST_PRESET / ((second[1] - first[1]) ** 2 + (first[0] - second[0]) ** 2)
             goal1 = (self.center[0] + ((second[1] - first[1]) / 2) * scale,
                      self.center[1] + ((first[0] - second[0]) / 2) * scale)
             goal2 = (self.center[0] - ((second[1] - first[1]) / 2) * scale,
@@ -188,6 +189,7 @@ class StateMachine:
         else:
             # self.current_state = self.calc_turn_to_goal
             if self.ready_to_drive_through:
+                self.turtle.reset_odometry()
                 self.current_state = self.drive_through
             else:
                 self.ready_to_drive_through = True
@@ -217,7 +219,7 @@ class StateMachine:
 
     def drive_through(self):
         odom = self.turtle.get_odometry()
-        if np.sqrt(odom[0] ** 2 + odom[1] ** 2) < 1:
+        if np.sqrt(odom[0] ** 2 + odom[1] ** 2) < MIDDLE_DIST_PRESET + 0.1:
             self.turtle.cmd_velocity(linear=1, angular=0)
         else:
             self.current_state = self.idle
