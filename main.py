@@ -227,6 +227,7 @@ class StateMachine:
             self.look_around_angle = np.pi/2
             self.look_around_steps = 5
             self.detected_cones = DetectedCones(self.turtle)
+            self.counter = 1
             self.turtle.reset_odometry()
             self.current_state = self.look_around1
 
