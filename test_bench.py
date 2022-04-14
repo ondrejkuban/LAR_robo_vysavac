@@ -206,22 +206,22 @@ def update(val):
     print(val)
 
 def updateHL(val):
-    ColorsThresholds.GREEN[1][0] = val
+    ColorsThresholds.BLUE[1][0] = val
 
 def updateVL(val):
-    ColorsThresholds.GREEN[1][1] = val
+    ColorsThresholds.BLUE[1][1] = val
 
 def updateSL(val):
-    ColorsThresholds.GREEN[1][2] = val
+    ColorsThresholds.BLUE[1][2] = val
 
 def updateHD(val):
-    ColorsThresholds.GREEN[0][0] = val
+    ColorsThresholds.BLUE[0][0] = val
 
 def updateVD(val):
-    ColorsThresholds.GREEN[0][1] = val
+    ColorsThresholds.BLUE[0][1] = val
 
 def updateSD(val):
-    ColorsThresholds.GREEN[0][2] = val
+    ColorsThresholds.BLUE[0][2] = val
 
 def main():
     global stop
@@ -239,7 +239,7 @@ def main():
         label='HL',
         valmin=0,
         valmax=255,
-        valinit=ColorsThresholds.GREEN[1][0],
+        valinit=ColorsThresholds.BLUE[1][0],
         orientation="vertical"
     )
 
@@ -250,7 +250,7 @@ def main():
         label="SL",
         valmin=0,
         valmax=255,
-        valinit=ColorsThresholds.GREEN[1][1],
+        valinit=ColorsThresholds.BLUE[1][1],
         orientation="vertical"
     )
     ayamp = plt.axes([0.2, 0.25, 0.0225, 0.63])
@@ -259,7 +259,7 @@ def main():
         label="VL",
         valmin=0,
         valmax=255,
-        valinit=ColorsThresholds.GREEN[1][2],
+        valinit=ColorsThresholds.BLUE[1][2],
         orientation="vertical"
     )
     axfreq = plt.axes([0.5, 0.25, 0.0225, 0.63])
@@ -268,7 +268,7 @@ def main():
         label='HD',
         valmin=0,
         valmax=255,
-        valinit=ColorsThresholds.GREEN[0][0],
+        valinit=ColorsThresholds.BLUE[0][0],
         orientation="vertical"
     )
 
@@ -279,7 +279,7 @@ def main():
         label="SD",
         valmin=0,
         valmax=255,
-        valinit=ColorsThresholds.GREEN[0][1],
+        valinit=ColorsThresholds.BLUE[0][1],
         orientation="vertical"
     )
     ayamp = plt.axes([0.7, 0.25, 0.0225, 0.63])
@@ -288,7 +288,7 @@ def main():
         label="VD",
         valmin=0,
         valmax=255,
-        valinit=ColorsThresholds.GREEN[0][2],
+        valinit=ColorsThresholds.BLUE[0][2],
         orientation="vertical"
     )
     freq_slider.on_changed(updateHL)
@@ -316,8 +316,8 @@ def main():
         max = np.ceil(minmax[1])
         out = cv2.convertScaleAbs(depth, alpha=255 / max)
        # detectedCones.draw_cones(out)
-        print(detectedCones.maskg)
-        cv2.imshow("RGB", detectedCones.maskg)
+        print(detectedCones.maskb)
+        cv2.imshow("RGB", detectedCones.maskb)
         plt.pause(0.001)
         cv2.waitKey(1)
 
