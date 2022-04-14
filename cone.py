@@ -9,7 +9,7 @@ class Color:
 class ColorsThresholds:
     #       dark           light
     RED = ((0, 116, 114), (6.5, 255, 255))
-    GREEN = ((39, 74, 54), (80, 255, 230))
+    GREEN = ((39, 35, 54), (80, 255, 230))
     BLUE = ((90, 45, 172), (106, 234, 255))
 
 
