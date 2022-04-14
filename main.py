@@ -54,7 +54,7 @@ class StateMachine:
             self.current_state = self.look_around2
 
     def close_look_around(self):
-        print(self.direction,self.turtle.get_odometry()[2],self.counter)
+        print(self.direction, self.turtle.get_odometry()[2], self.counter)
         self.new_detected_cones = None
         if self.direction == 1:
             if self.turtle.get_odometry()[2] < (np.pi / 9) * self.counter:
@@ -94,6 +94,14 @@ class StateMachine:
                 self.counter += 1
                 self.current_state = self.look_around2
 
+    def look_aroud(self):
+        self.new_detected_cones = None
+        if self.turtle < -np.pi / 2 + np.pi:
+            self.turtle.cmd_velocity(linear=0, angular=0.65)
+            self.detect_cones()
+        else:
+            self.current_state = self.estimate_cones_position
+
     def detect_cones(self):
         point_cloud = self.turtle.get_point_cloud()
         rgb_image = self.turtle.get_rgb_image()
@@ -119,8 +127,8 @@ class StateMachine:
             first = (pair[0].distance * np.sin(pair[0].odo - pair[0].angle),
                      pair[0].distance * np.cos(pair[0].odo - pair[0].angle))
             second = (pair[1].distance * np.sin(pair[1].odo - pair[1].angle),
-                     pair[1].distance * np.cos(pair[1].odo - pair[1].angle))
-            print("first ",first," second ",second)
+                      pair[1].distance * np.cos(pair[1].odo - pair[1].angle))
+            print("first ", first, " second ", second)
 
             self.center = ((first[0] + second[0]) / 2, (first[1] + second[1]) / 2)
             if self.ready_to_drive_through:
@@ -130,9 +138,11 @@ class StateMachine:
                 self.distance -= 0.1
                 self.current_state = self.turn_to_middle
                 return
-            scale = 0.5/((second[1] - first[1])**2+(first[0] - second[0])**2)
-            goal1 = (self.center[0] + ((second[1] - first[1]) / 2)*scale, self.center[1] + ((first[0] - second[0]) / 2)*scale)
-            goal2 = (self.center[0] - ((second[1] - first[1]) / 2)*scale, self.center[1] - ((first[0] - second[0]) / 2)*scale)
+            scale = 0.5 / ((second[1] - first[1]) ** 2 + (first[0] - second[0]) ** 2)
+            goal1 = (self.center[0] + ((second[1] - first[1]) / 2) * scale,
+                     self.center[1] + ((first[0] - second[0]) / 2) * scale)
+            goal2 = (self.center[0] - ((second[1] - first[1]) / 2) * scale,
+                     self.center[1] - ((first[0] - second[0]) / 2) * scale)
             print("goal1", goal1, "goal2", goal2)
             dist1 = np.sqrt(goal1[0] ** 2 + goal1[1] ** 2)
             dist2 = np.sqrt(goal2[0] ** 2 + goal2[1] ** 2)
@@ -143,9 +153,9 @@ class StateMachine:
                 self.angle = -np.arcsin(goal2[0] / dist2)
                 self.angle = -self.angle
                 self.distance = dist2
-            self.alpha = np.arcsin(self.center[0]/np.sqrt(self.center[0]**2+self.center[1]**2))
+            self.alpha = np.arcsin(self.center[0] / np.sqrt(self.center[0] ** 2 + self.center[1] ** 2))
             print(self.angle, dist1, dist2)
-            #self.distance -= 0.1
+            # self.distance -= 0.1
             self.distance -= self.distance * 0.06
             self.current_state = self.turn_to_middle
 
@@ -153,7 +163,7 @@ class StateMachine:
         print(self.turtle.get_odometry()[2])
         if self.turtle.get_odometry()[2] < -0.05:
             self.turtle.cmd_velocity(linear=0, angular=0.4)
-        elif self.turtle.get_odometry()[2]> 0.05:
+        elif self.turtle.get_odometry()[2] > 0.05:
             self.turtle.cmd_velocity(linear=0, angular=-0.4)
         else:
             time.sleep(0.7)
@@ -176,24 +186,24 @@ class StateMachine:
         if np.sqrt(odom[0] ** 2 + odom[1] ** 2) < self.distance:
             self.turtle.cmd_velocity(linear=0.25, angular=0)
         else:
-            #self.current_state = self.calc_turn_to_goal
+            # self.current_state = self.calc_turn_to_goal
             if self.ready_to_drive_through:
                 self.current_state = self.drive_through
             else:
                 self.ready_to_drive_through = True
                 self.turtle.reset_odometry()
-                self.detected_cones = DetectedCones(self.turtle) #throw out all detected cones
+                self.detected_cones = DetectedCones(self.turtle)  # throw out all detected cones
                 self.counter = 1
-                self.direction = -1 if self.angle-self.alpha > 0 else 1
+                self.direction = -1 if self.angle - self.alpha > 0 else 1
                 self.current_state = self.close_look_around
 
     def calc_turn_to_goal(self):
         self.distance += 0.1
-        center_dist = self.center[0]**2 + self.center[1]**2
-        parameter1 = self.distance**2 + (0.25*np.sqrt(3))**2 - center_dist
-        parameter2 = 2*self.distance*(0.25*np.sqrt(3))
-        self.angle_to_turn =np.pi - np.arccos(parameter1/parameter2)
-        if self.angle<0:
+        center_dist = self.center[0] ** 2 + self.center[1] ** 2
+        parameter1 = self.distance ** 2 + (0.25 * np.sqrt(3)) ** 2 - center_dist
+        parameter2 = 2 * self.distance * (0.25 * np.sqrt(3))
+        self.angle_to_turn = np.pi - np.arccos(parameter1 / parameter2)
+        if self.angle < 0:
             self.angle_to_turn = -self.angle_to_turn
         self.current_state = self.turn_to_goal
 
@@ -207,10 +217,11 @@ class StateMachine:
 
     def drive_through(self):
         odom = self.turtle.get_odometry()
-        if np.sqrt(odom[0] ** 2 + odom[1] ** 2) <  1:
+        if np.sqrt(odom[0] ** 2 + odom[1] ** 2) < 1:
             self.turtle.cmd_velocity(linear=1, angular=0)
         else:
             self.current_state = self.idle
+
 
 def fun(turtle):
     # global fun_step
@@ -253,11 +264,11 @@ def main():
             plt.clf()
             for cone in state_machine.detected_cones.all:
                 if cone.color is Color.RED:
-                    plt.scatter(cone.odo-cone.angle, cone.distance, s=40, color='red')
+                    plt.scatter(cone.odo - cone.angle, cone.distance, s=40, color='red')
                 if cone.color is Color.GREEN:
-                    plt.scatter(cone.odo-cone.angle, cone.distance, s=40, color='green')
+                    plt.scatter(cone.odo - cone.angle, cone.distance, s=40, color='green')
                 if cone.color is Color.BLUE:
-                    plt.scatter(cone.odo-cone.angle, cone.distance, s=40, color='blue')
+                    plt.scatter(cone.odo - cone.angle, cone.distance, s=40, color='blue')
         plt.pause(0.001)
         cv2.waitKey(1)
 
