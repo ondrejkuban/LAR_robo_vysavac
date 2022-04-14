@@ -207,21 +207,27 @@ def update(val):
 
 def updateHL(val):
     ColorsThresholds.BLUE[1][0] = val
+    print(val)
 
 def updateVL(val):
     ColorsThresholds.BLUE[1][1] = val
+    print(val)
 
 def updateSL(val):
     ColorsThresholds.BLUE[1][2] = val
+    print(val)
 
 def updateHD(val):
     ColorsThresholds.BLUE[0][0] = val
+    print(val)
 
 def updateVD(val):
     ColorsThresholds.BLUE[0][1] = val
+    print(val)
 
 def updateSD(val):
     ColorsThresholds.BLUE[0][2] = val
+    print(val)
 
 def main():
     global stop
@@ -233,7 +239,7 @@ def main():
     angle = 0
     distance = 0
     turtle.reset_odometry()
-    axfreq = plt.axes([0.0, 0.25, 0.0225, 0.63])
+    axfreq = plt.axes([.05, 0.25, 0.0225, 0.63])
     freq_slider = Slider(
         ax=axfreq,
         label='HL',
