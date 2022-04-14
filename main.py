@@ -48,7 +48,6 @@ class StateMachine:
         self.turtle.cmd_velocity(linear=0.0, angular=0)
 
     def look_around1(self):
-
         self.new_detected_cones = None
         print(self.turtle.get_odometry()[2])
         if self.turtle.get_odometry()[2] > -self.look_around_angle / 2:
@@ -222,11 +221,13 @@ class StateMachine:
 
     def drive_through(self):
         odom = self.turtle.get_odometry()
-        if np.sqrt(odom[0] ** 2 + odom[1] ** 2) < MIDDLE_DIST_PRESET + 0.1:
-            self.turtle.cmd_velocity(linear=1, angular=0)
+        if np.sqrt(odom[0] ** 2 + odom[1] ** 2) < MIDDLE_DIST_PRESET:
+            self.turtle.cmd_velocity(linear=0.5, angular=0)
         else:
             self.look_around_angle = np.pi/2
             self.look_around_steps = 5
+            self.detected_cones = DetectedCones(self.turtle)
+            self.turtle.reset_odometry()
             self.current_state = self.look_around1
 
 
