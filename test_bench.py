@@ -210,11 +210,11 @@ def updateHL(val):
     print(val)
 
 def updateVL(val):
-    ColorsThresholds.BLUE[1][1] = val
+    ColorsThresholds.BLUE[1][2] = val
     print(val)
 
 def updateSL(val):
-    ColorsThresholds.BLUE[1][2] = val
+    ColorsThresholds.BLUE[1][1] = val
     print(val)
 
 def updateHD(val):
@@ -222,11 +222,11 @@ def updateHD(val):
     print(val)
 
 def updateVD(val):
-    ColorsThresholds.BLUE[0][1] = val
+    ColorsThresholds.BLUE[0][2] = val
     print(val)
 
 def updateSD(val):
-    ColorsThresholds.BLUE[0][2] = val
+    ColorsThresholds.BLUE[0][1] = val
     print(val)
 
 def main():
@@ -250,7 +250,7 @@ def main():
     )
 
     # Make a vertically oriented slider to control the amplitude
-    axamp = plt.axes([0.1, 0.25, 0.0225, 0.63])
+    axamp = plt.axes([0.15, 0.25, 0.0225, 0.63])
     amp_slider = Slider(
         ax=axamp,
         label="SL",
@@ -259,7 +259,7 @@ def main():
         valinit=ColorsThresholds.BLUE[1][1],
         orientation="vertical"
     )
-    ayamp = plt.axes([0.2, 0.25, 0.0225, 0.63])
+    ayamp = plt.axes([0.25, 0.25, 0.0225, 0.63])
     p_slider = Slider(
         ax=ayamp,
         label="VL",
@@ -322,7 +322,7 @@ def main():
         max = np.ceil(minmax[1])
         out = cv2.convertScaleAbs(depth, alpha=255 / max)
        # detectedCones.draw_cones(out)
-        print(detectedCones.maskb)
+        #print(detectedCones.maskb)
         cv2.imshow("RGB", detectedCones.maskb)
         plt.pause(0.001)
         cv2.waitKey(1)
