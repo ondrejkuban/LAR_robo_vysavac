@@ -316,8 +316,8 @@ def main():
         max = np.ceil(minmax[1])
         out = cv2.convertScaleAbs(depth, alpha=255 / max)
        # detectedCones.draw_cones(out)
-        print(detectedCones.maskr)
-        cv2.imshow("RGB", detectedCones.maskr)
+        print(detectedCones.maskb)
+        cv2.imshow("RGB", detectedCones.maskb)
         plt.pause(0.001)
         cv2.waitKey(1)
 
