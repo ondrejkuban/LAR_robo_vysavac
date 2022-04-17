@@ -105,10 +105,10 @@ def detection_is_valid(detection):
         return False
     if detection[2] * 2.5 > detection[3]:
         return False
-    if detection[3]<40:
+    if detection[3]<30:
         return False
-    if detection[2]<30:
-        return False
+    #if detection[2]<30:
+      #  return False
     return True
 
 

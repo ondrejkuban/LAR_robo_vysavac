@@ -39,7 +39,7 @@ class StateMachine:
         self.bumper_error = False
         self.finish = False
         self.angular_pid = PID(0.3)
-        self.angular_pid.p_gain = 0.5
+        self.angular_pid.p_gain = 0.2
         self.linear_pid = PID(0.1)
 
     def run_state(self):
@@ -278,7 +278,7 @@ class StateMachine:
 
 class PID:
     def __init__(self,bot_saturation):
-        self.p_gain = 2.0
+        self.p_gain = 1.0
         self.d_gain = 0.3
         self.error = 0
         self.pos = 0
