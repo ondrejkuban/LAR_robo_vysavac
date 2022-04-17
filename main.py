@@ -268,8 +268,8 @@ def main():
     turtle.register_bumper_event_cb(bumper_cb)
     angle = 0
     distance = 0
-    state_machine = StateMachine(turtle)
     turtle.reset_odometry()
+    state_machine = StateMachine(turtle)
     plt.ion()
 
     while not turtle.is_shutting_down():
