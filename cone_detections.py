@@ -15,10 +15,12 @@ class DetectedCones:
         self.mask = None
 
     def detect_cones(self, image, point_cloud):
-        hsv = cv2.cvtColor(image[-1], cv2.COLOR_BGR2HSV)
-        self.red, mask_r = get_cones_for_color(hsv, ColorsThresholds.RED, self.turtle)
-        self.green, mask_g = get_cones_for_color(hsv, ColorsThresholds.GREEN, self.turtle)
-        self.blue, mask_b = get_cones_for_color(hsv, ColorsThresholds.BLUE, self.turtle)
+        hsvs = []
+        for im in image:
+            hsvs.append(cv2.cvtColor(im, cv2.COLOR_BGR2HSV))
+        self.red, mask_r = get_cones_for_color(hsvs, ColorsThresholds.RED, self.turtle)
+        self.green, mask_g = get_cones_for_color(hsvs, ColorsThresholds.GREEN, self.turtle)
+        self.blue, mask_b = get_cones_for_color(hsvs, ColorsThresholds.BLUE, self.turtle)
         get_distances_for_cones(point_cloud, self.red, mask_r)
         get_distances_for_cones(point_cloud, self.green, mask_g)
         get_distances_for_cones(point_cloud, self.blue, mask_b)
@@ -87,22 +89,27 @@ def detection_is_valid(detection):
 
 
 def get_cones_for_color(image, threshold: tuple, turtle):
-    mask = cv2.inRange(image, threshold[0], threshold[1])
-    detections = cv2.connectedComponentsWithStats(mask.astype(np.uint8))
+    masks = []
+    detections = []
+    for im in image:
+        mask = cv2.inRange(image, threshold[0], threshold[1])
+        masks.append(mask)
+        detections = cv2.connectedComponentsWithStats(mask.astype(np.uint8))
 
-    results = []
-    for i in range(1, detections[0]):
-        if detection_is_valid(detections[2][i]):
-            cone = Cone(get_color_for_threshold(threshold),
-                        (detections[2][i][0], detections[2][i][1]),
-                        (detections[2][i][2], detections[2][i][3]))
-            cone.odo = turtle.get_odometry()[2]
-            if cone.pt1[0] < 10 or cone.pt2[0] > 630 or cone.pt2[1]<120:
-                pass
-            else:
-                results.append(cone)
+        results = []
+        for i in range(1, detections[0]):
+            if detection_is_valid(detections[2][i]):
+                cone = Cone(get_color_for_threshold(threshold),
+                            (detections[2][i][0], detections[2][i][1]),
+                            (detections[2][i][2], detections[2][i][3]))
+                cone.odo = turtle.get_odometry()[2]
+                if cone.pt1[0] < 10 or cone.pt2[0] > 630 or cone.pt2[1]<120:
+                    pass
+                else:
+                    results.append(cone)
+        detections.append(results)
 
-    return results, mask
+    return detections[len(detections)//2], masks
 
 
 def draw_rectangles(image, cones: list):
@@ -126,12 +133,12 @@ def get_distances_for_cones(point_cloud, cones, mask):
 
 def get_point_in_space(point_cloud, cone, axis, mask):
     points = []
-    for pc in point_cloud:
+    for p in range(0,5):
         for i in range(cone.pt1[0], cone.pt2[0]):
             for j in range(cone.pt1[1], int(cone.pt2[1]-(cone.pt2[1]-cone.pt1[1])/3)):
-                if mask[j][i] == 255:
-                    if not np.isnan(pc[j][i][axis]):
-                        points.append(pc[j][i][axis])
+                if mask[p][j][i] == 255:
+                    if not np.isnan(point_cloud[p][j][i][axis]):
+                        points.append(point_cloud[p][j][i][axis])
     #if axis == 2 and len(points)>0:
         ##print("points",points[0],points[-1])
     return round(np.median(points), 3)
