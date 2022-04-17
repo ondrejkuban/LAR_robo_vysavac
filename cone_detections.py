@@ -51,7 +51,16 @@ class DetectedCones:
         draw_rectangles(image, self.blue)
 
     def get_closest_pair(self):
-        all_cones = self.red + self.green + self.blue
+        all_cones = []
+        if len(self.red)>1:
+            for cone in self.red:
+                all_cones.append(cone)
+        if len(self.green)>1:
+            for cone in self.green:
+                all_cones.append(cone)
+        if len(self.blue)>1:
+            for cone in self.blue:
+                all_cones.append(cone)
         if len(all_cones) > 0:
             closest_cone = min(all_cones,
                                key=lambda cone: cone.distance)  # moje duvera v tuhle radku je maximalne 5 (slovy pět)%
