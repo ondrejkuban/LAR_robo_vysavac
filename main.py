@@ -38,9 +38,6 @@ class StateMachine:
         self.actual_cone_color = Color.INVALID
         self.bumper_error = False
         self.finish = False
-        self.angular_pid = PID(0.3)
-        self.angular_pid.p_gain = 0.2
-        self.linear_pid = PID(0.1)
 
     def run_state(self):
         self.current_state()
@@ -58,11 +55,11 @@ class StateMachine:
         if side == "right":
             print(self.angle_before_turn,angle)
             if self.turtle.get_odometry()[2]- self.angle_before_turn > -angle:
-                self.turtle.cmd_velocity(linear=0, angular=-self.angular_pid.get_output(-angle,self.turtle.get_odometry()[2]))
+                self.turtle.cmd_velocity(linear=0, angular=-speed)
                 return False
         elif side == "left":
             if self.turtle.get_odometry()[2]- self.angle_before_turn < angle:
-                self.turtle.cmd_velocity(linear=0, angular=self.angular_pid.get_output(angle,self.turtle.get_odometry()[2]))
+                self.turtle.cmd_velocity(linear=0, angular=speed)
                 return False
         self.turtle.cmd_velocity(linear=0, angular=0)
         self.angle_before_turn = None
@@ -118,6 +115,8 @@ class StateMachine:
             #time.sleep(0.2)
             self.detect_cones()
             if self.counter > 7:
+                if not self.actual_cone_color == Color.INVALID: #alredy drove through first green - direct to middle
+                    self.ready_to_drive_through = True
                 self.counter = 1
                 self.current_state = self.estimate_cones_position
             else:
@@ -232,7 +231,7 @@ class StateMachine:
         odom = self.turtle.get_odometry()
         print("dist",np.sqrt(odom[0] ** 2 + odom[1] ** 2),self.distance)
         if np.sqrt(odom[0] ** 2 + odom[1] ** 2) < self.distance:
-            self.turtle.cmd_velocity(linear=self.linear_pid.get_output(self.distance,np.sqrt(odom[0] ** 2 + odom[1] ** 2)), angular=0)
+            self.turtle.cmd_velocity(linear=0.4, angular=0)
         else:
             self.ready_to_drive_through = True
             self.turtle.reset_odometry()
@@ -249,16 +248,28 @@ class StateMachine:
         self.actual_cone_color = Color.INVALID
         print("DRIVE THROUGH, ", self.last_cone_color)
         odom = self.turtle.get_odometry()
-        if np.sqrt(odom[0] ** 2 + odom[1] ** 2) < MIDDLE_DIST_PRESET:
-            self.turtle.cmd_velocity(linear=self.linear_pid.get_output(MIDDLE_DIST_PRESET,np.sqrt(odom[0] ** 2 + odom[1] ** 2)), angular=0)
+        if not self.actual_cone_color == Color.INVALID:
+            if np.sqrt(odom[0] ** 2 + odom[1] ** 2) < self.distance:
+                self.turtle.cmd_velocity(linear=0.6, angular=0)
+            else:
+                if self.finish:
+                    self.current_state = self.fun
+                self.ready_to_drive_through = False
+                self.detected_cones = DetectedCones(self.turtle)
+                self.counter = 1
+                self.turtle.reset_odometry()
+                self.current_state = self.look_around1
         else:
-            if self.finish:
-                self.current_state = self.fun
-            self.ready_to_drive_through = False
-            self.detected_cones = DetectedCones(self.turtle)
-            self.counter = 1
-            self.turtle.reset_odometry()
-            self.current_state = self.look_around1
+            if np.sqrt(odom[0] ** 2 + odom[1] ** 2) < MIDDLE_DIST_PRESET:
+                self.turtle.cmd_velocity(linear=0.6, angular=0)
+            else:
+                if self.finish:
+                    self.current_state = self.fun
+                self.ready_to_drive_through = False
+                self.detected_cones = DetectedCones(self.turtle)
+                self.counter = 1
+                self.turtle.reset_odometry()
+                self.current_state = self.look_around1
 
     def fun(self):
         if self.bumper_error:
@@ -276,16 +287,16 @@ class StateMachine:
         print('Bumper was activated, new state is STOP')
 
 
-class PID:
-    def __init__(self,bot_saturation):
-        self.p_gain = 1.0
-        self.d_gain = 0.3
-        self.error = 0
-        self.pos = 0
-        self.bot_saturation = bot_saturation
-
-    def get_output(self,goal,actual):
-        return max(self.bot_saturation,max(1.0,self.p_gain*(goal-actual)))
+#class PID:
+#    def __init__(self,bot_saturation):
+#        self.p_gain = 1.0
+#        self.d_gain = 0.3
+#        self.error = 0
+#        self.pos = 0
+#        self.bot_saturation = bot_saturation
+#
+#    def get_output(self,goal,actual):
+#        return max(self.bot_saturation,max(1.0,self.p_gain*(goal-actual)))
 
 def main():
     global stop
