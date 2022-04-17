@@ -20,7 +20,6 @@ MIDDLE_DIST_PRESET = 0.5
 stop = False
 t = 0
 fun_step = 0
-angle_before_turn = None
 
 
 class StateMachine:
@@ -38,6 +37,7 @@ class StateMachine:
         self.direction = 1
         self.alpha = None
         self.look_around_step = np.pi/9
+        self.angle_before_turn = None
 
     def run_state(self):
         self.current_state()
@@ -50,22 +50,19 @@ class StateMachine:
     def turn_to_desired_angle(self,angle, side, speed):
         print("turn_to_desired_angle",angle, side, speed)
         # side    -,right   +,left
-        global angle_before_turn
-        if angle_before_turn is None:
-            angle_before_turn = self.turtle.get_odometry()[2]
+        if self.angle_before_turn is None:
+            self.angle_before_turn = self.turtle.get_odometry()[2]
         if side == "right":
-            print(angle_before_turn,angle)
-            if self.turtle.get_odometry()[2]-angle_before_turn > -angle:
+            print(self.angle_before_turn,angle)
+            if self.turtle.get_odometry()[2]- self.angle_before_turn > -angle:
                 self.turtle.cmd_velocity(linear=0, angular=-speed)
                 return False
         elif side == "left":
-            if self.turtle.get_odometry()[2]-angle_before_turn < angle:
+            if self.turtle.get_odometry()[2]- self.angle_before_turn < angle:
                 self.turtle.cmd_velocity(linear=0, angular=speed)
                 return False
-
         self.turtle.cmd_velocity(linear=0, angular=0)
-
-        angle_before_turn = None
+        self.angle_before_turn = None
         return True
 
     def look_around1(self):
@@ -83,7 +80,7 @@ class StateMachine:
                     self.detect_cones()
                     self.current_state = self.close_look_around
                     return
-        if self.turn_to_desired_angle(np.pi/2,"right",0.6):
+        elif self.turn_to_desired_angle(np.pi/2,"right",0.6):
             self.detect_cones()
             self.current_state = self.look_around2
 
