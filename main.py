@@ -133,7 +133,7 @@ class StateMachine:
         print("detect_cones")
         image = []
         pc = []
-        for i in range(0,4):
+        for i in range(0,5):
             pc.append(self.turtle.get_point_cloud())
             image.append(self.turtle.get_rgb_image())
 
