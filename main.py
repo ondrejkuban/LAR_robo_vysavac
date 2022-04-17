@@ -80,6 +80,11 @@ class StateMachine:
                     self.detect_cones()
                     self.current_state = self.close_look_around
                     return
+            elif self.direction == 2:
+                if self.turn_to_desired_angle(np.pi/4,"left",0.6):
+                    self.detect_cones()
+                    self.current_state = self.close_look_around
+                    return
         elif self.turn_to_desired_angle(np.pi/2,"right",0.6):
             self.detect_cones()
             self.current_state = self.look_around2
@@ -101,6 +106,15 @@ class StateMachine:
             if self.turn_to_desired_angle(self.look_around_step,"right",0.6):
                 self.detect_cones()
                 if self.counter > 6:# or self.detected_cones.get_closest_pair() is not None:
+                    self.counter = 1
+                    self.current_state = self.estimate_cones_position
+                else:
+                    self.counter += 1
+                    self.current_state = self.close_look_around
+        else:
+            if self.turn_to_desired_angle(self.look_around_step,"right",0.6):
+                self.detect_cones()
+                if self.counter > 5:# or self.detected_cones.get_closest_pair() is not None:
                     self.counter = 1
                     self.current_state = self.estimate_cones_position
                 else:
@@ -237,12 +251,13 @@ class StateMachine:
         self.actual_cone_color = Color.INVALID
         print("DRIVE THROUGH, ", self.last_cone_color)
         odom = self.turtle.get_odometry()
-        if np.sqrt(odom[0] ** 2 + odom[1] ** 2) < MIDDLE_DIST_PRESET:
+        if np.sqrt(odom[0] ** 2 + odom[1] ** 2) < self.distance:
             self.turtle.cmd_velocity(linear=0.5, angular=0)
         else:
             if self.finish:
                 self.current_state = self.fun
-            self.ready_to_drive_through = False
+            self.ready_to_drive_through = True
+            self.direction = 2
             self.detected_cones = DetectedCones(self.turtle)
             self.counter = 1
             self.turtle.reset_odometry()
