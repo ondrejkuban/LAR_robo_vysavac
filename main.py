@@ -153,7 +153,7 @@ class StateMachine:
                 self.detected_cones.add_cone(new_cone)
 
     def estimate_cones_position(self):
-        print("estimate_cones_position")
+        print("estimate_cones_position", self.last_cone_color)
         pair = self.detected_cones.get_closest_pair(self.last_cone_color)
         if pair is not None:
             self.actual_cone_color = pair[0].color
@@ -237,7 +237,7 @@ class StateMachine:
     def drive_through(self):
         self.last_cone_color = self.actual_cone_color
         self.actual_cone_color = Color.INVALID
-        print("DRIVE THROUGH")
+        print("DRIVE THROUGH, ", last_cone_color)
         odom = self.turtle.get_odometry()
         if np.sqrt(odom[0] ** 2 + odom[1] ** 2) < MIDDLE_DIST_PRESET:
             self.turtle.cmd_velocity(linear=0.3, angular=0)
