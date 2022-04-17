@@ -86,6 +86,8 @@ class DetectedCones:
                     break
         else:
             return None
+        if closest_cone is None:
+            return None
         if closest_cone.color == Color.RED and len(self.red) > 1:  # red
             return [self.red[0], self.red[1]]
         elif closest_cone.color == Color.GREEN and len(self.green) > 1:  # green
