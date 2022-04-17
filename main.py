@@ -37,6 +37,7 @@ class StateMachine:
         self.last_cone_color = Color.INVALID
         self.actual_cone_color = Color.INVALID
         self.bumper_error = False
+        self.finish = False
 
     def run_state(self):
         self.current_state()
@@ -235,13 +236,18 @@ class StateMachine:
             self.current_state = self.look_around1
 
     def drive_through(self):
-        self.last_cone_color = self.actual_cone_color
+        if not self.last_cone_color == Color.INVALID and self.actual_cone_color == Color.GREEN: #already went through some cones
+                self.finish == True
+        if not self.actual_cone_color == Color.INVALID:
+            self.last_cone_color = self.actual_cone_color
         self.actual_cone_color = Color.INVALID
-        print("DRIVE THROUGH, ", last_cone_color)
+        print("DRIVE THROUGH, ", self.last_cone_color)
         odom = self.turtle.get_odometry()
         if np.sqrt(odom[0] ** 2 + odom[1] ** 2) < MIDDLE_DIST_PRESET:
             self.turtle.cmd_velocity(linear=0.3, angular=0)
         else:
+            if self.finish:
+                self.current_state = self.fun
             self.ready_to_drive_through = False
             self.detected_cones = DetectedCones(self.turtle)
             self.counter = 1
@@ -258,7 +264,7 @@ class StateMachine:
             self.turtle.cmd_velocity(linear=0, angular=1)
 
     # stop robot
-    def bumper_cb(msg):
+    def bumper_cb(self,msg):
         self.current_state = self.fun
         self.bumper_error = True
         print('Bumper was activated, new state is STOP')
