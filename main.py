@@ -55,11 +55,11 @@ class StateMachine:
         if side == "right":
             if self.turtle.get_odometry()[2] > -angle:
                 self.turtle.cmd_velocity(linear=0, angular=-speed)
-            return False
+                return False
         elif side == "left":
             if self.turtle.get_odometry()[2] < angle:
                 self.turtle.cmd_velocity(linear=0, angular=speed)
-            return False
+                return False
 
         self.turtle.cmd_velocity(linear=0, angular=0)
         print("ok1")
