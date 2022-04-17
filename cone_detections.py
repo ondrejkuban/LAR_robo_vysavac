@@ -122,4 +122,6 @@ def get_point_in_space(point_cloud, cone, axis, mask):
             if mask[j][i] == 255:
                 if not np.isnan(point_cloud[j][i][axis]):
                     points.append(point_cloud[j][i][axis])
+    if axis == 2:
+        print("points",points[0],points[-1])
     return round(np.median(points), 3)
