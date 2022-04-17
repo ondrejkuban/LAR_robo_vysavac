@@ -48,6 +48,7 @@ class StateMachine:
         self.turtle.cmd_velocity(linear=0.0, angular=0)
 
     def turn_to_desired_angle(self,angle, side, speed):
+        print("turn_to_desired_angle",angle, side, speed)
         # side    -,right   +,left
         global angle_before_turn
         if angle_before_turn is None:
@@ -68,6 +69,7 @@ class StateMachine:
         return True
 
     def look_around1(self):
+        print("look_around1")
         self.new_detected_cones = None
         print(self.turtle.get_odometry()[2])
         if self.ready_to_drive_through: #dosahl jsem bodu pul metri pred stredem
@@ -86,6 +88,7 @@ class StateMachine:
             self.current_state = self.look_around2
 
     def close_look_around(self):
+        print("close_look_around")
         print(self.direction, self.turtle.get_odometry()[2], self.counter)
         self.new_detected_cones = None
         if self.direction == 1:
@@ -108,6 +111,7 @@ class StateMachine:
                     self.current_state = self.close_look_around
 
     def look_around2(self):
+        print("look_around2")
         self.new_detected_cones = None
         print("OK2")
         if self.turn_to_desired_angle(self.look_around_step,"left",0.6):
@@ -129,6 +133,7 @@ class StateMachine:
     #        self.current_state = self.estimate_cones_position
 
     def detect_cones(self):
+        print("detect_cones")
         point_cloud = self.turtle.get_point_cloud()
         rgb_image = self.turtle.get_rgb_image()
         image_copy = rgb_image.copy()
@@ -147,6 +152,7 @@ class StateMachine:
                 self.detected_cones.add_cone(new_cone)
 
     def estimate_cones_position(self):
+        print("estimate_cones_position")
         pair = self.detected_cones.get_closest_pair()
         if pair is not None:
             print()
@@ -198,6 +204,7 @@ class StateMachine:
     #        self.current_state = self.turn_turtle_to_angle
 
     def turn_turtle_to_angle(self):
+        print("turn_turtle_to_angle")
         if self.angle_to_turn > 0:
             if self.turn_to_desired_angle(self.angle_to_turn,"left",0.3):
                 self.turtle.reset_odometry()
@@ -214,6 +221,7 @@ class StateMachine:
                     self.current_state = self.drive_turtle_to_position
 
     def drive_turtle_to_position(self):
+        print("drive_turtle_to_position")
         odom = self.turtle.get_odometry()
         if np.sqrt(odom[0] ** 2 + odom[1] ** 2) < self.distance:
             self.turtle.cmd_velocity(linear=0.25, angular=0)
@@ -226,6 +234,7 @@ class StateMachine:
             self.current_state = self.look_around1
 
     def drive_through(self):
+        print("DRIVE THROUGH")
         odom = self.turtle.get_odometry()
         if np.sqrt(odom[0] ** 2 + odom[1] ** 2) < MIDDLE_DIST_PRESET:
             self.turtle.cmd_velocity(linear=0.5, angular=0)
