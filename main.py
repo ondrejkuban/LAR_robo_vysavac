@@ -53,6 +53,7 @@ class StateMachine:
         if angle_before_turn is None:
             angle_before_turn = self.turtle.get_odometry()[2]
         if side == "right":
+            print(angle_before_turn,angle)
             if self.turtle.get_odometry()[2]-angle_before_turn > -angle:
                 self.turtle.cmd_velocity(linear=0, angular=-speed)
                 return False
