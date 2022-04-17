@@ -113,7 +113,7 @@ class StateMachine:
         if self.turn_to_desired_angle(self.look_around_step,"left",0.6):
             time.sleep(0.2)
             self.detect_cones()
-            if self.counter > 8:
+            if self.counter > 7:
                 self.counter = 1
                 self.current_state = self.estimate_cones_position
             else:
