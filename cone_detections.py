@@ -90,7 +90,7 @@ def detection_is_valid(detection):
 
 def get_cones_for_color(image, threshold: tuple, turtle):
     masks = []
-    detections = []
+    detections_s = []
     for im in image:
         mask = cv2.inRange(im, threshold[0], threshold[1])
         masks.append(mask)
@@ -107,9 +107,9 @@ def get_cones_for_color(image, threshold: tuple, turtle):
                     pass
                 else:
                     results.append(cone)
-        detections.append(results)
+        detections_s.append(results)
 
-    return detections[len(detections)//2], masks
+    return detections_s[len(detections_s)//2], masks
 
 
 def draw_rectangles(image, cones: list):
