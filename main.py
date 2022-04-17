@@ -263,12 +263,12 @@ def bumper_cb(msg):
 def main():
     global stop
     turtle = Turtlebot(pc=True, rgb=True, depth=True)
+    turtle.reset_odometry()
     state = 0
     cv2.namedWindow(WINDOW)  # display rgb image
     turtle.register_bumper_event_cb(bumper_cb)
     angle = 0
     distance = 0
-    turtle.reset_odometry()
     state_machine = StateMachine(turtle)
     plt.ion()
 
