@@ -184,13 +184,15 @@ class StateMachine:
             if dist1 < dist2:
                 self.angle = np.arcsin(goal1[0] / dist1)
                 self.distance = dist1
+
             else:
                 self.angle = -np.arcsin(goal2[0] / dist2)
                 self.angle = -self.angle
                 self.distance = dist2
             self.alpha = np.arcsin(self.center[0] / np.sqrt(self.center[0] ** 2 + self.center[1] ** 2))
             #print(self.angle, dist1, dist2)
-            self.distance -= self.distance * 0.06
+            self.distance -= 0.1
+            #self.distance -= self.distance * 0.06
             self.angle_to_turn = -self.turtle.get_odometry()[2]+self.angle
             print("ANGLE",self.turtle.get_odometry()[2],self.angle)
             self.current_state = self.turn_turtle_to_angle
@@ -225,6 +227,7 @@ class StateMachine:
     def drive_turtle_to_position(self):
         print("drive_turtle_to_position")
         odom = self.turtle.get_odometry()
+        print("dist",np.sqrt(odom[0] ** 2 + odom[1] ** 2),self.distance)
         if np.sqrt(odom[0] ** 2 + odom[1] ** 2) < self.distance:
             self.turtle.cmd_velocity(linear=0.25, angular=0)
         else:
