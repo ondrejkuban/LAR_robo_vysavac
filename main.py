@@ -62,6 +62,7 @@ class StateMachine:
             return False
         else:
             self.turtle.cmd_velocity(linear=0, angular=0)
+            print("ok1")
             angle_before_turn = None
             return True
 
@@ -107,6 +108,7 @@ class StateMachine:
 
     def look_around2(self):
         self.new_detected_cones = None
+        print("OK2")
         if self.turn_to_desired_angle(self.look_around_step,"left",0.6):
             time.sleep(0.2)
             self.detect_cones()
