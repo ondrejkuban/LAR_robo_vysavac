@@ -161,7 +161,7 @@ def get_distances_for_cones(point_cloud, cones, mask):
 
 def get_point_in_space(point_cloud, cone, axis, mask):
     points = []
-    for p in range(0, 5):
+    for p in range(0, len(mask)):
         for i in range(cone.pt1[0], cone.pt2[0]):
             for j in range(cone.pt1[1], int(cone.pt2[1] - (cone.pt2[1] - cone.pt1[1]) / 3)):
                 if mask[p][j][i] == 255:
