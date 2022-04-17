@@ -92,7 +92,7 @@ def get_cones_for_color(image, threshold: tuple, turtle):
     masks = []
     detections = []
     for im in image:
-        mask = cv2.inRange(image, threshold[0], threshold[1])
+        mask = cv2.inRange(im, threshold[0], threshold[1])
         masks.append(mask)
         detections = cv2.connectedComponentsWithStats(mask.astype(np.uint8))
 
