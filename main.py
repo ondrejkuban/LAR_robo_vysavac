@@ -115,7 +115,7 @@ class StateMachine:
         self.new_detected_cones = None
         print("OK2")
         if self.turn_to_desired_angle(self.look_around_step,"left",0.6):
-            time.sleep(0.2)
+            #time.sleep(0.2)
             self.detect_cones()
             if self.counter > 7:
                 self.counter = 1
@@ -134,14 +134,19 @@ class StateMachine:
 
     def detect_cones(self):
         print("detect_cones")
-        point_cloud = self.turtle.get_point_cloud()
-        rgb_image = self.turtle.get_rgb_image()
-        image_copy = rgb_image.copy()
+        image = []
+        pc = []
+        for i in range(0,5):
+            pc.append(self.turtle.get_point_cloud())
+            image.append(self.turtle.get_rgb_image())
+            time.sleep(0.1)
+        imgcpy = image[0].copy()
         self.new_detected_cones = DetectedCones(self.turtle)  # -> detectedCones.red, green, blue
-        self.new_detected_cones.detect_cones(rgb_image, point_cloud)
+        self.new_detected_cones.detect_cones(image, pc)
         self.new_detected_cones.draw_cones(
-            image_copy)  # -> az na konec, prekresli puvodni obrazek mohlo by se s nim pak hure pracovat
-        cv2.imshow("RGB", image_copy)
+            imgcpy)  # -> az na konec, prekresli puvodni obrazek mohlo by se s nim pak hure pracovat
+        cv2.imshow("RGB", imgcpy)
+
         self.merge_new_cones()
         # self.current_state = self.estimate_cones_position
 
@@ -237,7 +242,7 @@ class StateMachine:
         print("DRIVE THROUGH")
         odom = self.turtle.get_odometry()
         if np.sqrt(odom[0] ** 2 + odom[1] ** 2) < MIDDLE_DIST_PRESET:
-            self.turtle.cmd_velocity(linear=0.5, angular=0)
+            self.turtle.cmd_velocity(linear=0.3, angular=0)
         else:
             self.ready_to_drive_through = False
             self.detected_cones = DetectedCones(self.turtle)
