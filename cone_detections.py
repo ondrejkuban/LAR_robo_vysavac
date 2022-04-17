@@ -77,7 +77,7 @@ class DetectedCones:
         if len(self.blue) > 1:
             for cone in self.blue:
                 all_cones.append(cone)
-        closest_cone = None
+        closest_cone = Cone(Color.INVALID,(-100,-100),(-100,-100))
         if len(all_cones) > 0:
             for sorted_cone in sorted(all_cones, key=lambda
                     cone: cone.distance):  # moje duvera v tuhle radku je maximalne 5 (slovy pět)%
@@ -86,7 +86,7 @@ class DetectedCones:
                     break
         else:
             return None
-        if closest_cone is None:
+        if closest_cone.color == Color.INVALID:
             return None
         if closest_cone.color == Color.RED and len(self.red) > 1:  # red
             return [self.red[0], self.red[1]]
