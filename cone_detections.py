@@ -21,6 +21,8 @@ class DetectedCones:
         self.red, mask_r = get_cones_for_color(hsvs, ColorsThresholds.RED, self.turtle)
         self.green, mask_g = get_cones_for_color(hsvs, ColorsThresholds.GREEN, self.turtle)
         self.blue, mask_b = get_cones_for_color(hsvs, ColorsThresholds.BLUE, self.turtle)
+        if None not in (self.red,self.green,self.blue):
+            return False
         get_distances_for_cones(point_cloud, self.red, mask_r)
         get_distances_for_cones(point_cloud, self.green, mask_g)
         get_distances_for_cones(point_cloud, self.blue, mask_b)
@@ -87,12 +89,16 @@ def detection_is_valid(detection):
         return False
     return True
 
+def is_mask_valid(mask):
+    return  sum(map(sum, mask))//255 > 300
 
 def get_cones_for_color(image, threshold: tuple, turtle):
     masks = []
     detections_s = []
     for im in image:
         mask = cv2.inRange(im, threshold[0], threshold[1])
+        if not is_mask_valid(mask):
+            return None,None
         masks.append(mask)
         detections = cv2.connectedComponentsWithStats(mask.astype(np.uint8))
 

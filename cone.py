@@ -13,6 +13,7 @@ class ColorsThresholds:
     BLUE = ((90, 172, 42), (106, 255, 235))
 
 
+
 class Cone:
     def __init__(self, color: int, position: tuple, size: tuple):
         self.color = color
