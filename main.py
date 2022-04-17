@@ -60,11 +60,11 @@ class StateMachine:
             if self.turtle.get_odometry()[2] < angle:
                 self.turtle.cmd_velocity(linear=0, angular=speed)
             return False
-        else:
-            self.turtle.cmd_velocity(linear=0, angular=0)
-            print("ok1")
-            angle_before_turn = None
-            return True
+
+        self.turtle.cmd_velocity(linear=0, angular=0)
+        print("ok1")
+        angle_before_turn = None
+        return True
 
     def look_around1(self):
         self.new_detected_cones = None
