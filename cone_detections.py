@@ -1,8 +1,9 @@
-from cone import ColorsThresholds, Cone, get_color_for_threshold, get_threshold_for_color,Color
+from cone import ColorsThresholds, Cone, get_color_for_threshold, get_threshold_for_color, Color
 import cv2
 import numpy as np
 
 SURFACE_THRESHOLD = 400
+
 
 class DetectedCones:
     def __init__(self, turtle):
@@ -20,7 +21,7 @@ class DetectedCones:
         self.red, mask_r = get_cones_for_color(hsvs, ColorsThresholds.RED, self.turtle)
         self.green, mask_g = get_cones_for_color(hsvs, ColorsThresholds.GREEN, self.turtle)
         self.blue, mask_b = get_cones_for_color(hsvs, ColorsThresholds.BLUE, self.turtle)
-        if None not in (self.red,self.green,self.blue):
+        if len(self.red) == 0 and len(self.blue) == 0 and len(self.green) == 0:
             return False
         get_distances_for_cones(point_cloud, self.red, mask_r)
         get_distances_for_cones(point_cloud, self.green, mask_g)
@@ -36,7 +37,7 @@ class DetectedCones:
         self.green.sort(key=lambda cone: cone.distance)  # bude fungovat???
         self.blue.sort(key=lambda cone: cone.distance)  # bude fungovat???
 
-    def add_cone(self,cone):
+    def add_cone(self, cone):
         self.all.append(cone)
         if cone.color == Color.RED:
             self.red.append(cone)
@@ -55,30 +56,31 @@ class DetectedCones:
 
     def get_closest_pair(self, last_color):
         search_color = []
-        if last_color == Color.INVALID:#Search for green
+        if last_color == Color.INVALID:  # Search for green
             search_color.append(Color.GREEN)
-        elif last_color == Color.RED:#Search for blue or green
+        elif last_color == Color.RED:  # Search for blue or green
             search_color.append(Color.BLUE)
             search_color.append(Color.GREEN)
-        elif last_color == Color.BLUE:#Search for red or green
+        elif last_color == Color.BLUE:  # Search for red or green
             search_color.append(Color.GREEN)
             search_color.append(Color.RED)
-        elif last_color == Color.GREEN:#Search for Blue or red
+        elif last_color == Color.GREEN:  # Search for Blue or red
             search_color.append(Color.BLUE)
             search_color.append(Color.RED)
         all_cones = []
-        if len(self.red)>1:
+        if len(self.red) > 1:
             for cone in self.red:
                 all_cones.append(cone)
-        if len(self.green)>1:
+        if len(self.green) > 1:
             for cone in self.green:
                 all_cones.append(cone)
-        if len(self.blue)>1:
+        if len(self.blue) > 1:
             for cone in self.blue:
                 all_cones.append(cone)
         closest_cone = None
         if len(all_cones) > 0:
-            for sorted_cone in sorted(all_cones, key=lambda cone: cone.distance):  # moje duvera v tuhle radku je maximalne 5 (slovy pět)%
+            for sorted_cone in sorted(all_cones, key=lambda
+                    cone: cone.distance):  # moje duvera v tuhle radku je maximalne 5 (slovy pět)%
                 if sorted_cone.color in search_color:
                     closest_cone = sorted_cone
                     break
@@ -103,8 +105,10 @@ def detection_is_valid(detection):
         return False
     return True
 
+
 def is_mask_valid(mask):
-    return  sum(map(sum, mask))//255 > 300
+    return sum(map(sum, mask)) // 255 > 300
+
 
 def get_cones_for_color(image, threshold: tuple, turtle):
     masks = []
@@ -112,7 +116,7 @@ def get_cones_for_color(image, threshold: tuple, turtle):
     for im in image:
         mask = cv2.inRange(im, threshold[0], threshold[1])
         if not is_mask_valid(mask):
-            return None,None
+            return [], []
         masks.append(mask)
         detections = cv2.connectedComponentsWithStats(mask.astype(np.uint8))
 
@@ -123,13 +127,13 @@ def get_cones_for_color(image, threshold: tuple, turtle):
                             (detections[2][i][0], detections[2][i][1]),
                             (detections[2][i][2], detections[2][i][3]))
                 cone.odo = turtle.get_odometry()[2]
-                if cone.pt1[0] < 10 or cone.pt2[0] > 630 or cone.pt2[1]<120:
+                if cone.pt1[0] < 10 or cone.pt2[0] > 630 or cone.pt2[1] < 120:
                     pass
                 else:
                     results.append(cone)
         detections_s.append(results)
 
-    return detections_s[len(detections_s)//2], masks
+    return detections_s[len(detections_s) // 2], masks
 
 
 def draw_rectangles(image, cones: list):
@@ -153,12 +157,12 @@ def get_distances_for_cones(point_cloud, cones, mask):
 
 def get_point_in_space(point_cloud, cone, axis, mask):
     points = []
-    for p in range(0,5):
+    for p in range(0, 5):
         for i in range(cone.pt1[0], cone.pt2[0]):
-            for j in range(cone.pt1[1], int(cone.pt2[1]-(cone.pt2[1]-cone.pt1[1])/3)):
+            for j in range(cone.pt1[1], int(cone.pt2[1] - (cone.pt2[1] - cone.pt1[1]) / 3)):
                 if mask[p][j][i] == 255:
                     if not np.isnan(point_cloud[p][j][i][axis]):
                         points.append(point_cloud[p][j][i][axis])
-    #if axis == 2 and len(points)>0:
-        ##print("points",points[0],points[-1])
+    # if axis == 2 and len(points)>0:
+    ##print("points",points[0],points[-1])
     return round(np.median(points), 3)
