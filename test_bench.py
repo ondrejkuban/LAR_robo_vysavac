@@ -29,9 +29,9 @@ class Color:
 
 class ColorsThresholds:
     #       dark           light
-    RED = [[0, 116, 114], [6.5, 255, 255]]
-    GREEN = [[39, 74, 54], [80, 255, 230]]
-    BLUE = [[90, 89, 172], [106, 234, 255]]
+    RED = [[0, 116, 90], [6.5, 255, 255]]
+    GREEN = [[34, 71, 46], [50, 255, 230]]
+    BLUE = [[90, 172, 42], [106, 255, 235]]
 
 
 class Cone:
@@ -207,21 +207,27 @@ def update(val):
 
 def updateHL(val):
     ColorsThresholds.RED[1][0] = val
+    print(val)
 
 def updateVL(val):
-    ColorsThresholds.RED[1][1] = val
+    ColorsThresholds.RED[1][2] = val
+    print(val)
 
 def updateSL(val):
-    ColorsThresholds.RED[1][2] = val
+    ColorsThresholds.RED[1][1] = val
+    print(val)
 
 def updateHD(val):
     ColorsThresholds.RED[0][0] = val
+    print(val)
 
 def updateVD(val):
-    ColorsThresholds.RED[0][1] = val
+    ColorsThresholds.RED[0][2] = val
+    print(val)
 
 def updateSD(val):
-    ColorsThresholds.RED[0][2] = val
+    ColorsThresholds.RED[0][1] = val
+    print(val)
 
 def main():
     global stop
@@ -233,7 +239,7 @@ def main():
     angle = 0
     distance = 0
     turtle.reset_odometry()
-    axfreq = plt.axes([0.0, 0.25, 0.0225, 0.63])
+    axfreq = plt.axes([.05, 0.25, 0.0225, 0.63])
     freq_slider = Slider(
         ax=axfreq,
         label='HL',
@@ -244,7 +250,7 @@ def main():
     )
 
     # Make a vertically oriented slider to control the amplitude
-    axamp = plt.axes([0.1, 0.25, 0.0225, 0.63])
+    axamp = plt.axes([0.15, 0.25, 0.0225, 0.63])
     amp_slider = Slider(
         ax=axamp,
         label="SL",
@@ -253,7 +259,7 @@ def main():
         valinit=ColorsThresholds.RED[1][1],
         orientation="vertical"
     )
-    ayamp = plt.axes([0.2, 0.25, 0.0225, 0.63])
+    ayamp = plt.axes([0.25, 0.25, 0.0225, 0.63])
     p_slider = Slider(
         ax=ayamp,
         label="VL",
@@ -316,7 +322,7 @@ def main():
         max = np.ceil(minmax[1])
         out = cv2.convertScaleAbs(depth, alpha=255 / max)
        # detectedCones.draw_cones(out)
-        print(detectedCones.maskr)
+        #print(detectedCones.maskb)
         cv2.imshow("RGB", detectedCones.maskr)
         plt.pause(0.001)
         cv2.waitKey(1)
