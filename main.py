@@ -237,7 +237,7 @@ class StateMachine:
 
     def drive_through(self):
         if not self.last_cone_color == Color.INVALID and self.actual_cone_color == Color.GREEN: #already went through some cones
-                self.finish == True
+                self.finish = True
         if not self.actual_cone_color == Color.INVALID:
             self.last_cone_color = self.actual_cone_color
         self.actual_cone_color = Color.INVALID
@@ -255,12 +255,12 @@ class StateMachine:
             self.current_state = self.look_around1
 
     def fun(self):
-        if self.bumper_error == True:
+        if self.bumper_error:
             self.turtle.cmd_velocity(linear=0, angular=0)
         else:
             self.fun_step += 1
             self.fun_step %= 7
-            self.turtle.play_sound(fun_step)
+            self.turtle.play_sound(self.fun_step)
             self.turtle.cmd_velocity(linear=0, angular=1)
 
     # stop robot
