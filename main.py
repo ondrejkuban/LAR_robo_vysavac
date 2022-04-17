@@ -38,6 +38,9 @@ class StateMachine:
         self.actual_cone_color = Color.INVALID
         self.bumper_error = False
         self.finish = False
+        self.angular_pid = PID(0.3)
+        self.angular_pid.p_gain = 0.5
+        self.linear_pid = PID(0.1)
 
     def run_state(self):
         self.current_state()
@@ -55,11 +58,11 @@ class StateMachine:
         if side == "right":
             print(self.angle_before_turn,angle)
             if self.turtle.get_odometry()[2]- self.angle_before_turn > -angle:
-                self.turtle.cmd_velocity(linear=0, angular=-speed)
+                self.turtle.cmd_velocity(linear=0, angular=self.angular_pid.get_output(-angle,self.turtle.get_odometry()[2]))
                 return False
         elif side == "left":
             if self.turtle.get_odometry()[2]- self.angle_before_turn < angle:
-                self.turtle.cmd_velocity(linear=0, angular=speed)
+                self.turtle.cmd_velocity(linear=0, angular=self.angular_pid.get_output(angle,self.turtle.get_odometry()[2]))
                 return False
         self.turtle.cmd_velocity(linear=0, angular=0)
         self.angle_before_turn = None
@@ -178,7 +181,7 @@ class StateMachine:
                      self.center[1] + ((first[0] - second[0]) / 2) * scale)
             goal2 = (self.center[0] - ((second[1] - first[1]) / 2) * scale,
                      self.center[1] - ((first[0] - second[0]) / 2) * scale)
-            print("goal1", goal1, "goal2", goal2)
+            #print("goal1", goal1, "goal2", goal2)
             dist1 = np.sqrt(goal1[0] ** 2 + goal1[1] ** 2)
             dist2 = np.sqrt(goal2[0] ** 2 + goal2[1] ** 2)
             if dist1 < dist2:
@@ -229,7 +232,7 @@ class StateMachine:
         odom = self.turtle.get_odometry()
         print("dist",np.sqrt(odom[0] ** 2 + odom[1] ** 2),self.distance)
         if np.sqrt(odom[0] ** 2 + odom[1] ** 2) < self.distance:
-            self.turtle.cmd_velocity(linear=0.25, angular=0)
+            self.turtle.cmd_velocity(linear=self.linear_pid.get_output(self.distance,np.sqrt(odom[0] ** 2 + odom[1] ** 2)), angular=0)
         else:
             self.ready_to_drive_through = True
             self.turtle.reset_odometry()
@@ -247,7 +250,7 @@ class StateMachine:
         print("DRIVE THROUGH, ", self.last_cone_color)
         odom = self.turtle.get_odometry()
         if np.sqrt(odom[0] ** 2 + odom[1] ** 2) < MIDDLE_DIST_PRESET:
-            self.turtle.cmd_velocity(linear=0.3, angular=0)
+            self.turtle.cmd_velocity(linear=self.linear_pid.get_output(MIDDLE_DIST_PRESET,np.sqrt(odom[0] ** 2 + odom[1] ** 2)), angular=0)
         else:
             if self.finish:
                 self.current_state = self.fun
@@ -272,6 +275,17 @@ class StateMachine:
         self.bumper_error = True
         print('Bumper was activated, new state is STOP')
 
+
+class PID:
+    def __init__(self,bot_saturation):
+        self.p_gain = 2.0
+        self.d_gain = 0.3
+        self.error = 0
+        self.pos = 0
+        self.bot_saturation = bot_saturation
+
+    def get_output(self,goal,actual):
+        return max(self.bot_saturation,max(1.0,self.p_gain*(goal-actual)))
 
 def main():
     global stop
