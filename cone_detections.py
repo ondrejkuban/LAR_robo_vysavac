@@ -77,7 +77,7 @@ class DetectedCones:
         if len(self.blue) > 1:
             for cone in self.blue:
                 all_cones.append(cone)
-        closest_cone = Cone(Color.INVALID,(-100,-100),(-100,-100))
+        closest_cone = Cone(Color.INVALID, (-100, -100), (-100, -100))
         if len(all_cones) > 0:
             for sorted_cone in sorted(all_cones, key=lambda
                     cone: cone.distance):  # moje duvera v tuhle radku je maximalne 5 (slovy pět)%
@@ -120,6 +120,8 @@ def get_cones_for_color(image, threshold: tuple, turtle):
         if not is_mask_valid(mask):
             return [], []
         masks.append(mask)
+        if len(masks) != 2:
+            continue
         detections = cv2.connectedComponentsWithStats(mask.astype(np.uint8))
 
         results = []
@@ -135,7 +137,7 @@ def get_cones_for_color(image, threshold: tuple, turtle):
                     results.append(cone)
         detections_s.append(results)
 
-    return detections_s[len(detections_s) // 2], masks
+    return detections_s[0], masks
 
 
 def draw_rectangles(image, cones: list):
