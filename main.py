@@ -17,11 +17,6 @@ WINDOW = 'RGB'
 MIDDLE_DIST_PRESET = 0.5
 
 
-stop = False
-t = 0
-fun_step = 0
-
-
 class StateMachine:
     def __init__(self, turtle):
         self.current_state = self.look_around1
@@ -38,6 +33,10 @@ class StateMachine:
         self.alpha = None
         self.look_around_step = np.pi/9
         self.angle_before_turn = None
+        self.fun_step = 0
+        self.last_cone_color = Color.INVALID
+        self.actual_cone_color = Color.INVALID
+        self.bumper_error = False
 
     def run_state(self):
         self.current_state()
@@ -155,9 +154,9 @@ class StateMachine:
 
     def estimate_cones_position(self):
         print("estimate_cones_position")
-        pair = self.detected_cones.get_closest_pair()
+        pair = self.detected_cones.get_closest_pair(self.last_cone_color)
         if pair is not None:
-            print()
+            self.actual_cone_color = pair[0].color
             first = (pair[0].distance * np.sin(pair[0].odo - pair[0].angle),
                      pair[0].distance * np.cos(pair[0].odo - pair[0].angle))
             second = (pair[1].distance * np.sin(pair[1].odo - pair[1].angle),
@@ -236,6 +235,8 @@ class StateMachine:
             self.current_state = self.look_around1
 
     def drive_through(self):
+        self.last_cone_color = self.actual_cone_color
+        self.actual_cone_color = Color.INVALID
         print("DRIVE THROUGH")
         odom = self.turtle.get_odometry()
         if np.sqrt(odom[0] ** 2 + odom[1] ** 2) < MIDDLE_DIST_PRESET:
@@ -247,28 +248,20 @@ class StateMachine:
             self.turtle.reset_odometry()
             self.current_state = self.look_around1
 
+    def fun(self):
+        if self.bumper_error == True:
+            self.turtle.cmd_velocity(linear=0, angular=0)
+        else:
+            self.fun_step += 1
+            self.fun_step %= 7
+            self.turtle.play_sound(fun_step)
+            self.turtle.cmd_velocity(linear=0, angular=1)
 
-def fun(turtle):
-    global fun_step
-    fun_step += 1
-    fun_step %= 7
-    turtle.play_sound(fun_step)
-    global t
-    print(turtle.get_odometry())
-    if abs(turtle.get_odometry()[2]) < np.pi:
-        turtle.cmd_velocity(linear=0, angular=1)
-    else:
-        turtle.cmd_velocity(linear=0, angular=0)
-
-
-# stop robot
-def bumper_cb(msg):
-    global stop
-    global t
-    t = get_time()
-
-    stop = True
-    print('Bumper was activated, new state is STOP')
+    # stop robot
+    def bumper_cb(msg):
+        self.current_state = self.fun
+        self.bumper_error = True
+        print('Bumper was activated, new state is STOP')
 
 
 def main():
@@ -277,11 +270,11 @@ def main():
     turtle.reset_odometry()
     state = 0
     cv2.namedWindow(WINDOW)  # display rgb image
-    turtle.register_bumper_event_cb(bumper_cb)
     angle = 0
     distance = 0
     state_machine = StateMachine(turtle)
     plt.ion()
+    turtle.register_bumper_event_cb(state_machine.bumper_cb)
 
     while not turtle.is_shutting_down():
         state_machine.run_state()

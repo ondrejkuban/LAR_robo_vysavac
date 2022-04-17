@@ -4,7 +4,6 @@ import numpy as np
 
 SURFACE_THRESHOLD = 400
 
-
 class DetectedCones:
     def __init__(self, turtle):
         self.red = []
@@ -52,7 +51,19 @@ class DetectedCones:
         draw_rectangles(image, self.green)
         draw_rectangles(image, self.blue)
 
-    def get_closest_pair(self):
+    def get_closest_pair(self, last_color):
+        search_color = []
+        if last_color == Color.INVALID:#Search for green
+            search_color.append(Color.GREEN)
+        elif last_color == Color.RED:#Search for blue or green
+            search_color.append(Color.BLUE)
+            search_color.append(Color.GREEN)
+        elif last_color == Color.BLUE:#Search for red or green
+            search_color.append(Color.GREEN)
+            search_color.append(Color.RED)
+        elif last_color == Color.GREEN:#Search for Blue or red
+            search_color.append(Color.BLUE)
+            search_color.append(Color.RED)
         all_cones = []
         if len(self.red)>1:
             for cone in self.red:
@@ -63,16 +74,19 @@ class DetectedCones:
         if len(self.blue)>1:
             for cone in self.blue:
                 all_cones.append(cone)
+        closest_cone = None
         if len(all_cones) > 0:
-            closest_cone = min(all_cones,
-                               key=lambda cone: cone.distance)  # moje duvera v tuhle radku je maximalne 5 (slovy pět)%
+            for sorted_cone in sorted(all_cones, key=lambda cone: cone.distance):  # moje duvera v tuhle radku je maximalne 5 (slovy pět)%
+                if sorted_cone.color in search_color:
+                    closest_cone = sorted_cone
+                    break
         else:
             return None
-        if closest_cone.color == 1 and len(self.red) > 1:  # red
+        if closest_cone.color == Color.RED and len(self.red) > 1:  # red
             return [self.red[0], self.red[1]]
-        elif closest_cone.color == 2 and len(self.green) > 1:  # green
+        elif closest_cone.color == Color.GREEN and len(self.green) > 1:  # green
             return [self.green[0], self.green[1]]
-        elif closest_cone.color == 3 and len(self.blue) > 1:  # blue
+        elif closest_cone.color == Color.BLUE and len(self.blue) > 1:  # blue
             return [self.blue[0], self.blue[1]]
         return None
         # chci navratit nejblizsi dvojici
