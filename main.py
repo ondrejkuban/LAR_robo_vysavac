@@ -91,7 +91,7 @@ class StateMachine:
         if self.direction == 1:
             if self.turn_to_desired_angle(self.look_around_step,"left",0.6):
                 self.detect_cones()
-                if self.counter > 6 or self.detected_cones.get_closest_pair() is not None:
+                if self.counter > 6: #or self.detected_cones.get_closest_pair() is not None:
                     self.counter = 1
                     self.current_state = self.estimate_cones_position
                 else:
@@ -100,7 +100,7 @@ class StateMachine:
         elif self.direction == -1:
             if self.turn_to_desired_angle(self.look_around_step,"right",0.6):
                 self.detect_cones()
-                if self.counter > 6 or self.detected_cones.get_closest_pair() is not None:
+                if self.counter > 6:# or self.detected_cones.get_closest_pair() is not None:
                     self.counter = 1
                     self.current_state = self.estimate_cones_position
                 else:
@@ -113,7 +113,7 @@ class StateMachine:
         if self.turn_to_desired_angle(self.look_around_step,"left",0.6):
             time.sleep(0.2)
             self.detect_cones()
-            if self.counter > 8 or self.detected_cones.get_closest_pair() is not None:
+            if self.counter > 8:
                 self.counter = 1
                 self.current_state = self.estimate_cones_position
             else:
@@ -181,9 +181,10 @@ class StateMachine:
                 self.angle = -self.angle
                 self.distance = dist2
             self.alpha = np.arcsin(self.center[0] / np.sqrt(self.center[0] ** 2 + self.center[1] ** 2))
-            print(self.angle, dist1, dist2)
+            #print(self.angle, dist1, dist2)
             self.distance -= self.distance * 0.06
             self.angle_to_turn = -self.turtle.get_odometry()[2]+self.angle
+            print("ANGLE",self.turtle.get_odometry()[2],self.angle)
             self.current_state = self.turn_turtle_to_angle
 
     #def turn_to_middle(self):
