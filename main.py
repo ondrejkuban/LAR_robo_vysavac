@@ -114,7 +114,7 @@ class StateMachine:
         else:
             if self.turn_to_desired_angle(self.look_around_step,"right",0.6):
                 self.detect_cones()
-                if self.counter > 4:# or self.detected_cones.get_closest_pair() is not None:
+                if self.counter > 5:# or self.detected_cones.get_closest_pair() is not None:
                     self.counter = 1
                     self.current_state = self.estimate_cones_position
                 else:
