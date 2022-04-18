@@ -13,7 +13,6 @@ class ColorsThresholds:
     BLUE = ((90, 172, 42), (106, 255, 235))
 
 
-
 class Cone:
     def __init__(self, color: int, position: tuple, size: tuple):
         self.color = color
@@ -28,10 +27,11 @@ class Cone:
         self.odo = None
 
     def __eq__(self, other):
-        #if (self.angle - self.odo - 0.05 < other.angle - other.odo < self.angle - self.odo + 0.05) and self.color==other.color:
-           # self.distance = min(self.distance,other.distance)
-        return ((self.angle - self.odo - 0.08 < other.angle - other.odo < self.angle - self.odo + 0.08) and \
-               abs(self.distance - other.distance) < 50)
+        # if (self.angle - self.odo - 0.05 < other.angle - other.odo < self.angle - self.odo + 0.05) and self.color==other.color:
+        # self.distance = min(self.distance,other.distance)
+        return ((
+                            self.angle - self.odo - 0.08 < other.angle - other.odo < self.angle - self.odo + 0.08) and self.color == other.color and
+                abs(self.distance - other.distance) < 50)
 
 
 def get_color_for_threshold(threshold):
