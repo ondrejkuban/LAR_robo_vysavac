@@ -83,11 +83,11 @@ class DetectedCones:
         else:
             return None
 
-        if closest_cone.color == Color.RED:  # red
+        if closest_cone.color == Color.RED and len(self.red) > 1:  # red
             return [self.red[0], self.red[1]]
-        elif closest_cone.color == Color.GREEN:  # green
+        elif closest_cone.color == Color.GREEN and len(self.green) > 1:  # green
             return [self.green[0], self.green[1]]
-        elif closest_cone.color == Color.BLUE:  # blue
+        elif closest_cone.color == Color.BLUE and len(self.blue) > 1:  # blue
             return [self.blue[0], self.blue[1]]
         return None
         # chci navratit nejblizsi dvojici
