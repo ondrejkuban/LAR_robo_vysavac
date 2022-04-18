@@ -167,7 +167,7 @@ def get_point_in_space(point_cloud, cone, axis, mask):
     points = []
     for p in range(0, len(point_cloud)):
         for i in range(cone.pt1[0], cone.pt2[0]):
-            for j in range(cone.pt1[1], int(cone.pt2[1] - (cone.pt2[1] - cone.pt1[1]) / 3)):
+            for j in range(cone.pt1[1], int(cone.pt2[1] - (cone.pt2[1] - cone.pt1[1]) / 1.5)):
                 if mask[p][j][i] == 255:
                     if not np.isnan(point_cloud[p][j][i][axis]):
                         points.append(point_cloud[p][j][i][axis])
