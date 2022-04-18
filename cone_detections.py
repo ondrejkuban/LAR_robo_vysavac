@@ -105,10 +105,10 @@ def detection_is_valid(detection):
         return False
     if detection[2] * 2.5 > detection[3]:
         return False
-    if detection[3]<30:
+    if detection[3] < 30:
         return False
-    #if detection[2]<30:
-      #  return False
+    # if detection[2]<30:
+    #  return False
     return True
 
 
@@ -124,7 +124,7 @@ def get_cones_for_color(image, threshold: tuple, turtle):
         if not is_mask_valid(mask):
             return [], []
         masks.append(mask)
-        if len(masks)!=2:
+        if len(masks) != 2:
             continue
         detections = cv2.connectedComponentsWithStats(mask.astype(np.uint8))
 
@@ -166,19 +166,17 @@ def get_distances_for_cones(point_cloud, cones, mask):
 def get_point_in_space(point_cloud, cone, axis, mask):
     points = []
     width = int(cone.pt2[0] - cone.pt1[0])
-    center_w = int(cone.pt2[0]-width/2)
+    center_w = int(cone.pt2[0] - width / 2)
     height = int(cone.pt2[1] - cone.pt1[1])
-    center_h = int(cone.pt2[1]-height/2)
-    print("pc",width,center_w,height,center_h)
-
+    center_h = int(cone.pt2[1] - height / 2)
 
     for p in range(0, len(point_cloud)):
-        for i in range(center_w-width//4,center_w+width//4):
-            for j in range(center_h-height, center_h+height//4):
+        for i in range(cone.pt1[0], cone.pt2[0]):
+            for j in range(cone.pt1[1], center_h):
                 if not np.isnan(point_cloud[p][j][i][axis]):
                     if mask[p][j][i] == 255:
                         points.append(point_cloud[p][j][i][axis])
     # if axis == 2 and len(points)>0:
     ##print("points",points[0],points[-1])
 
-    return np.percentile(points,10)
+    return np.median(points)
