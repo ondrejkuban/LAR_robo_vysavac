@@ -166,6 +166,10 @@ class StateMachine:
         for new_cone in self.new_detected_cones.all:
             if new_cone not in self.detected_cones.all:
                 self.detected_cones.add_cone(new_cone)
+            else:
+                for i in range(0,len(self.detected_cones.all)):
+                    if self.detected_cones.all[i] == new_cone:
+                        self.new_detected_cones.all[i].distance = min(new_cone.distance,self.new_detected_cones.all[i].distance)
 
     def estimate_cones_position(self):
         print("estimate_cones_position", self.last_cone_color)
