@@ -165,12 +165,19 @@ def get_distances_for_cones(point_cloud, cones, mask):
 
 def get_point_in_space(point_cloud, cone, axis, mask):
     points = []
+    width = int(cone.pt2[0] - cone.pt1[0])
+    center_w = int(cone.pt2[0]-width/2)
+    height = int(cone.pt2[1] - cone.pt1[1])
+    center_h = int(cone.pt2[1]-height/2)
+    print("pc",width,center_w,height,center_h)
+
+
     for p in range(0, len(point_cloud)):
-        for i in range(cone.pt1[0], cone.pt2[0]):
-            for j in range(cone.pt1[1], int(cone.pt2[1] - (cone.pt2[1] - cone.pt1[1]) / 3)):
-                if mask[p][j][i] == 255:
-                    if not np.isnan(point_cloud[p][j][i][axis]):
+        for i in range(center_w-width//3,center_w+width//3):
+            for j in range(center_h-height//3, center_h-height//10):
+                if not np.isnan(point_cloud[p][j][i][axis]):
+                    if mask[p][j][i] == 255:
                         points.append(point_cloud[p][j][i][axis])
     # if axis == 2 and len(points)>0:
     ##print("points",points[0],points[-1])
-    return round(np.median(points), 3)
+    return np.median(np.percentile(points,10))
