@@ -180,4 +180,5 @@ def get_point_in_space(point_cloud, cone, axis, mask):
                         points.append(point_cloud[p][j][i][axis])
     # if axis == 2 and len(points)>0:
     ##print("points",points[0],points[-1])
-    return np.median(np.percentile(points,10))
+
+    return np.median(points)
