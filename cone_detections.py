@@ -124,8 +124,8 @@ def get_cones_for_color(image, threshold: tuple, turtle):
         if not is_mask_valid(mask):
             return [], []
         masks.append(mask)
-        if len(masks) != 2:
-            continue
+        #if len(masks) != 2:
+           # continue
         detections = cv2.connectedComponentsWithStats(mask.astype(np.uint8))
 
         results = []
