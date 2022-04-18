@@ -68,31 +68,26 @@ class DetectedCones:
             search_color.append(Color.BLUE)
             search_color.append(Color.RED)
         all_cones = []
-        if len(self.red) > 1:
+        if len(self.red) > 1 and Color.RED in search_color:
             for cone in self.red:
                 all_cones.append(cone)
-        if len(self.green) > 1:
+        if len(self.green) > 1 and Color.GREEN in search_color:
             for cone in self.green:
                 all_cones.append(cone)
-        if len(self.blue) > 1:
+        if len(self.blue) > 1 and Color.BLUE in search_color:
             for cone in self.blue:
                 all_cones.append(cone)
         closest_cone = Cone(Color.INVALID, (-100, -100), (-100, -100))
         if len(all_cones) > 0:
-            for sorted_cone in sorted(all_cones, key=lambda
-                    cone: cone.distance):  # moje duvera v tuhle radku je maximalne 5 (slovy pět)%
-                if sorted_cone.color in search_color:
-                    closest_cone = sorted_cone
-                    break
+            closest_cone = min(all_cones,key=lambda c: c.distance)
         else:
             return None
-        if closest_cone.color == Color.INVALID:
-            return None
-        if closest_cone.color == Color.RED and len(self.red) > 1:  # red
+
+        if closest_cone.color == Color.RED:  # red
             return [self.red[0], self.red[1]]
-        elif closest_cone.color == Color.GREEN and len(self.green) > 1:  # green
+        elif closest_cone.color == Color.GREEN:  # green
             return [self.green[0], self.green[1]]
-        elif closest_cone.color == Color.BLUE and len(self.blue) > 1:  # blue
+        elif closest_cone.color == Color.BLUE:  # blue
             return [self.blue[0], self.blue[1]]
         return None
         # chci navratit nejblizsi dvojici
