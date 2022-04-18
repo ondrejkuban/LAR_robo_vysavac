@@ -263,6 +263,7 @@ class StateMachine:
         else:
             if self.finish:
                 self.current_state = self.fun
+                return
             self.ready_to_drive_through = True
             self.direction = 2
             self.detected_cones = DetectedCones(self.turtle)
