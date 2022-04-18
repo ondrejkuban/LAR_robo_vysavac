@@ -302,7 +302,7 @@ def main():
                 if cone.color is Color.BLUE:
                     plt.scatter(cone.odo - cone.angle, cone.distance, s=40, color='blue')
         plt.pause(0.00001)
-        cv2.waitKey(0.1)
+        cv2.waitKey(1)
 
 
 if __name__ == '__main__':
