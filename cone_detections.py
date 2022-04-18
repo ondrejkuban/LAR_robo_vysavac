@@ -181,4 +181,4 @@ def get_point_in_space(point_cloud, cone, axis, mask):
     # if axis == 2 and len(points)>0:
     ##print("points",points[0],points[-1])
 
-    return np.percentile(points,50)
+    return np.percentile(points,10)
