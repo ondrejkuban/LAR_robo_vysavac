@@ -181,7 +181,7 @@ class StateMachine:
             second = (pair[1].distance * np.sin(pair[1].odo - pair[1].angle),
                       pair[1].distance * np.cos(pair[1].odo - pair[1].angle))
             print("first ", first, " second ", second)
-
+            print("ready",self.ready_to_drive_through)
             self.center = ((first[0] + second[0]) / 2, (first[1] + second[1]) / 2)
             if self.ready_to_drive_through:
                 dist1 = np.sqrt(self.center[0] ** 2 + self.center[1] ** 2)
