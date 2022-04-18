@@ -171,7 +171,7 @@ def get_point_in_space(point_cloud, cone, axis, mask):
 
 
     for p in range(0, len(point_cloud)):
-        for i in range(cone.pt1[0],cone.pt2[0]):
+        for i in range(center_w-width//4,center_w+width//4):
             for j in range(center_h-height, center_h+height//4):
                 if not np.isnan(point_cloud[p][j][i][axis]):
                     if mask[p][j][i] == 255:
@@ -179,4 +179,4 @@ def get_point_in_space(point_cloud, cone, axis, mask):
     # if axis == 2 and len(points)>0:
     ##print("points",points[0],points[-1])
 
-    return np.percentile(points,10)
+    return np.percentile(points,50)
