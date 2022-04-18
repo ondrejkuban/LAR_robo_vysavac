@@ -229,7 +229,7 @@ class StateMachine:
                 else:
                     self.current_state = self.drive_turtle_to_position
         else:
-            if self.turn_to_desired_angle(abs(self.angle_to_turn),"right",0.3):
+            if self.turn_to_desired_angle(self.angle_to_turn,"right",0.3):
                 self.turtle.reset_odometry()
                 if self.ready_to_drive_through:
                     self.current_state = self.drive_through
