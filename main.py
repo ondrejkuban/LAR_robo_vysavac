@@ -212,7 +212,7 @@ class StateMachine:
             self.distance -= 0.1
             self.distance -= self.distance * 0.06
             self.angle_to_turn = -self.turtle.get_odometry()[2]+self.angle
-            print("ANGLE",self.turtle.get_odometry()[2],self.angle)
+            print("ODOM:",self.turtle.get_odometry()[2]," ANGLE",self.angle," distance:", self.distance)
             self.current_state = self.turn_turtle_to_angle
 
 
