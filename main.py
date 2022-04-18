@@ -206,7 +206,7 @@ class StateMachine:
             self.alpha = np.arcsin(self.center[0] / np.sqrt(self.center[0] ** 2 + self.center[1] ** 2))
             #print(self.angle, dist1, dist2)
             self.distance -= 0.1
-            #self.distance -= self.distance * 0.06
+            self.distance -= self.distance * 0.06
             self.angle_to_turn = -self.turtle.get_odometry()[2]+self.angle
             print("ANGLE",self.turtle.get_odometry()[2],self.angle)
             self.current_state = self.turn_turtle_to_angle
@@ -234,7 +234,7 @@ class StateMachine:
         odom = self.turtle.get_odometry()
         print("dist",np.sqrt(odom[0] ** 2 + odom[1] ** 2),self.distance)
         if np.sqrt(odom[0] ** 2 + odom[1] ** 2) < self.distance:
-            self.turtle.cmd_velocity(linear=0.5, angular=0)
+            self.turtle.cmd_velocity(linear=0.3, angular=0)
         else:
             self.ready_to_drive_through = True
             self.turtle.reset_odometry()
@@ -252,7 +252,7 @@ class StateMachine:
         print("DRIVE THROUGH, ", self.last_cone_color)
         odom = self.turtle.get_odometry()
         if np.sqrt(odom[0] ** 2 + odom[1] ** 2) < self.distance:
-            self.turtle.cmd_velocity(linear=0.5, angular=0)
+            self.turtle.cmd_velocity(linear=0.3, angular=0)
         else:
             if self.finish:
                 self.current_state = self.fun
