@@ -169,7 +169,7 @@ class StateMachine:
             else:
                 for i in range(0,len(self.detected_cones.all)):
                     if self.detected_cones.all[i] == new_cone:
-                        self.new_detected_cones.all[i].distance = min(new_cone.distance,self.new_detected_cones.all[i].distance)
+                        self.detected_cones.all[i].distance = min(new_cone.distance,self.detected_cones.all[i].distance)
 
     def estimate_cones_position(self):
         print("estimate_cones_position", self.last_cone_color)
