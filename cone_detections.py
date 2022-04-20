@@ -86,25 +86,25 @@ class DetectedCones:
             first = self.red[0]
             for i in range(0,len(self.red)-1):
                 second = self.red[i+1]
-                cones_distance = np.sqrt(first.distance**2+second.distance**2-2*first.distance*second.distance*np.cos(first.angle-second.angle))
+                cones_distance = np.sqrt(first.distance**2+second.distance**2-2*first.distance*second.distance*np.cos((first.angle-first.odo)-(second.angle-second.odo)))
                 print("cone distance: ", cones_distance,first.angle,first.distance,second.angle,second.distance)
-                if cones_distance > 0.35:
+                if cones_distance > 0.20:
                     return [first, second]
         elif closest_cone.color == Color.GREEN and len(self.green) > 1:  # green
             first = self.green[0]
             for i in range(0,len(self.green)-1):
                 second = self.green[i+1]
-                cones_distance = np.sqrt(first.distance**2+second.distance**2-2*first.distance*second.distance*np.cos(first.angle-second.angle))
+                cones_distance = np.sqrt(first.distance**2+second.distance**2-2*first.distance*second.distance*np.cos((first.angle-first.odo)-(second.angle-second.odo)))
                 print("cone distance: ", cones_distance,first.angle,first.distance,second.angle,second.distance)
-                if cones_distance > 0.35:
+                if cones_distance > 0.20:
                     return [first, second]
         elif closest_cone.color == Color.BLUE and len(self.blue) > 1:  # blue
             first = self.blue[0]
             for i in range(0,len(self.blue)-1):
                 second = self.blue[i+1]
-                cones_distance = np.sqrt(first.distance**2+second.distance**2-2*first.distance*second.distance*np.cos(first.angle-second.angle))
+                cones_distance = np.sqrt(first.distance**2+second.distance**2-2*first.distance*second.distance*np.cos((first.angle-first.odo)-(second.angle-second.odo)))
                 print("cone distance: ", cones_distance,first.angle,first.distance,second.angle,second.distance)
-                if cones_distance > 0.35:
+                if cones_distance > 0.20:
                     return [first, second]
         return None
         # chci navratit nejblizsi dvojici
