@@ -192,7 +192,8 @@ class StateMachine:
                 if j not in indexpop and detections[i]==detections[j]:
                     sim.append(detections[j])
                     indexpop.append(j)
-            similar.append(sim)
+            if len(sim)>0
+                similar.append(sim)
         out = []
         print(similar)
         for sim in similar:
