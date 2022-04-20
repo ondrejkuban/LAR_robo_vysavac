@@ -185,11 +185,12 @@ class StateMachine:
     def merge_multiple_detections(self,detections):
         similar = []
         indexpop = []
+        detectionscpy = detections.copy()
         for i in range(0,len(detections)):
             sim = []
             for j in range(0,len(detections)):
                 if j not in indexpop and detections[i]==detections[j]:
-                    sim.append(detections.pop(j))
+                    sim.append(detections[j])
                     indexpop.append(j)
             similar.append(sim)
         out = []
