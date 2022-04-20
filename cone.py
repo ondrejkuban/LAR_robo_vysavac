@@ -1,4 +1,6 @@
 # color class
+angle_threshold = 0.08
+distance_threshold = 0.5
 class Color:
     INVALID = 0
     RED = 1
@@ -14,25 +16,22 @@ class ColorsThresholds:
 
 
 class Cone:
-    def __init__(self, color: int, position: tuple, size: tuple):
+    def __init__(self, color: int, contour, center: tuple, bounding_box,turtle_rotation):
         self.color = color
-        self.pt1 = position
-        self.pt2 = (position[0] + size[0], position[1] + size[1])
-        self.size = size
-        self.center = (position[0] + size[0] // 2, position[1] + size[1] // 2)
-        self.distance = -1
+        self.center = center
+        self.contour = contour
+        self.bounding_box = bounding_box
+        self.turtle_rotation = turtle_rotation
         self.x = None
         self.y = None
-        self.angle = None
-        self.odo = None
-        self.contour = None
-        self.scanArea = None
+        self.distance = None
+        self.angle_for_rotation = None
 
     def __eq__(self, other):
-        # if (self.angle - self.odo - 0.05 < other.angle - other.odo < self.angle - self.odo + 0.05) and self.color==other.color:
-        # self.distance = min(self.distance,other.distance)
-        return ((self.angle - self.odo - 0.08 < other.angle - other.odo < self.angle - self.odo + 0.08) and self.color == other.color and
-                abs(self.distance - other.distance) < .50)
+        this_true_angle = self.angle_for_rotation - self.turtle_rotation
+        other_true_angle = other.angle_for_rotation - other.turtle_rotation
+        angle_similar = this_true_angle - angle_threshold < other_true_angle < this_true_angle + angle_threshold
+        return angle_similar and self.color == other.angle and abs(self.distance - other.distance) < distance_threshold
 
 
 def get_color_for_threshold(threshold):
