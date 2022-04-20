@@ -160,6 +160,7 @@ class StateMachine:
         self.new_detected_cones = DetectedCones(self.turtle)
         for c in self.merge_multiple_detections(new_detec):
             self.new_detected_cones.add_cone(c)
+        print(self.new_detected_cones.all)
         '''imgcpy = image[0].copy()
         self.new_detected_cones = DetectedCones(self.turtle)  # -> detectedCones.red, green, blue
         self.new_detected_cones.detect_cones(image, pc)
@@ -185,7 +186,6 @@ class StateMachine:
     def merge_multiple_detections(self,detections):
         similar = []
         indexpop = []
-        detectionscpy = detections.copy()
         for i in range(0,len(detections)):
             sim = []
             for j in range(0,len(detections)):
@@ -195,7 +195,6 @@ class StateMachine:
             if len(sim)>0:
                 similar.append(sim)
         out = []
-        print(similar)
         for sim in similar:
             distances = []
             for cone in sim:
