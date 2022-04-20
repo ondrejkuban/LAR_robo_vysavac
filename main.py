@@ -194,6 +194,7 @@ class StateMachine:
                     indexpop.append(j)
             similar.append(sim)
         out = []
+        print(similar)
         for sim in similar:
             distances = []
             for cone in sim:
