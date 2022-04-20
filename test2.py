@@ -3,7 +3,6 @@
 import cv2
 from scipy.io import loadmat
 import numpy as np
-import imutils
 
 matlab_data = [loadmat('2022-03-03-15-30-32.mat'),
                loadmat('2022-03-03-15-31-04.mat'),
@@ -74,7 +73,7 @@ def get_cones_for_color(image, threshold: tuple):
     results = []
     c_max = None
     for d in detec:
-        if cv2.contourArea(d)>=200:
+        if cv2.contourArea(d)>=800:
             results.append(Cone(get_color_for_threshold(threshold),
                                 (0, 0),
                                 (0, 0), d,mask))
@@ -97,7 +96,8 @@ def draw_rectangles(image, cones: list):
         M = cv2.moments(cone.contours)
         cX = int(M["m10"] / M["m00"])
         cY = int(M["m01"] / M["m00"])
-        #.circle(image, (cX, cY), 7,get_threshold_for_color(cone.color), -1)
+        cv2.circle(image, (cX, cY), 7,get_threshold_for_color(cone.color), -1)
+        continue
         points = []
         box = cv2.boundingRect(cone.contours)
         for i in range(box[0],box[0]+box[2]):
@@ -111,8 +111,8 @@ def draw_rectangles(image, cones: list):
                     if t:
                         dist = np.sqrt(pc[j][i][0]**2+pc[j][i][2]**2)
                         points.append([i,j,dist])
-                        #cv2.circle(image, (i, j), 1, get_threshold_for_color(cone.color), -1)
-
+                        cv2.circle(image, (i, j), 1, get_threshold_for_color(cone.color), -1)
+        continue
         n = min(points,key=lambda x:x[2])[2]
         m = max(points, key=lambda l: l[2])
         m[2]-=n
@@ -146,11 +146,12 @@ def draw_circle(event,x,y,flags,param):
         mouseX,mouseY = x,y
 
 # init
-rgb_image = matlab_data[0]['image_rgb']
-depth_image = matlab_data[0]['image_depth']
-k_depth = matlab_data[0]['K_depth']
-k_rgb = matlab_data[0]['K_rgb']
-point_cloud = matlab_data[0]['point_cloud']
+i = 1
+rgb_image = matlab_data[i]['image_rgb']
+depth_image = matlab_data[i]['image_depth']
+k_depth = matlab_data[i]['K_depth']
+k_rgb = matlab_data[i]['K_rgb']
+point_cloud = matlab_data[i]['point_cloud']
 cv2.namedWindow("RGB")
 #cv2.namedWindow("DEPTH")
 # print(rgb_image[481][420])
