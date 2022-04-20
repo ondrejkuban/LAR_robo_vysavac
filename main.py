@@ -48,7 +48,7 @@ class StateMachine:
         self.turtle.cmd_velocity(linear=0.0, angular=0)
 
     def turn_to_desired_angle(self,angle, side, speed):
-        print("turn_to_desired_angle",angle, side, speed)
+        print("turn_to_desired_angle",angle,self.turtle.get_odometry()[2], side, speed)
         # side    -,right   +,left
         if self.angle_before_turn is None:
             self.angle_before_turn = self.turtle.get_odometry()[2]
