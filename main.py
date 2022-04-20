@@ -160,7 +160,7 @@ class StateMachine:
         self.new_detected_cones = DetectedCones(self.turtle)
         for c in self.merge_multiple_detections(new_detec):
             self.new_detected_cones.add_cone(c)
-        print(self.new_detected_cones.all)
+        #print(self.new_detected_cones.all)
         '''imgcpy = image[0].copy()
         self.new_detected_cones = DetectedCones(self.turtle)  # -> detectedCones.red, green, blue
         self.new_detected_cones.detect_cones(image, pc)
@@ -199,7 +199,10 @@ class StateMachine:
             distances = []
             for cone in sim:
                 distances.append(cone.distance)
+                print(cone.distance)
+
             p = np.percentile(distances,15)
+            print("percentile",p)
             for cone in sim:
                 if cone.distance == p:
                     out.append(cone)
