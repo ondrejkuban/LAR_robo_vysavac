@@ -25,6 +25,8 @@ class Cone:
         self.y = None
         self.angle = None
         self.odo = None
+        self.contour = None
+        self.scanArea = None
 
     def __eq__(self, other):
         # if (self.angle - self.odo - 0.05 < other.angle - other.odo < self.angle - self.odo + 0.05) and self.color==other.color:

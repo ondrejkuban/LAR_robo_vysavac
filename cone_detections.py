@@ -122,18 +122,27 @@ def get_cones_for_color(image, threshold: tuple, turtle):
         #if len(masks) != 2:
            # continue
         detections = cv2.connectedComponentsWithStats(mask.astype(np.uint8))
-
+        detec,_ = cv2.findContours(mask,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
         results = []
+        for d in detec:
+            if cv2.contourArea(d)>=800:
+                cone = Cone(get_color_for_threshold(threshold),(0,0),(0,0))
+                cone.odo = turtle.get_odometry()[2]
+                cone.contour = d
+                results.append(cone)
+        '''        
         for i in range(1, detections[0]):
             if detection_is_valid(detections[2][i]):
                 cone = Cone(get_color_for_threshold(threshold),
                             (detections[2][i][0], detections[2][i][1]),
                             (detections[2][i][2], detections[2][i][3]))
                 cone.odo = turtle.get_odometry()[2]
+                
                 if cone.pt1[0] < 10 or cone.pt2[0] > 630 or cone.pt2[1] < 120:
                     pass
                 else:
                     results.append(cone)
+        '''
         detections_s.append(results)
 
     return detections_s[0], masks
@@ -164,10 +173,17 @@ def get_point_in_space(point_cloud, cone, axis, mask):
     center_w = int(cone.pt2[0] - width / 2)
     height = int(cone.pt2[1] - cone.pt1[1])
     center_h = int(cone.pt2[1] - height / 2)
-
+    box = cv2.boundingRect(cone.contour)
+    M = cv2.moments(cone.contour)
+    cX = int(M["m10"] / M["m00"])
+    cY = int(M["m01"] / M["m00"])
+    stw = cX-box[2]//2.5
+    enw = cX+box[2]//2.5
+    sth = cY-box[3]//4
+    enh = cY+box[3]//4
     for p in range(0, len(point_cloud)):
-        for i in range(cone.pt1[0], cone.pt2[0]):
-            for j in range(cone.pt1[1]+height//4, center_h+height//4):
+        for i in range(stw,enw):
+            for j in range(sth,enw):
                 if not np.isnan(point_cloud[p][j][i][axis]):
                     if mask[p][j][i] == 255:
                         points.append(point_cloud[p][j][i][axis])

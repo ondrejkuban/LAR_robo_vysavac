@@ -73,6 +73,8 @@ def get_cones_for_color(image, threshold: tuple):
     results = []
     c_max = None
     for d in detec:
+        box = cv2.boundingRect(d)
+
         if cv2.contourArea(d)>=800:
             results.append(Cone(get_color_for_threshold(threshold),
                                 (0, 0),
@@ -96,8 +98,8 @@ def draw_rectangles(image, cones: list):
         M = cv2.moments(cone.contours)
         cX = int(M["m10"] / M["m00"])
         cY = int(M["m01"] / M["m00"])
-        cv2.circle(image, (cX, cY), 7,get_threshold_for_color(cone.color), -1)
-        continue
+        #cv2.circle(image, (cX, cY), 7,get_threshold_for_color(cone.color), -1)
+
         points = []
         box = cv2.boundingRect(cone.contours)
         for i in range(box[0],box[0]+box[2]):
@@ -112,7 +114,7 @@ def draw_rectangles(image, cones: list):
                         dist = np.sqrt(pc[j][i][0]**2+pc[j][i][2]**2)
                         points.append([i,j,dist])
                         cv2.circle(image, (i, j), 1, get_threshold_for_color(cone.color), -1)
-        continue
+
         n = min(points,key=lambda x:x[2])[2]
         m = max(points, key=lambda l: l[2])
         m[2]-=n
@@ -146,7 +148,7 @@ def draw_circle(event,x,y,flags,param):
         mouseX,mouseY = x,y
 
 # init
-i = 1
+i = 4
 rgb_image = matlab_data[i]['image_rgb']
 depth_image = matlab_data[i]['image_depth']
 k_depth = matlab_data[i]['K_depth']
