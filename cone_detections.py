@@ -15,8 +15,6 @@ class DetectedCones:
         self.mask = None
 
     def detect_cones(self, image, point_cloud):
-
-
         hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
         self.red, mask_r = get_cones_for_color(hsv, ColorsThresholds.RED, self.turtle)
         self.green, mask_g = get_cones_for_color(hsv, ColorsThresholds.GREEN, self.turtle)
@@ -36,6 +34,7 @@ class DetectedCones:
         self.red.sort(key=lambda cone: cone.distance)  # bude fungovat??? (dostanu cone a sort podle jeji distance)
         self.green.sort(key=lambda cone: cone.distance)  # bude fungovat???
         self.blue.sort(key=lambda cone: cone.distance)  # bude fungovat???
+        return True
 
     def add_cone(self, cone):
         self.all.append(cone)
