@@ -145,19 +145,28 @@ class StateMachine:
 
     def detect_cones(self):
         print("detect_cones")
-        image = []
-        pc = []
-        #for i in range(0,5):
-        pc.append(self.turtle.get_point_cloud())
-        image.append(self.turtle.get_rgb_image())
-
-        imgcpy = image[0].copy()
+        new_detec = []
+        for i in range(0,5):
+            pc = self.turtle.get_point_cloud()
+            image = self.turtle.get_rgb_image()
+            imgcpy=image.copy()
+            self.new_detected_cones = DetectedCones(self.turtle)  # -> detectedCones.red, green, blue
+            if not self.new_detected_cones.detect_cones(image, pc):
+                break
+            self.new_detected_cones.draw_cones(
+                imgcpy)  # -> az na konec, prekresli puvodni obrazek mohlo by se s nim pak hure pracovat
+            new_detec+=self.new_detected_cones.all
+            cv2.imshow("RGB", imgcpy)
+        self.new_detected_cones = DetectedCones(self.turtle)
+        for c in self.merge_multiple_detections(new_detec):
+            self.new_detected_cones.add_cone(c)
+        '''imgcpy = image[0].copy()
         self.new_detected_cones = DetectedCones(self.turtle)  # -> detectedCones.red, green, blue
         self.new_detected_cones.detect_cones(image, pc)
         self.new_detected_cones.draw_cones(
             imgcpy)  # -> az na konec, prekresli puvodni obrazek mohlo by se s nim pak hure pracovat
         cv2.imshow("RGB", imgcpy)
-
+        '''
         self.merge_new_cones()
         # self.current_state = self.estimate_cones_position
 
@@ -173,6 +182,27 @@ class StateMachine:
                             self.detected_cones.all[i] = new_cone
 
 
+    def merge_multiple_detections(self,detections):
+        similar = []
+        indexpop = []
+        for i in range(0,len(detections)):
+            sim = []
+            for j in range(0,len(detections)):
+                if j not in indexpop and detections[i]==detections[j]:
+                    sim.append(detections.pop(j))
+                    indexpop.append(j)
+            similar.append(sim)
+        out = []
+        for sim in similar:
+            distances = []
+            for cone in sim:
+                distances.append(cone.distance)
+            p = np.percentile(distances,15)
+            for cone in sim:
+                if cone.distance == p:
+                    out.append(cone)
+                    break
+        return out
 
     def estimate_cones_position(self):
         print("estimate_cones_position", self.last_cone_color)
