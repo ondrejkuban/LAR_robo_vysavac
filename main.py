@@ -294,7 +294,7 @@ class StateMachine:
         self.actual_cone_color = Color.INVALID
         print("DRIVE THROUGH, ", self.last_cone_color)
         odom = self.turtle.get_odometry()
-        if np.sqrt(odom[0] ** 2 + odom[1] ** 2) < self.distance:
+        if np.sqrt(odom[0] ** 2 + odom[1] ** 2) < self.distance + 0.4 if self.finish else 0:
             self.turtle.cmd_velocity(linear=0.3, angular=0)
         else:
             if self.finish:
