@@ -84,7 +84,7 @@ class DetectedCones:
 
         if closest_cone.color == Color.RED and len(self.red) > 1:  # red
             first = self.red[0]
-            for i in range(1,len(self.red)-1):
+            for i in range(0,len(self.red)-1):
                 second = self.red[i+1]
                 cones_distance = np.sqrt(first.distance**2+second.distance**2-2*first.distance*second.distance*np.cos(first.angle-second.angle))
                 print("cone distance: ", cones_distance,first.angle,first.distance,second.angle,second.distance)
@@ -92,7 +92,7 @@ class DetectedCones:
                     return [first, second]
         elif closest_cone.color == Color.GREEN and len(self.green) > 1:  # green
             first = self.green[0]
-            for i in range(1,len(self.green)-1):
+            for i in range(0,len(self.green)-1):
                 second = self.green[i+1]
                 cones_distance = np.sqrt(first.distance**2+second.distance**2-2*first.distance*second.distance*np.cos(first.angle-second.angle))
                 print("cone distance: ", cones_distance,first.angle,first.distance,second.angle,second.distance)
@@ -100,7 +100,7 @@ class DetectedCones:
                     return [first, second]
         elif closest_cone.color == Color.BLUE and len(self.blue) > 1:  # blue
             first = self.blue[0]
-            for i in range(1,len(self.blue)-1):
+            for i in range(0,len(self.blue)-1):
                 second = self.blue[i+1]
                 cones_distance = np.sqrt(first.distance**2+second.distance**2-2*first.distance*second.distance*np.cos(first.angle-second.angle))
                 print("cone distance: ", cones_distance,first.angle,first.distance,second.angle,second.distance)
