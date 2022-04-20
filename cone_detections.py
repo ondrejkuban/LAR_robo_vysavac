@@ -193,10 +193,10 @@ def get_point_in_space(point_cloud, cone, axis, mask):
     M = cv2.moments(cone.contour)
     cX = int(M["m10"] / M["m00"])
     cY = int(M["m01"] / M["m00"])
-    stw = cX-box[2]//2.5
-    enw = cX+box[2]//2.5
-    sth = cY-box[3]//4
-    enh = cY+box[3]//4
+    stw = int(cX-box[2]//2.5)
+    enw = int(cX+box[2]//2.5)
+    sth = int(cY-box[3]//4)
+    enh = int(cY+box[3]//4)
     for p in range(0, len(point_cloud)):
         for i in range(stw,enw):
             for j in range(sth,enw):
