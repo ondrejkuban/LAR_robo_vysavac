@@ -112,8 +112,8 @@ class DetectedCones:
 
 
 def detection_is_valid(detection):
-    if detection[4] < SURFACE_THRESHOLD:
-        return False
+    #if detection[2]*detection[3] < SURFACE_THRESHOLD:
+     #   return False
     if detection[2] * 2.5 > detection[3]:
         return False
     if detection[3] < 30:
@@ -141,7 +141,8 @@ def get_cones_for_color(image, threshold: tuple, turtle):
         detec,_ = cv2.findContours(mask,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
         results = []
         for d in detec:
-            if cv2.contourArea(d)>=800:
+            box = cv2.boundingRect(d)
+            if cv2.contourArea(d)>=800 and detection_is_valid(box):
                 cone = Cone(get_color_for_threshold(threshold),(0,0),(0,0))
                 cone.odo = turtle.get_odometry()[2]
                 cone.contour = d
