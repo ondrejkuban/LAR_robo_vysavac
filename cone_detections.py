@@ -15,12 +15,12 @@ class DetectedCones:
         self.mask = None
 
     def detect_cones(self, image, point_cloud):
-        hsvs = []
-        for im in image:
-            hsvs.append(cv2.cvtColor(im, cv2.COLOR_BGR2HSV))
-        self.red, mask_r = get_cones_for_color(hsvs, ColorsThresholds.RED, self.turtle)
-        self.green, mask_g = get_cones_for_color(hsvs, ColorsThresholds.GREEN, self.turtle)
-        self.blue, mask_b = get_cones_for_color(hsvs, ColorsThresholds.BLUE, self.turtle)
+
+
+        hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
+        self.red, mask_r = get_cones_for_color(hsv, ColorsThresholds.RED, self.turtle)
+        self.green, mask_g = get_cones_for_color(hsv, ColorsThresholds.GREEN, self.turtle)
+        self.blue, mask_b = get_cones_for_color(hsv, ColorsThresholds.BLUE, self.turtle)
         if len(self.red) == 0 and len(self.blue) == 0 and len(self.green) == 0:
             return False
         get_distances_for_cones(point_cloud, self.red, mask_r)
@@ -131,41 +131,36 @@ def is_mask_valid(mask):
 
 
 def get_cones_for_color(image, threshold: tuple, turtle):
-    masks = []
-    detections_s = []
-    for im in image:
-        mask = cv2.inRange(im, threshold[0], threshold[1])
-        if not is_mask_valid(mask):
-            return [], []
-        masks.append(mask)
-        #if len(masks) != 2:
-           # continue
-        detections = cv2.connectedComponentsWithStats(mask.astype(np.uint8))
-        detec,_ = cv2.findContours(mask,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
-        results = []
-        for d in detec:
-            box = cv2.boundingRect(d)
-            if cv2.contourArea(d)>=800 and detection_is_valid(box):
-                cone = Cone(get_color_for_threshold(threshold),(0,0),(0,0))
-                cone.odo = turtle.get_odometry()[2]
-                cone.contour = d
-                results.append(cone)
-        '''        
-        for i in range(1, detections[0]):
-            if detection_is_valid(detections[2][i]):
-                cone = Cone(get_color_for_threshold(threshold),
-                            (detections[2][i][0], detections[2][i][1]),
-                            (detections[2][i][2], detections[2][i][3]))
-                cone.odo = turtle.get_odometry()[2]
-                
-                if cone.pt1[0] < 10 or cone.pt2[0] > 630 or cone.pt2[1] < 120:
-                    pass
-                else:
-                    results.append(cone)
-        '''
-        detections_s.append(results)
+    mask = cv2.inRange(image, threshold[0], threshold[1])
+    if not is_mask_valid(mask):
+        return [], []
 
-    return detections_s[0], masks
+    detections = cv2.connectedComponentsWithStats(mask.astype(np.uint8))
+    detec,_ = cv2.findContours(mask,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
+    results = []
+    for d in detec:
+        box = cv2.boundingRect(d)
+        if cv2.contourArea(d)>=800 and detection_is_valid(box):
+            cone = Cone(get_color_for_threshold(threshold),(0,0),(0,0))
+            cone.odo = turtle.get_odometry()[2]
+            cone.contour = d
+            results.append(cone)
+    '''        
+    for i in range(1, detections[0]):
+        if detection_is_valid(detections[2][i]):
+            cone = Cone(get_color_for_threshold(threshold),
+                        (detections[2][i][0], detections[2][i][1]),
+                        (detections[2][i][2], detections[2][i][3]))
+            cone.odo = turtle.get_odometry()[2]
+            
+            if cone.pt1[0] < 10 or cone.pt2[0] > 630 or cone.pt2[1] < 120:
+                pass
+            else:
+                results.append(cone)
+    '''
+    #detections_s.append(results)
+
+    return results, mask
 
 
 def draw_rectangles(image, cones: list):
@@ -205,12 +200,12 @@ def get_point_in_space(point_cloud, cone, axis, mask):
     enw = int(cX+box[2]//2.5)
     sth = int(cY-box[3]//4)
     enh = int(cY+box[3]//4)
-    for p in range(0, len(point_cloud)):
-        for i in range(max(stw,0),min(enw,640)):
-            for j in range(max(sth,0),min(enh,480)):
-                if not np.isnan(point_cloud[p][j][i][axis]):
-                    if mask[p][j][i] == 255:
-                        points.append(point_cloud[p][j][i][axis])
+    #for p in range(0, len(point_cloud)):
+    for i in range(max(stw,0),min(enw,640)):
+        for j in range(max(sth,0),min(enh,480)):
+            if not np.isnan(point_cloud[j][i][axis]):
+                if mask[j][i] == 255:
+                    points.append(point_cloud[j][i][axis])
     # if axis == 2 and len(points)>0:
     ##print("points",points[0],points[-1])
 
