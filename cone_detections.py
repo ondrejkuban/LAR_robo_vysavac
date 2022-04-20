@@ -166,8 +166,8 @@ def get_cones_for_color(image, threshold: tuple, turtle):
 
 def draw_rectangles(image, cones: list):
     for cone in cones:
-        cv2.drawContours(image,[cone.contours],-1,get_threshold_for_color(cone.color),2)
-        M = cv2.moments(cone.contours)
+        cv2.drawContours(image,[cone.contour],-1,get_threshold_for_color(cone.color),2)
+        M = cv2.moments(cone.contour)
         cX = int(M["m10"] / M["m00"])
         cY = int(M["m01"] / M["m00"])
         #cv2.rectangle(image, cone.pt1, cone.pt2, color=get_threshold_for_color(cone.color), thickness=2)
