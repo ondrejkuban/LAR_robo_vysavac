@@ -201,7 +201,7 @@ class StateMachine:
                 distances.append(cone.distance)
                 print(cone.distance)
 
-            p = np.percentile(distances,15)
+            p = np.median(distances)
             print("percentile",p)
             for cone in sim:
                 if cone.distance == p:
