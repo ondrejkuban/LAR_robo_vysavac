@@ -43,9 +43,9 @@ class DetectedCones:
             self.blue.sort(key=lambda c: c.distance)
 
     def draw_cones(self, image):
-        draw_rectangles(image, self.red)
-        draw_rectangles(image, self.green)
-        draw_rectangles(image, self.blue)
+        draw_contours(image, self.red)
+        draw_contours(image, self.green)
+        draw_contours(image, self.blue)
 
     def get_search_color(self, last_color):
         search_color = []
@@ -139,7 +139,7 @@ def get_cones_for_color(image, threshold: tuple, turtle):
     return [], []
 
 
-def draw_rectangles(image, cones: list):
+def draw_contours(image, cones: list):
     for cone in cones:
         cv2.drawContours(image, [cone.contour], -1, get_threshold_for_color(cone.color), 2)
         cv2.putText(image, str(round(cone.distance, 2)), cone.center, cv2.FONT_ITALIC, 1,
