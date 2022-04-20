@@ -31,7 +31,7 @@ class Cone:
     def __eq__(self, other):
         # if (self.angle - self.odo - 0.05 < other.angle - other.odo < self.angle - self.odo + 0.05) and self.color==other.color:
         # self.distance = min(self.distance,other.distance)
-        return ((self.angle - self.odo - 0.06 < other.angle - other.odo < self.angle - self.odo + 0.06) and self.color == other.color and
+        return ((self.angle - self.odo - 0.08 < other.angle - other.odo < self.angle - self.odo + 0.08) and self.color == other.color and
                 abs(self.distance - other.distance) < .50)
 
 
