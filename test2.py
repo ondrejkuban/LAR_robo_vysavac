@@ -24,7 +24,7 @@ class Color:
 
 class ColorsThresholds:
     #       dark           light
-    RED = ((0, 116, 70), (6.5, 255, 255))
+    RED = ((0, 116, 90), (6.5, 255, 255))
     GREEN = ((28, 55, 45), (85, 255, 230))
     BLUE = ((90, 172, 42), (106, 255, 235))
 
@@ -69,22 +69,22 @@ def get_cones_for_color(image, threshold: tuple):
 
     detec,_ = cv2.findContours(mask,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
     #detec = imutils.grab_contours(detec)
-    #detections = cv2.connectedComponentsWithStats(mask.astype(np.uint8))
+    detections = cv2.connectedComponentsWithStats(mask.astype(np.uint8))
     results = []
     c_max = None
-    for d in detec:
-        box = cv2.boundingRect(d)
+   # for d in detec:
+       # box = cv2.boundingRect(d)
 
-        if cv2.contourArea(d)>=800:
+       # if cv2.contourArea(d)>=800:
+       #     results.append(Cone(get_color_for_threshold(threshold),
+        #                        (0, 0),
+        #                        (0, 0), d,mask))
+
+    for i in range(1, detections[0]):
+        if detection_is_valid(detections[2][i]):
             results.append(Cone(get_color_for_threshold(threshold),
-                                (0, 0),
-                                (0, 0), d,mask))
-
-    #for i in range(1, detections[0]):
-       # if detection_is_valid(detections[2][i]):
-      #      results.append(Cone(get_color_for_threshold(threshold),
-       #                         (detections[2][i][0], detections[2][i][1]),
-      #                          (detections[2][i][2], detections[2][i][3]),detec))
+                                (detections[2][i][0], detections[2][i][1]),
+                                (detections[2][i][2], detections[2][i][3]),detec,mask))
 
     return results
 
@@ -94,11 +94,13 @@ pc = matlab_data[i]['point_cloud']
 def draw_rectangles(image, cones: list):
     for cone in cones:
         #for c in cone.contours:
-        cv2.drawContours(image,[cone.contours],-1,get_threshold_for_color(cone.color),1)
+        cv2.rectangle(image, cone.pt1, cone.pt2, color=get_threshold_for_color(cone.color), thickness=2)
+        #cv2.putText(image, str(cone.distance), cone.pt1, cv2.FONT_ITALIC, 1, get_threshold_for_color(cone.color), 2)
+''' cv2.drawContours(image,[cone.contours],-1,get_threshold_for_color(cone.color),1)
         M = cv2.moments(cone.contours)
         cX = int(M["m10"] / M["m00"])
         cY = int(M["m01"] / M["m00"])
-        #cv2.circle(image, (cX, cY), 7,get_threshold_for_color(cone.color), -1)
+        cv2.circle(image, (cX, cY), 7,get_threshold_for_color(cone.color), -1)
 
         points = []
         box = cv2.boundingRect(cone.contours)
@@ -123,14 +125,13 @@ def draw_rectangles(image, cones: list):
             s = int(s*255)
             z = None
             if cone.color == Color.BLUE:
-                z=(s,0,0)
+                z=(0,s/2,s)
             elif cone.color == Color.GREEN:
-                z = (0, s, 0)
+                z = (0, s/2, s)
             elif cone.color == Color.RED:
-                z = (0, 0, s)
-            cv2.circle(image, (p[0],p[1]), 1,z, -1)
-        #cv2.rectangle(image, cone.pt1, cone.pt2, color=get_threshold_for_color(cone.color), thickness=2)
-        #cv2.putText(image, str(cone.distance), cone.pt1, cv2.FONT_ITALIC, 1, get_threshold_for_color(cone.color), 2)
+                z = (0, s/2, s)
+            cv2.circle(image, (p[0],p[1]), 1,z, -1)'''
+
 
 
 def calculate_euclidean(points):
@@ -158,39 +159,40 @@ cv2.namedWindow("RGB")
 #cv2.namedWindow("DEPTH")
 # print(rgb_image[481][420])
 
-while True:
-    # M = k_depth @ np.linalg.inv(k_rgb)
-    # warped_rgb = cv2.warpPerspective(rgb_image, M, (640, 480))
-    hsv = cv2.cvtColor(rgb_image, cv2.COLOR_BGR2HSV)
-    get_cones_for_color(hsv, ColorsThresholds.BLUE)
-    # creating mask to find rectangles
-    red_cones = get_cones_for_color(hsv, ColorsThresholds.RED)
-    green_cones = get_cones_for_color(hsv, ColorsThresholds.GREEN)
-    blue_cones = get_cones_for_color(hsv, ColorsThresholds.BLUE)
 
-    for cone in red_cones:
-        cone.distance = calculate_euclidean(point_cloud[cone.center[1]][cone.center[0]])
-    for cone in green_cones:
-        cone.distance = calculate_euclidean(point_cloud[cone.center[1]][cone.center[0]])
-    for cone in blue_cones:
-        cone.distance = calculate_euclidean(point_cloud[cone.center[1]][cone.center[0]])
+# M = k_depth @ np.linalg.inv(k_rgb)
+# warped_rgb = cv2.warpPerspective(rgb_image, M, (640, 480))
+hsv = cv2.cvtColor(rgb_image, cv2.COLOR_BGR2HSV)
+get_cones_for_color(hsv, ColorsThresholds.BLUE)
+# creating mask to find rectangles
+red_cones = get_cones_for_color(hsv, ColorsThresholds.RED)
+green_cones = get_cones_for_color(hsv, ColorsThresholds.GREEN)
+blue_cones = get_cones_for_color(hsv, ColorsThresholds.BLUE)
 
-    # drawing rectangle
-    im = rgb_image.copy()
-    draw_rectangles(im, red_cones)
-    draw_rectangles(im, green_cones)
-    draw_rectangles(im, blue_cones)
+for cone in red_cones:
+    cone.distance = calculate_euclidean(point_cloud[cone.center[1]][cone.center[0]])
+for cone in green_cones:
+    cone.distance = calculate_euclidean(point_cloud[cone.center[1]][cone.center[0]])
+for cone in blue_cones:
+    cone.distance = calculate_euclidean(point_cloud[cone.center[1]][cone.center[0]])
+
+# drawing rectangle
+im = rgb_image.copy()
+draw_rectangles(im, red_cones)
+draw_rectangles(im, green_cones)
+draw_rectangles(im, blue_cones)
 
 
-    cv2.imshow("RGB", im)
-    #cv2.imshow("DEPTH", out)
-    cv2.setMouseCallback('RGB', draw_circle)
-    k = cv2.waitKey(1)
-    if k==ord('f'):
-        i+=1
-        rgb_image = matlab_data[i]['image_rgb']
-        depth_image = matlab_data[i]['image_depth']
-        k_depth = matlab_data[i]['K_depth']
-        k_rgb = matlab_data[i]['K_rgb']
-        point_cloud = matlab_data[i]['point_cloud']
+cv2.imshow("RGB", im)
+cv2.imwrite('boundingbox.jpg', im)
+#cv2.imshow("DEPTH", out)
+cv2.setMouseCallback('RGB', draw_circle)
+k = cv2.waitKey(1)
+if k==ord('f'):
+    i+=1
+    rgb_image = matlab_data[i]['image_rgb']
+    depth_image = matlab_data[i]['image_depth']
+    k_depth = matlab_data[i]['K_depth']
+    k_rgb = matlab_data[i]['K_rgb']
+    point_cloud = matlab_data[i]['point_cloud']
 
