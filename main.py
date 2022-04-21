@@ -215,7 +215,7 @@ class StateMachine:
         odom = self.turtle.get_odometry()
         ds = self.distance
         if self.finish:
-            ds = self.distance + 0.4
+            ds = self.distance + 0.15
         if np.sqrt(odom[0] ** 2 + odom[1] ** 2) < ds:
             self.turtle.cmd_velocity(linear=0.3, angular=0)
         else:
