@@ -15,7 +15,7 @@ MIDDLE_DIST_PRESET = 0.5
 
 class StateMachine:
     def __init__(self, turtle):
-        self.current_state = self.turn_to_initial_angle
+        self.current_state = self.idle
         self.turtle = turtle
         self.detected_cones = DetectedCones(turtle)
         self.new_detected_cones = None
@@ -37,6 +37,9 @@ class StateMachine:
 
     def run_state(self):
         self.current_state()
+
+    def idle(self):
+        self.turtle.cmd_velocity(linear=0.0, angular=0)
 
     def turn_to_desired_angle(self, angle, side, speed):
         # side    -,right   +,left
@@ -242,6 +245,9 @@ class StateMachine:
         self.current_state = self.fun
         self.bumper_error = True
 
+    def button_cb(self,msg):
+        if self.current_state == self.idle:
+            self.current_state = self.turn_to_initial_angle
 
 def main():
     global stop
@@ -251,6 +257,7 @@ def main():
     state_machine = StateMachine(turtle)
     plt.ion()
     turtle.register_bumper_event_cb(state_machine.bumper_cb)
+    turtle.register_button_event_cb(state_machine.button_cb)
     while not turtle.is_shutting_down():
         state_machine.run_state()
         if state_machine.detected_cones is not None:
