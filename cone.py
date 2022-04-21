@@ -31,7 +31,7 @@ class Cone:
         this_true_angle = self.angle_for_rotation - self.turtle_rotation
         other_true_angle = other.angle_for_rotation - other.turtle_rotation
         angle_similar = this_true_angle - angle_threshold < other_true_angle < this_true_angle + angle_threshold
-        return angle_similar and self.color == other.angle and abs(self.distance - other.distance) < distance_threshold
+        return angle_similar and self.color == other.color and abs(self.distance - other.distance) < distance_threshold
 
 
 def get_color_for_threshold(threshold):
